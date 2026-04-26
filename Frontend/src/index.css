@@ -1,115 +1,202 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
 
-:root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
-
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
-
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
+@plugin "tailwind-scrollbar" {
+    nocompatible: true;
+}
+@theme {
+    --font-lobster: "Lobster", cursive;
+    --font-ibm-plex-sans: "IBM Plex Sans", sans-serif;
+    --font-jost: "Jost", sans-serif;
+    --font-roboto: "Roboto", sans-serif;
+    /* Define animation */
+    --animate-movingY: move 3s linear infinite;
+    --animate-rotating: rotate 15s linear infinite;
+    --animate-scaleUp: scaleUp 3s linear infinite;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
-
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
+@keyframes move {
+    50% {
+        transform: translateY(-1rem);
+    }
 }
+@keyframes rotate {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes scaleUp {
+    0% {
+        transform: scale(0.8);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(0.8);
+    }
+}
+
 
 body {
-  margin: 0;
+    @apply bg-gray-50 text-black font-jost overflow-x-hidden
+
 }
 
-#root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
+.nav-link {
+    @apply text-lg font-bold duration-300;
 }
 
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
+.nav-link:hover {
+    @apply text-yellow-500;
+}
+
+.section {
+    @apply py-20 md:py-28;
 }
 
 h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
+    @apply text-3xl md:text-4xl xl:text-5xl font-bold;
 }
+
+.btn {
+    @apply border border-purple-300 text-white bg-gradient-to-r from-purple-400 via-fuchsia-400 to-pink-400 rounded-2xl px-5 py-2 duration-300 cursor-pointer;
+}
+
+.btn span {
+    @apply font-bold;
+}
+
+.btn:hover {
+    @apply opacity-90 from-purple-500 via-fuchsia-500 to-pink-500;
+}
+
+.btn_outline {
+    @apply bg-transparent;
+}
+
+.btn_outline:hover {
+    @apply bg-gradient-to-r from-purple-400 via-fuchsia-400 to-pink-400 text-white;
+}
+
+.btn_outline {
+    @apply border border-purple-400 text-purple-500;
+}
+
+.title-landing {
+    @apply font-lobster bg-gradient-to-r from-purple-500 via-fuchsia-500 to-pink-500 bg-clip-text text-transparent
+}
+
 h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
+    @apply text-3xl md:text-4xl xl:text-5xl font-bold
+}
+
+h3 {
+    @apply text-2xl md:text-3xl xl:text-4xl font-bold
+}
+
+.swiper-pagination {
+    position: relative !important;
+    margin-top: 2rem !important;
+}
+
+@keyframes gradient-x {
+    0%, 100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
   }
-}
-p {
-  margin: 0;
+  
+  .animate-gradient-x {
+    background-size: 200% 200%;
+    animation: gradient-x 2s ease infinite;
+  }
+
+/* Fade in animation for hero section */
+@keyframes fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
+.animate-fade-in {
+    animation: fade-in 0.8s ease-out forwards;
 }
 
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
+/* Smooth transitions for all interactive elements */
+* {
+    scroll-behavior: smooth;
+}
+
+/* Custom scrollbar for brand consistency */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: linear-gradient(to bottom, #f0f0f0, #e0e0e0);
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(to bottom, #a78bfa, #c084fc, #f0abfc);
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(to bottom, #8b5cf6, #a855f7, #e879f9);
+}
+
+/* Enhanced button hover effects */
+button {
+    transition: all 0.3s ease;
+}
+
+/* Swiper pagination custom styling for brand colors */
+.swiper-pagination-bullet {
+    background: linear-gradient(to right, #a78bfa, #c084fc, #f0abfc) !important;
+    opacity: 0.5 !important;
+}
+
+.swiper-pagination-bullet-active {
+    opacity: 1 !important;
+    transform: scale(1.2);
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none; /* IE + Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+/* Soft gradient background similar to SettingPage */
+.bg-soft-gradient {
+  @apply relative bg-slate-50;
+  background-image: 
+    radial-gradient(circle at top, rgba(167, 139, 250, 0.08), transparent 55%),
+    linear-gradient(to bottom right, rgba(240, 171, 252, 0.15), transparent 40%);
+}
+
+
+.bg-soft-gradient-bold {
+  @apply relative bg-slate-50;
+  background-image: 
+    /* Soft purple radial gradient from top */
+    radial-gradient(circle at top, rgba(139, 92, 246, 0.12), transparent 55%),
+
+    /* Fuchsia-pink diagonal gradient */
+    linear-gradient(to bottom right, rgba(192, 132, 252, 0.25), transparent 40%);
 }
