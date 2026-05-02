@@ -145,16 +145,16 @@ h3 {
 }
 
 ::-webkit-scrollbar-track {
-    background: linear-gradient(to bottom, #f0f0f0, #e0e0e0);
+    background: #e5e7eb;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: linear-gradient(to bottom, #a78bfa, #c084fc, #f0abfc);
+    background: #9ca3af;
     border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(to bottom, #8b5cf6, #a855f7, #e879f9);
+    background: #6b7280;
 }
 
 /* Enhanced button hover effects */
@@ -164,11 +164,12 @@ button {
 
 /* Swiper pagination custom styling for brand colors */
 .swiper-pagination-bullet {
-    background: linear-gradient(to right, #a78bfa, #c084fc, #f0abfc) !important;
-    opacity: 0.5 !important;
+    background: #d1d5db !important;
+    opacity: 0.6 !important;
 }
 
 .swiper-pagination-bullet-active {
+    background: #6b7280 !important;
     opacity: 1 !important;
     transform: scale(1.2);
 }
