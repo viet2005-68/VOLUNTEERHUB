@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: ServiceDiscovery
+  config:
+    import: optional:file:.env[.properties]
+server:
+  port: ${PORT}
+eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: false
