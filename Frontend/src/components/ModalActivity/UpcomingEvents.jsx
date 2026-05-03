@@ -3,7 +3,7 @@ import ModalActivity from "./ModalActivity";
 import UpComingCard from "./UpComingCard";
 import { useUpcomingApprovedRegistrations } from "../../hook/useRegistration";
 import Skeleton from "@mui/material/Skeleton";
-import Card from "../Card/Card";
+import Card from "../Card.jsx/Card";
 import { BellOff } from "lucide-react";
 
 function UpcomingEvents() {
@@ -27,10 +27,10 @@ function UpcomingEvents() {
   const items = Array.isArray(data)
     ? data
     : Array.isArray(data?.content)
-      ? data.content
-      : Array.isArray(data?.data)
-        ? data.data
-        : [];
+    ? data.content
+    : Array.isArray(data?.data)
+    ? data.data
+    : [];
 
   console.log("[UpcomingEvents] items:", items);
 
