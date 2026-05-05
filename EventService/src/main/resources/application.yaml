@@ -1,3 +1,55 @@
 spring:
   application:
     name: EventService
+
+  config:
+    import: optional:file:.env[.properties]
+
+  datasource:
+    url: jdbc:postgresql://${HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+
+  data:
+    redis:
+      database: 0
+      host: ${HOST}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
+      timeout: 60000
+
+  rabbitmq:
+    host: ${HOST}
+    port: ${RABBITMQ_PORT}
+    username: ${RABBITMQ_DEFAULT_USER}
+    password: ${RABBITMQ_DEFAULT_PASS}
+
+rabbitmq:
+  exchange:
+    notification: ${NOTIFICATION_EXCHANGE}
+    event: ${EVENT_EXCHANGE}
+  routingKey:
+    notification: ${NOTIFICATION_ROUTING_KEY}
+    event: ${EVENT_ROUTING_KEY}
+
+firebase:
+  projectId: ${FIREBASE_PROJECT_ID}
+  storage:
+    bucket: ${FIREBASE_STORAGE_BUCKET}
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_SERVER_URL}
+
+server:
+  port: ${PORT}
