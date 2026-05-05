@@ -53,6 +53,24 @@ public class EventController {
         return ResponseEntity.ok(eventService.findById(eventId));
     }
 
+
+    @GetMapping("/owned")
+    public ResponseEntity<Page<EventResponse>> getAllOwnedEvents(@RequestParam(required = false) Integer pageNum,
+                                                                 @RequestParam(required = false) Integer pageSize,
+                                                                 @RequestParam(required = false) EventStatus status,
+                                                                 @RequestParam(required = false) String category,
+                                                                 @RequestParam(required = false) LocalDateTime startAfter,
+                                                                 @RequestParam(required = false) LocalDateTime endBefore,
+                                                                 @RequestParam(required = false) String province,
+                                                                 @RequestParam(required = false) String district,
+                                                                 @RequestParam(required = false) String street,
+                                                                 @RequestParam(defaultValue = "id") String sortedBy,
+                                                                 @RequestParam(defaultValue = "desc") String order)  {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return ResponseEntity.ok(eventService.findAllOwnedEvent(auth.getName(), pageNum, pageSize, status, category,
+                startAfter, endBefore, province, district, street, sortedBy, order));
+    }
+
     @PostMapping
     public ResponseEntity<EventResponse> createEvent(@RequestPart @Validated(OnCreate.class) EventRequest eventRequest,
                                                      @RequestPart(required = false) MultipartFile imageFile) throws IOException {

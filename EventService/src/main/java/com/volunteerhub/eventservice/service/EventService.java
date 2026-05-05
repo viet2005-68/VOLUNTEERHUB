@@ -67,6 +67,21 @@ public class EventService {
         return eventMapper.toDtoPage(events);
     }
 
+    public Page<EventResponse> findAllOwnedEvent(String userId, Integer pageNum, Integer pageSize, EventStatus status,
+                                                 String categoryName, LocalDateTime startAfter, LocalDateTime endBefore,
+                                                 String province, String district, String street,
+                                                 String sortedBy, String order) {
+        PageNumAndSizeResponse pageNumAndSizeResponse = PaginationValidation.validate(pageNum, pageSize);
+        Sort sort = order.equals("asc")
+                ? Sort.by(sortedBy).ascending()
+                : Sort.by(sortedBy).descending();
+        Page<Event> events = eventRepository
+                .findAll(EventSpecification.filterEvents(categoryName, status, startAfter, endBefore, province, district, street, userId),
+                         PageRequest.of(pageNumAndSizeResponse.getPageNum(), pageNumAndSizeResponse.getPageSize(), sort));
+
+        return eventMapper.toDtoPage(events);
+    }
+
     @PreAuthorize("hasRole('MANAGER')")
     public EventResponse createEvent(String userId, EventRequest eventRequest, MultipartFile imageFile)
             throws IOException {

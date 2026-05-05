@@ -5,6 +5,11 @@ spring:
   config:
     import: optional:file:.env[.properties]
 
+  servlet:
+    multipart:
+      max-file-size: 25MB
+      max-request-size: 30MB
+
   datasource:
     url: jdbc:postgresql://${HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
     username: ${POSTGRES_USER}
@@ -18,14 +23,6 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
-
-  data:
-    redis:
-      database: 0
-      host: ${HOST}
-      port: ${REDIS_PORT}
-      password: ${REDIS_PASSWORD}
-      timeout: 60000
 
   rabbitmq:
     host: ${HOST}
@@ -53,3 +50,6 @@ eureka:
 
 server:
   port: ${PORT}
+  tomcat:
+    max-http-form-post-size: 30MB
+    max-swallow-size: 30MB
