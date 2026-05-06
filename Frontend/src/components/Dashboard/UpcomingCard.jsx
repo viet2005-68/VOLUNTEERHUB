@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Card from "../Card/Card";
+import Card from "../Card.jsx/Card";
 import { FiChevronDown, FiChevronUp } from "react-icons/fi";
 import { LogIn, Trash, Calendar, MapPin, Building2, X } from "lucide-react";
 import { useUnregisterFromEvent } from "../../hook/useRegistration";

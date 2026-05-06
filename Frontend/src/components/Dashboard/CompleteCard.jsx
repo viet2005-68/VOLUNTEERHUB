@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Card from "../Card/Card";
+import Card from "../Card.jsx/Card";
 import { FiChevronDown, FiChevronUp } from "react-icons/fi";
 import { Calendar, Clock, Building2, Check } from "lucide-react";
 import { useAuth } from "../../hook/useAuth";

@@ -1,6 +1,6 @@
 import { FiClock, FiChevronDown, FiChevronUp } from "react-icons/fi";
 import { Calendar, MapPin, Building2, X } from "lucide-react";
-import Card from "../Card/Card";
+import Card from "../Card.jsx/Card";
 import React, { useState } from "react";
 import { useUnregisterFromEvent } from "../../hook/useRegistration";
 
