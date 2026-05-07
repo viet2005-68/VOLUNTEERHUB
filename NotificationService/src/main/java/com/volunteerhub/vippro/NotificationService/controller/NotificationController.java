@@ -5,10 +5,7 @@ import com.volunteerhub.vippro.NotificationService.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -25,5 +22,10 @@ public class NotificationController {
         return notificationService.getAllNotification(authentication.getName(), pageNum, pageSize);
     }
 
+    @PutMapping("/{notificationId}/mark-as-read")
+    public NotificationResponse markAsRead(@PathVariable Long notificationId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return notificationService.markAsRead(authentication.getName(), notificationId);
+    }
 
 }

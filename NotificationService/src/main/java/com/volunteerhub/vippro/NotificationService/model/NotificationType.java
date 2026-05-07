@@ -1,7 +1,7 @@
 package com.volunteerhub.vippro.NotificationService.model;
 
 public enum NotificationType {
-    VENT_REQUESTED,
+    EVENT_REQUESTED,
     EVENT_APPROVED,
     EVENT_REJECTED,
     EVENT_DELETED,
