@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { FiCalendar } from "react-icons/fi";
-import Card from "../Card/Card";
+import Card from "../Card.jsx/Card";
 import { FaLocationPin } from "react-icons/fa6";
 import { formatDateTime } from "../../utils/date";
 import { Book, BookOpen } from "lucide-react";
@@ -94,24 +94,6 @@ function EventOverview({ description, location, startTime, endTime }) {
           </span>
         )}
       </div>
-      {/* <div>
-        <Card>
-          <div className="flex flex-col gap-5 max-sm:gap-2">
-            <div>
-              <p className="font-semibold">Other Volunteer</p>
-              <p className="text-gray-600 text-sm">
-                See who else is participating
-              </p>
-            </div>
-            <div className="flex flex-col gap-1 md:gap-4">
-              {dumpData.slice(0, 5).map((item) => (
-                <UserCard key={item.id} {...item} />
-              ))}
-            </div>
-            <p className="font-light text-xs mt-2">More volunteers</p>
-          </div>
-        </Card>
-      </div> */}
     </div>
   );
 }

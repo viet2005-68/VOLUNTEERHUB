@@ -1,20 +1,17 @@
-import React, { useMemo, useState } from "react";
-import { Search, CheckCircle, Send, Download } from "lucide-react";
+import React, { useMemo, useState, useEffect } from "react";
+import { Search, CheckCircle, Send } from "lucide-react";
 import DropdownSelect from "../Dropdown/DropdownSelect";
-import MarkCompletionCard from "../MarkCompletion/MarkCompletionCard";
-import { useOutletContext } from "react-router-dom";
+import MarkCompletionCard from "./MarkCompletionCard";
 import {
-  useListUserOfAnEvent,
+  useAllRegistrationForManager,
   useReviewRegistration,
 } from "../../hook/useRegistration";
 
-function EventManagerMarkComplete() {
-  const { eventId } = useOutletContext();
-
+function MarkCompletionList() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [filter, setFilter] = useState("attended"); // Default: Approved users
-  const [itemsToShow, setItemsToShow] = useState(10);
-  const [pageNum, setPageNum] = useState(0);
+  const [filter, setFilter] = useState("attended");
+  const [page, setPage] = useState(1);
+  const [pageSize] = useState(10);
 
   const mappedStatus = useMemo(() => {
     switch (filter) {
@@ -25,45 +22,69 @@ function EventManagerMarkComplete() {
       case "absent":
         return "REJECTED";
       case "all":
-        return undefined; // no status filter
+        return "all";
       default:
         return "APPROVED";
     }
   }, [filter]);
 
-  const queryParams = useMemo(() => {
-    const base = { pageNum, pageSize: itemsToShow };
-    return mappedStatus ? { ...base, status: mappedStatus } : base;
-  }, [pageNum, itemsToShow, mappedStatus]);
+  const { data, rawData, isLoading, isError, refetch } =
+    useAllRegistrationForManager({
+      page,
+      pageSize,
+      search: searchQuery,
+      status: mappedStatus,
+      event: "all",
+    });
 
-  const { data, isLoading, isError, refetch } = useListUserOfAnEvent(
-    eventId,
-    queryParams
-  );
-  const registrations = data?.data || [];
+  useEffect(() => {
+    console.group("[MarkCompletionList] Aggregated Manager Data");
+    console.log("Query params:", {
+      page,
+      pageSize,
+      search: searchQuery,
+      status: mappedStatus,
+    });
+    console.log("Raw API data (unfiltered):", rawData);
+    if (Array.isArray(rawData) && rawData.length) {
+      console.log("Sample raw item event fields:", {
+        eventId: rawData[0]?.eventId,
+        eventName: rawData[0]?.eventName,
+        status: rawData[0]?.status,
+      });
+    }
+    console.log("Processed data (paginated):", data);
+    console.log("Items:", data?.items);
+    console.log("Pagination:", {
+      totalItems: data?.totalItems,
+      totalPages: data?.totalPages,
+      page: data?.page,
+      pageSize: data?.pageSize,
+    });
+    console.groupEnd();
+  }, [rawData, data, page, pageSize, searchQuery, mappedStatus]);
 
-  // Local overrides to instantly reflect COMPLETED + note edits before refetch returns
-  const [statusOverrides, setStatusOverrides] = useState({}); // { [userId]: { status: "COMPLETED", note: string|null } }
+  const registrations = data?.items || [];
 
+  // Local overrides for immediate UI after completion/note edit
+  const [statusOverrides, setStatusOverrides] = useState({}); // { [regKey]: { status: "COMPLETED", note: string|null } }
+  const getRegKey = (reg) =>
+    reg.registrationId ?? `${reg.eventId}-${reg.userId}`;
   const getEffectiveRegistrationStatus = (reg) => {
-    const override = statusOverrides[reg.userId];
+    const override = statusOverrides[getRegKey(reg)];
     return override?.status || reg.registrationStatus || reg.status;
   };
 
-  const filteredRegistrations = registrations.filter((registration) => {
-    const searchLower = searchQuery.toLowerCase();
-    const user = registration.user || {};
-    return (
-      user.fullName?.toLowerCase().includes(searchLower) ||
-      user.email?.toLowerCase().includes(searchLower) ||
-      user.username?.toLowerCase().includes(searchLower) ||
-      user.phoneNumber?.toLowerCase().includes(searchLower) ||
-      user.address?.toLowerCase().includes(searchLower)
-    );
-  });
+  const displayedRegistrations =
+    filter === "all"
+      ? registrations.filter(
+          (reg) =>
+            (reg.registrationStatus ?? reg.status)?.toUpperCase() !== "PENDING"
+        )
+      : registrations;
 
-  const volunteers = filteredRegistrations.map((reg) => {
-    const user = reg.user || {};
+  const volunteers = displayedRegistrations.map((reg) => {
+    const regKey = reg.registrationId ?? `${reg.eventId}-${reg.userId}`;
     const regStatus = getEffectiveRegistrationStatus(reg);
     const cardStatus =
       regStatus === "APPROVED"
@@ -75,23 +96,28 @@ function EventManagerMarkComplete() {
         : "registered";
 
     return {
-      id: reg.userId,
-      name: user.fullName || user.name || user.username || "Unknown",
-      email: user.email || "",
+      id: regKey,
+      name: reg.fullName || reg.username || "Unknown",
+      email: reg.email || "",
       status: cardStatus,
       hoursLogged: Math.floor(Math.random() * 4) + 1, // Random 1-4 hours
-      feedback: statusOverrides[reg.userId]?.note ?? reg.note ?? undefined,
-      avatar: user.avatarUrl || null,
+      feedback: statusOverrides[regKey]?.note ?? reg.note ?? undefined,
+      avatar: reg.avatarUrl || null,
+      eventName: reg.eventName,
+      eventId: reg.eventId,
     };
   });
 
   const regMap = useMemo(() => {
     const m = new Map();
-    registrations.forEach((reg) => m.set(reg.userId, reg));
+    registrations.forEach((reg) => {
+      const regKey = reg.registrationId ?? `${reg.eventId}-${reg.userId}`;
+      m.set(regKey, reg);
+    });
     return m;
   }, [registrations]);
 
-  // Modal state for marking completion / editing note
+  // Completion note modal state
   const [selectedReg, setSelectedReg] = useState(null);
   const [note, setNote] = useState("");
   const [isEditingNote, setIsEditingNote] = useState(false); // Track if editing existing completion
@@ -101,7 +127,8 @@ function EventManagerMarkComplete() {
     const reg = regMap.get(vol.id);
     if (!reg) return;
     setSelectedReg(reg);
-    setNote(statusOverrides[reg.userId]?.note ?? reg.note ?? "");
+    const regKey = reg.registrationId ?? `${reg.eventId}-${reg.userId}`;
+    setNote(statusOverrides[regKey]?.note ?? reg.note ?? "");
     setIsEditingNote(isEditing);
   };
 
@@ -110,7 +137,7 @@ function EventManagerMarkComplete() {
 
     // If editing note only, don't send status
     const payload = {
-      eventId: selectedReg.eventId || eventId,
+      eventId: selectedReg.eventId,
       participantId: selectedReg.userId,
       note: note.trim(),
     };
@@ -121,12 +148,16 @@ function EventManagerMarkComplete() {
     }
 
     reviewMutation.mutate(payload, {
-      onSuccess: () => {
+      onSuccess: (resp) => {
+        console.log("[MarkCompletionList] reviewRegistration response:", resp);
+        const regKey =
+          selectedReg.registrationId ??
+          `${selectedReg.eventId}-${selectedReg.userId}`;
         setStatusOverrides((prev) => ({
           ...prev,
-          [selectedReg.userId]: {
+          [regKey]: {
             status: isEditingNote
-              ? prev[selectedReg.userId]?.status || "COMPLETED"
+              ? prev[regKey]?.status || "COMPLETED"
               : "COMPLETED",
             note: note.trim() || null,
           },
@@ -173,7 +204,7 @@ function EventManagerMarkComplete() {
           Volunteer Completion Management
         </h2>
         <p className="text-sm sm:text-base text-gray-600">
-          Đánh dấu hoàn thành và chỉnh sửa ghi chú cho tình nguyện viên
+          Mark attendance and completion status for event volunteers
         </p>
       </div>
 
@@ -184,9 +215,12 @@ function EventManagerMarkComplete() {
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
           <input
             type="text"
-            placeholder="Tìm kiếm tình nguyện viên..."
+            placeholder="Search volunteers..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setPage(1);
+            }}
             className="w-full pl-9 sm:pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50 text-sm sm:text-base"
           />
         </div>
@@ -221,7 +255,10 @@ function EventManagerMarkComplete() {
                 { label: "Absent", value: "absent" },
               ]}
               value={filter}
-              onChange={(next) => setFilter(next)}
+              onChange={(next) => {
+                setFilter(next);
+                setPage(1);
+              }}
             />
           </div>
         </div>
@@ -230,9 +267,9 @@ function EventManagerMarkComplete() {
       {/* Tip Box */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6">
         <p className="text-xs sm:text-sm text-gray-700">
-          <span className="font-semibold">Mẹo:</span> Lọc theo "Attended" để xem
-          danh sách đã duyệt, sau đó đánh dấu "Completed" và thêm ghi chú để cấp
-          chứng nhận.
+          <span className="font-semibold">Tip:</span> Filter by "Attended" to
+          view the list of approved volunteers, then mark them as "Completed"
+          and add a note to issue certificates.
         </p>
       </div>
 
@@ -252,7 +289,7 @@ function EventManagerMarkComplete() {
           ))
         ) : (
           <div className="text-center py-8 sm:py-12 text-gray-500 text-sm sm:text-base">
-            Không tìm thấy tình nguyện viên phù hợp "{searchQuery}"
+            No volunteers found matching "{searchQuery}"
           </div>
         )}
       </div>
@@ -261,19 +298,23 @@ function EventManagerMarkComplete() {
       {selectedReg && (
         <div className="fixed inset-0 bg-gray-900/60 bg-opacity-40 flex items-center justify-center p-4 z-50">
           <div className="bg-white w-full max-w-[500px] p-6 rounded-xl shadow-lg">
-            <h3 className="text-xl font-semibold mb-6 text-center">
-              {isEditingNote ? "Chỉnh sửa ghi chú" : "Đánh dấu hoàn thành"}
+            <h3 className="text-xl font-semibold mb-3 text-center">
+              {isEditingNote ? "Edit Completion Note" : "Mark Completion"}
             </h3>
+            <p className="text-sm text-gray-600 text-center mb-3">
+              Event: {selectedReg?.eventName ?? "—"} • ID:{" "}
+              {selectedReg?.eventId ?? "—"}
+            </p>
 
             <div className="space-y-4">
               <div>
                 <p className="text-sm text-gray-600 mb-2">
-                  Ghi chú (tùy chọn):
+                  Completion Note (optional):
                 </p>
                 <textarea
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
-                  placeholder="Nhập ghi chú cho việc hoàn thành..."
+                  placeholder="Enter completion note (optional)"
                   rows={3}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                   disabled={reviewMutation.isPending}
@@ -298,10 +339,10 @@ function EventManagerMarkComplete() {
                   className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded transition disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {reviewMutation.isPending
-                    ? "Đang xử lý..."
+                    ? "Processing..."
                     : isEditingNote
-                    ? "Lưu ghi chú"
-                    : "Xác nhận hoàn thành"}
+                    ? "Save Note"
+                    : "Confirm Completion"}
                 </button>
               </div>
             </div>
@@ -312,4 +353,4 @@ function EventManagerMarkComplete() {
   );
 }
 
-export default EventManagerMarkComplete;
+export default MarkCompletionList;

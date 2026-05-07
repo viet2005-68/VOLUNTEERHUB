@@ -1,6 +1,8 @@
 import { useState, useMemo } from "react";
 import Pagination from "@mui/material/Pagination";
+import RegistrationFilters from "../Registration/RegistrationFilters";
 import RegistrationTableForAd from "./RegistrationTableForAd";
+import RegistrationDetailModal from "../Registration/RegistrationDetailModal";
 import EventVolunteerRegisterFilter from "./EventVolunteerRegisterFilter";
 import { useOutletContext } from "react-router-dom";
 import { useListUserOfAnEvent } from "../../hook/useRegistration";

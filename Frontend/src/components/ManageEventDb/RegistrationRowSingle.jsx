@@ -1,4 +1,5 @@
 import { Calendar } from "lucide-react";
+import RegistrationStatusBadge from "../Registration/RegistrationStatusBadge";
 
 export default function RegistrationRowSingle({ reg, onSelect }) {
   return (

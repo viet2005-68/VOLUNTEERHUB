@@ -1,11 +1,5 @@
 import { useEffect, useState } from "react";
 import {
-  EVENT_STATUS,
-  getStatusColor,
-  STATUS_CONFIG,
-  canCancelEvent,
-} from "../../pages/EventManager/eventManagerData";
-import {
   ChevronDown,
   ChevronUp,
   Calendar,
@@ -22,6 +16,12 @@ import {
   confirmDelete,
   showError,
 } from "../../utils/confirmDialog";
+import {
+  EVENT_STATUS,
+  getStatusColor,
+  STATUS_CONFIG,
+  canCancelEvent,
+} from "../../constant/eventStatus";
 
 function MobileManageCard({ data, onCancelEvent, onEdit, onView }) {
   const [isExpanded, setIsExpanded] = useState(false);

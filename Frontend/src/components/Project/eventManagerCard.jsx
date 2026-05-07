@@ -5,7 +5,7 @@ import {
   STATUS_CONFIG,
   EVENT_STATUS,
   canCancelEvent,
-} from "../../pages/EventManager/eventManagerData";
+} from "../../constant/eventStatus";
 import { useDeleteEvent } from "../../hook/useEvent";
 import {
   confirmCancel,
