@@ -1,0 +1,147 @@
+openapi: 3.0.3
+info:
+  title: Notification API
+  description: API quản lý thông báo của người dùng.
+  version: 1.0.0
+servers:
+  - url: http:localhost/3000
+    description: Default server
+tags:
+  - name: Notification
+    description: Endpoints liên quan đến thông báo
+paths:
+  /api/v1/notifications:
+    get:
+      tags:
+        - Notification
+      summary: Lấy danh sách thông báo
+      description: Lấy danh sách thông báo của user đang đăng nhập (phân trang).
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: pageNum
+          in: query
+          description: Số thứ tự trang (bắt đầu từ 0)
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 0
+        - name: pageSize
+          in: query
+          description: Số lượng bản ghi trên một trang
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 10
+      responses:
+        '200':
+          description: Lấy danh sách thành công
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/NotificationResponse'
+
+  /api/v1/notifications/{notificationId}/mark-as-read:
+    put:
+      tags:
+        - Notification
+      summary: Đánh dấu thông báo đã đọc
+      description: Cập nhật trạng thái isRead = true cho một thông báo cụ thể.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: notificationId
+          in: path
+          description: ID của thông báo
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Đánh dấu đã đọc thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationResponse'
+
+  /api/v1/notifications/{notificationId}:
+    delete:
+      tags:
+        - Notification
+      summary: Xoá thông báo
+      description: Xoá một thông báo cụ thể của user.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: notificationId
+          in: path
+          description: ID của thông báo cần xoá
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Xoá thông báo thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationResponse'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    NotificationResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        type:
+          $ref: '#/components/schemas/NotificationType'
+        actorId:
+          type: string
+        contextId:
+          type: integer
+          format: int64
+        userId:
+          type: string
+        payload:
+          type: object
+          additionalProperties: true
+          description: Dữ liệu JSON dạng Key-Value đi kèm với thông báo
+        isRead:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+          example: '2023-10-25T10:00:00Z'
+
+    NotificationType:
+      type: string
+      description: Phân loại thông báo (Dựa trên switch-case trong Service)
+      enum:
+        - EVENT_REQUESTED
+        - EVENT_APPROVED
+        - EVENT_REJECTED
+        - EVENT_DELETED
+        - EVENT_UPDATED
+        - USER_EVENT_REQUESTED
+        - USER_EVENT_APPROVED
+        - USER_EVENT_REJECTED
+        - USER_EVENT_COMPLETED
+        - POST_CREATED
+        - POST_UPDATED
+        - COMMENT
+        - REACTION
+        - USER_ACTIVE
+        - USER_BANNED

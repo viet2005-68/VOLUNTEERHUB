@@ -1,0 +1,165 @@
+openapi: 3.0.3
+
+info:
+  title: Analytics API
+  description: API thống kê và dashboard cho hệ thống VolunteerHub
+  version: 1.0.0
+
+servers:
+  - url: http:localhost/3000
+    description: Default server
+
+tags:
+  - name: Analytics
+    description: Thống kê và dashboard hệ thống
+
+paths:
+
+  /api/v1/analytics/admin/dashboard:
+    get:
+      tags:
+        - Analytics
+      summary: Dashboard cho Admin
+      description: Thống kê tổng quan hệ thống dành cho ADMIN
+      security:
+        - bearerAuth: []
+
+      responses:
+        '200':
+          description: Lấy dashboard admin thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminDashboardResponse'
+
+        '401':
+          description: Chưa đăng nhập
+
+        '403':
+          description: Không có quyền ADMIN
+
+  /api/v1/analytics/manager/dashboard:
+    get:
+      tags:
+        - Analytics
+      summary: Dashboard cho Manager
+      description: Thống kê dành cho MANAGER (theo sự kiện của họ)
+      security:
+        - bearerAuth: []
+
+      responses:
+        '200':
+          description: Lấy dashboard manager thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ManagerDashboardResponse'
+
+        '401':
+          description: Chưa đăng nhập
+
+        '403':
+          description: Không có quyền MANAGER
+
+  /api/v1/analytics/me:
+    get:
+      tags:
+        - Analytics
+      summary: Thống kê cá nhân người dùng
+      description: Thống kê hoạt động của user hiện tại
+      security:
+        - bearerAuth: []
+
+      responses:
+        '200':
+          description: Lấy thống kê user thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserAnalyticsResponse'
+
+        '401':
+          description: Chưa đăng nhập
+
+components:
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+
+    AdminDashboardResponse:
+      type: object
+      description: Dashboard tổng quan hệ thống cho ADMIN
+
+      properties:
+        totalUsers:
+          type: integer
+          format: int64
+
+        totalManagers:
+          type: integer
+          format: int64
+
+        totalEvents:
+          type: integer
+          format: int64
+
+        activeEvents:
+          type: integer
+          format: int64
+
+        totalApplications:
+          type: integer
+          format: int64
+
+    ManagerDashboardResponse:
+      type: object
+      description: Dashboard cho MANAGER
+
+      properties:
+        myEvents:
+          type: integer
+          format: int64
+
+        activeEvents:
+          type: integer
+          format: int64
+
+        applicationRate:
+          type: number
+          format: double
+          example: 0.75
+
+        approvalRate:
+          type: number
+          format: double
+          example: 0.60
+
+        totalApplications:
+          type: integer
+          format: int64
+
+    UserAnalyticsResponse:
+      type: object
+      description: Thống kê cho user thường
+
+      properties:
+        participatedEvents:
+          type: integer
+          format: int64
+
+        requestCount:
+          type: integer
+          format: int64
+
+        approvedCount:
+          type: integer
+          format: int64
+
+        rejectedCount:
+          type: integer
+          format: int64
