@@ -1,5 +1,7 @@
 import React, { useState, useRef } from "react";
 import { MoreVertical, Edit2, Trash2 } from "lucide-react";
+import ReactionBar from "./ReactionBar";
+import useClickOutside from "../../hook/ClickOutside";
 
 export default function PostCard({
   post,

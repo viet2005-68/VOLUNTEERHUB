@@ -1,4 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
+import Modal from "./Modal";
+import CommentInput from "./CommentInput";
+import CommentList from "./CommentList";
+import ImageLightbox from "./ImageLightbox";
+import ReactionBar from "./ReactionBar";
 import { X } from "lucide-react";
 import { IoMdArrowRoundBack } from "react-icons/io";
 import {
