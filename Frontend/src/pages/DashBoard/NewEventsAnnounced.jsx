@@ -2,7 +2,6 @@ import React from "react";
 import ModalActivity from "../../components/ModalActivity/ModalActivity";
 import AnnouncedEventCard from "../../components/Dashboard/AnnouncedEventCard";
 import { useApprovedEventsTop2ByName } from "../../hook/useEvent";
-import { noAnnounce } from "../../assets/dashboard";
 import { BellOff } from "lucide-react";
 
 function NewEventsAnnounced({ className }) {

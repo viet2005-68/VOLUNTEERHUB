@@ -1,14 +1,10 @@
 import React, { useEffect, useState } from "react";
 import NavBar from "../components/Sidebar/NavBar";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
-import BottomNav from "../components/Sidebar/BottomNav";
 import { useNavbar } from "../hook/useNavbar";
 import { useAuth } from "../hook/useAuth";
 import { LOGIN_LINK } from "../constant/constNavigate";
-import { getUserInfo } from "../services/userService";
 import { useProfileCompleteness } from "../hook/useUser";
-import ProfileCompletionBanner from "../components/Banner/ProfileCompletionBanner";
-import NotificationPermissionPrompt from "../components/Notification/NotificationPermissionPrompt";
 import { ArrowUp } from "lucide-react";
 
 export default function MainLayout() {

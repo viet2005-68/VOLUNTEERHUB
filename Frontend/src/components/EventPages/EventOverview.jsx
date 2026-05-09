@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { FiCalendar } from "react-icons/fi";
-import Card from "../Card.jsx/Card";
+import Card from "../Card/Card";
 import { FaLocationPin } from "react-icons/fa6";
 import { formatDateTime } from "../../utils/date";
 import { Book, BookOpen } from "lucide-react";

@@ -1,5 +1,5 @@
 import React from "react";
-import Card from "../Card.jsx/Card";
+import Card from "../Card/Card";
 import { FaFire } from "react-icons/fa";
 import { FaArrowTrendUp } from "react-icons/fa6";
 import { Eye, Users, MessageSquare, ThumbsUp, FileText } from "lucide-react";
