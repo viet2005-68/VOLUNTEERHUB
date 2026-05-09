@@ -1,9 +1,5 @@
 import { useState, useEffect, useRef } from "react";
 import Pagination from "@mui/material/Pagination";
-import RegistrationFilters from "../../components/Registration/RegistrationFilters";
-import RegistrationTable from "../../components/Registration/RegistrationTable";
-import RegistrationDetailModal from "../../components/Registration/RegistrationDetailModal";
-import RegistrationStatusBadge from "../../components/Registration/RegistrationStatusBadge";
 import { useAllRegistrationForManager } from "../../hook/useRegistration";
 
 const PAGE_SIZE = 6;

@@ -13,7 +13,6 @@ import {
   useRemoveParticipant,
 } from "../../hook/useRegistration";
 import { useOutletContext } from "react-router-dom";
-import AnalysisService from "../../services/analysisService";
 import { confirmDelete } from "../../utils/confirmDialog";
 
 const PAGE_SIZE = 10; // giống cách đặt PAGE_SIZE trong EventManager

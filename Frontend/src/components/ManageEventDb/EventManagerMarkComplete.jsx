@@ -1,7 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { Search, CheckCircle, Send, Download } from "lucide-react";
-import DropdownSelect from "../Dropdown/DropdownSelect";
-import MarkCompletionCard from "../MarkCompletion/MarkCompletionCard";
+
 import { useOutletContext } from "react-router-dom";
 import {
   useListUserOfAnEvent,

@@ -1,19 +1,16 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
-import Card from "../Card.jsx/Card";
+import Card from "../Card/Card";
 import { FaEdit, FaSave, FaTimes } from "react-icons/fa";
 import { ScrollText, TriangleAlert, XCircle, CheckCircle } from "lucide-react";
 import { getCoordinates } from "../../utils/getCoordinates";
-import MapPreview from "../Location/MapPreview";
 import {
   useEventDetail,
   useUpdateEvent,
   useCancelEventRegistration,
 } from "../../hook/useEvent";
-import DropdownSelect from "../Dropdown/DropdownSelect";
 import toast from "react-hot-toast";
 import { useOutletContext } from "react-router-dom";
 import eventSchema from "../../validation/eventSchema";
-import { useProvinces, useDistricts } from "../../hook/useVietnamLocations";
 
 const categoryOptions = [
   { value: "health", label: "Health" },

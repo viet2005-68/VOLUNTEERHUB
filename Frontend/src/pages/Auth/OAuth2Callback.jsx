@@ -4,11 +4,6 @@ import { useAuthStore } from "../../store/authStore";
 import { LOGIN_LINK } from "../../constant/constNavigate";
 import { ROLES } from "../../constant/role";
 import storage from "../../utils/storage";
-import {
-  createUserProfile,
-  getUserInfo,
-  getProfileCompleteness,
-} from "../../services/userService";
 
 /**
  * OAuth authorization codes are single-use. React 18 Strict Mode runs effects

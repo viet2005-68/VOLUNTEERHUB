@@ -1,11 +1,6 @@
 // src/routes/AppRouter.jsx
 import { Routes, Route, Navigate } from "react-router-dom";
-import RequireRole from "../components/Protected/RequireRole";
-import AdminPage from "../pages/DemoPages/AdminPage";
-import UserPage from "../pages/DemoPages/UserPage";
-import OrganizationPage from "../pages/DemoPages/OrganizationPage";
 
-import Unauthorized from "../pages/DemoPages/Unauthorized";
 import { ROLES } from "../constant/role";
 import MainLayout from "../Layout/MainLayout";
 import DashboardShell from "../pages/DashBoard/DashboardShell";
@@ -17,28 +12,17 @@ import Badges from "../pages/DashBoard/Badges";
 import OpportunitiesEvent from "../pages/Opportunities/Opportunities";
 import OpportunitiePageDetail from "../pages/EventPage/EventLayout";
 import EventLayout from "../pages/EventPage/EventLayout";
-import TrendingPage from "../pages/TrendingPages/TrendingPage";
-import EventManager from "../pages/EventManager/EventManager";
-import MarkCompletionList from "../components/MarkCompletion/MarkCompletionList";
+
 import ManagerEventForManager from "../pages/ManageEventForManager/ManagerEventForManager";
 import EventManagerMarkComplete from "../components/ManageEventDb/EventManagerMarkComplete";
 import OverviewEventManager from "../components/ManageEventDb/OverviewEventManager";
 import VolunteerList from "../components/ManageEventDb/VolunteerList";
 import EventVolunteerRegister from "../components/ManageEventDb/EventVolunteerRegister";
 import RegistrationPage from "../pages/DashBoard/RegistrationPage";
-import EventAdminManager from "../components/Admin/EventAdminManager";
-import UserManager from "../components/Admin/UserManager";
-import ExportData from "../components/Admin/ExportData";
-import ReportAdmin from "../components/Report/ReportAdmin";
-import Notifications from "../pages/Notification/Notifications";
 import LandingPage from "../pages/Landing";
 import SignUpForm from "../pages/Home/SignUp";
 import OAuth2Callback from "../pages/Auth/OAuth2Callback";
-import Settingpage from "../pages/Setting/Settingpage";
 import BanUser from "../pages/Auth/BanUser";
-import Analytics from "../pages/Analysis/Analytics";
-import AdminAnalytics from "../pages/Analysis/AdminAnalytics";
-import CompleteProfile from "../pages/Profile/CompleteProfile";
 
 function AppRouter() {
   return (

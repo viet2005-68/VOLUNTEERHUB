@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { FiSearch, FiCalendar } from "react-icons/fi";
-import DropdownSelect from "../Dropdown/DropdownSelect";
 
 export default function FilterHorizontal({
   query,

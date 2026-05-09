@@ -3,7 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import EventHero from "../../components/EventPages/EventHero";
 import EventOverview from "../../components/EventPages/EventOverview";
 import Tabs from "../../components/Tabs/Tabs";
-import RegistrationCard from "../../components/EventPages/RegistrationCard";
+
 import OrganizationCard from "../../components/EventPages/OrganizationCard";
 import FeedPage from "../Post/FeedPage";
 import VolunteerList from "../../components/EventPages/VoluteerList";
