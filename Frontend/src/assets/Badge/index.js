@@ -1,0 +1,15 @@
+import TechBadge from "./award_2901758.png"
+import EnvironmentBadge from "./award_9287894.png"
+import LeadBadge from "./branding_4927274.png"
+import EducationBadge from "./education_5433419.png"
+import GoldMedal from "./gold-medal_10095084.png"
+import PeopleWithCommunityBadge from "./medal_250603.png"
+import BasicBadge from "./medal_5061098.png"
+import HandEarthBadge from "./medical_10649536.png"
+import PlantBadge from "./organic_9287276.png"
+import SaveWaterBadge from "./paraben-free_13074050.png"
+import AnimalBadge from "./protection_3843259.png"
+import SocietyBadge from "./society_5494571.png"
+import BloodBadge from "./world-diabetes-day_14846529.png"
+
+export { TechBadge, EducationBadge, LeadBadge, EnvironmentBadge, GoldMedal, PeopleWithCommunityBadge, PlantBadge, BasicBadge, HandEarthBadge, SaveWaterBadge, AnimalBadge, SocietyBadge, BloodBadge }

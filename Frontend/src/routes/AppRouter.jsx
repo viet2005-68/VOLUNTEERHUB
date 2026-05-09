@@ -9,6 +9,7 @@ import OpportunitiesTab from "../pages/DashBoard/Opportunities";
 import Activity from "../pages/DashBoard/Activity";
 import Badges from "../pages/DashBoard/Badges";
 
+import Unauthorized from "../pages/DemoPages/Unauthorized";
 import OpportunitiesEvent from "../pages/Opportunities/Opportunities";
 import OpportunitiePageDetail from "../pages/EventPage/EventLayout";
 import EventLayout from "../pages/EventPage/EventLayout";
@@ -37,63 +38,39 @@ function AppRouter() {
       <Route path="/signup" element={<SignUpForm />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
       <Route path="/banned" element={<BanUser />} />
-      <Route path="/complete-profile" element={<CompleteProfile />} />
       <Route path="/" element={<LandingPage />} />
-      <Route path="/setting" element={<Settingpage />} />
       {/* Protected routes */}
       <Route element={<MainLayout />}>
         {/* Shared protected area */}
-        <Route
-          element={
-            <RequireRole
-              allowedRoles={[ROLES.ADMIN, ROLES.USER, ROLES.MANAGER]}
-            />
-          }
-        >
+        <Route>
           {/* Dashboard (with nested tabs) */}
           <Route path="/dashboard" element={<DashboardShell />}>
             <Route index element={<Overview />} />
             <Route path="opportunities" element={<OpportunitiesTab />} />
             <Route path="activity" element={<Activity />} />
             <Route path="badges" element={<Badges />} />
-            <Route path="notifications" element={<Notifications />} />
-            <Route path="eventmanager" element={<EventManager />} />
-          </Route>
+            </Route>
 
           {/* opportunities */}
           <Route path="/opportunities" element={<OpportunitiesEvent />} />
           <Route path="/opportunities/:tab/:id" element={<EventLayout />} />
-
-          {/* trending events */}
-          <Route path="/trending" element={<TrendingPage />} />
-        </Route>
+      </Route>
 
         {/* Admin-only route */}
-        <Route element={<RequireRole allowedRoles={[ROLES.ADMIN]} />}>
-          <Route path="/admin" element={<AdminPage />} />
-          <Route path="/dashboard" element={<DashboardShell />}>
-            <Route path="eventAdminManager" element={<EventAdminManager />} />
-            <Route path="userAdminManager" element={<UserManager />} />
-            <Route path="exportData" element={<ReportAdmin />} />
-            <Route path="admin-analytics" element={<AdminAnalytics />} />
-          </Route>
+        <Route >
+         <Route path="/dashboard" element={<DashboardShell />}>
+           </Route>
         </Route>
 
         {/* User-only route */}
-        <Route element={<RequireRole allowedRoles={[ROLES.USER]} />}>
-          <Route path="/user" element={<UserPage />} />
+        <Route>
         </Route>
 
-        <Route element={<RequireRole allowedRoles={[ROLES.MANAGER]} />}>
-          <Route path="/organization" element={<OrganizationPage />} />
+        <Route>
           <Route path="/dashboard" element={<DashboardShell />}>
             <Route index element={<Overview />} />
             <Route path="approve-registration" element={<RegistrationPage />} />
-            <Route path="markcompletion" element={<MarkCompletionList />} />
-            <Route path="notifications" element={<Notifications />} />
-            <Route path="eventmanager" element={<EventManager />} />
-            <Route path="manager-analytics" element={<Analytics />} />
-          </Route>
+            </Route>
 
           <Route
             path="/dashboard/eventmanager/:id"

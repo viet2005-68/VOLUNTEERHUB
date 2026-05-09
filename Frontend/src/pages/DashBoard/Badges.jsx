@@ -1,4 +1,21 @@
 import React from "react";
+import {
+  TechBadge,
+  EducationBadge,
+  LeadBadge,
+  EnvironmentBadge,
+  GoldMedal,
+  PeopleWithCommunityBadge,
+  PlantBadge,
+  BasicBadge,
+  HandEarthBadge,
+  SaveWaterBadge,
+  AnimalBadge,
+  SocietyBadge,
+  BloodBadge,
+} from "../../assets/Badge/index";
+import Badge from "../../components/Badge/Badge";
+
 const dumpdata = [
   { id: 1, title: "Tech Badge", description: "Tech Badge", icon: TechBadge },
   {
