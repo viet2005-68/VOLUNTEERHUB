@@ -1,0 +1,56 @@
+spring:
+  application:
+    name: ApiGateway
+
+  config:
+    import: optional:file:.env[.properties]
+
+  servlet:
+    multipart:
+      max-file-size: 25MB
+      max-request-size: 30MB
+
+  data:
+    redis:
+      database: 0
+      host: ${HOST}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
+      timeout: 60000
+
+  security:
+    oauth2:
+      google:
+        issuer: ${GOOGLE_AS_URI}
+        jwk-uri: ${GOOGLE_AS_JWK_URI}
+      volunteerhub:
+        issuer: ${VOLUNTEER_HUB_AS_URI}
+        jwk-uri: ${VOLUNTEER_HUB_AS_JWK_URI}
+
+app:
+  cors:
+    allowed-origins: ${APP_CORS_ALLOWED_ORIGINS}
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_SERVER_URL}
+
+server:
+  port: ${PORT}
+  tomcat:
+    max-http-form-post-size: 30MB
+    max-swallow-size: 30MB
+
+logging:
+  level:
+    org:
+      springframework:
+        cloud:
+          gateway:
+            server:
+              webmvc: TRACE
+          mvc: TRACE
+        web:
+          servlet: TRACE
+          web: TRACE
