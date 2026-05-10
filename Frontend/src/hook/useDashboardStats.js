@@ -2,7 +2,14 @@
 import { useQueries } from "@tanstack/react-query";
 import axiosClient from "../services/axiosClient";
 import { dashboardConfig } from "../constant/dashboardConfig";
-
+import {
+    useTotalEvents,
+    useTotalActiveEvents,
+    useTotalUsers,
+    useTotalManagers,
+    useEventStatsCount,
+    useMyStatusEvents
+} from "./useAnalysis";
 // --- 1. ĐỊNH NGHĨA DỮ LIỆU GIẢ ---
 const MOCK_API_RESPONSES = {
     // USER (paths relative to axios base …/api)

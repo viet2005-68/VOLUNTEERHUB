@@ -73,10 +73,9 @@ export const useAuthStore = create((set, get) => ({
         console.log("🟢 [authStore] Logout COMPLETED!");
     },
 
-    login: (role) => {
-        const demoUser = { name: "Demo User", role };
-        persistUser(demoUser);
-        set({ user: demoUser });
+    login: (user) => {
+        persistUser(user);
+        set({ user });
     },
 
     hasRole: (role) => get().user?.role === role,

@@ -1,4 +1,4 @@
-
+import { EVENT_STATUS } from "../constant/eventStatus";
 import axiosClient from "./axiosClient";
 const REGISTRATION_BASE_URL = "/v1/registrations";
 const AGGREGATED_REGISTRATION_BASE_URL = "/v1/aggregated/registrations";

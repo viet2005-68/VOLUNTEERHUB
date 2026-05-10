@@ -1,5 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { registerAuthUser } from "../services/authService";
+import { LOGIN_LINK } from "../constant/constNavigate";
 
 const useSignUp = () => {
     return useMutation({
@@ -14,13 +15,8 @@ const useSignUp = () => {
         onSuccess: (data) => {
             console.log("Sign up successful:", data);
 
-            // 3. Redirect sang OAuth2 login
-            window.location.href =
-                `${import.meta.env.VITE_API_LOGIN}/oauth2/authorize` +
-                `?response_type=${import.meta.env.VITE_OAUTH_RESPONSE_TYPE}` +
-                `&client_id=${import.meta.env.VITE_OAUTH_CLIENT_ID}` +
-                `&scope=${import.meta.env.VITE_OAUTH_SCOPE}` +
-                `&redirect_uri=${import.meta.env.VITE_OAUTH_REDIRECT_URI}`;
+            // User profile is created after OAuth login completes and a token exists.
+            window.location.href = LOGIN_LINK;
         },
         onError: (error) => {
             console.error("Sign up failed:", error.response?.data || error.message);
