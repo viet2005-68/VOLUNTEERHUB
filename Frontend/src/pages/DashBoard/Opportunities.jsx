@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import Tabs from "../../components/Tabs/Tabs";
+import Tabs from "../../components/Tabs.jsx/Tabs";
 import UpcomingCard from "../../components/Dashboard/UpcomingCard";
 import AppliedCard from "../../components/Dashboard/AppliedCard";
 import CompleteCard from "../../components/Dashboard/CompleteCard";

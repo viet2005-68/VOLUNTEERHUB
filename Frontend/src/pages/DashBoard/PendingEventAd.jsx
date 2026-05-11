@@ -1,5 +1,6 @@
 import React from "react";
 import ModalActivity from "../../components/ModalActivity/ModalActivity";
+import PendingEventCard from "../../components/Admin/PendingEventCard";
 import { usePendingEventsTop3 } from "../../hook/useEvent";
 import { Clock } from "lucide-react";
 

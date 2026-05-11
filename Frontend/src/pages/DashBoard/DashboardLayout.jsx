@@ -1,5 +1,5 @@
 // DashboardLayout.jsx
-import Tabs from "../../components/Tabs/Tabs";
+import Tabs from "../../components/Tabs.jsx/Tabs";
 import { useAuth } from "../../hook/useAuth";
 import { ROLES } from "../../constant/role";
 

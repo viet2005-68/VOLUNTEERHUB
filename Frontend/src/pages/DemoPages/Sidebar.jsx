@@ -2,6 +2,7 @@
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../../hook/useAuth";
 import { MENU_ITEMS } from "../../constant/menuConfig";
+import LogoutButton from "./LogoutButton";
 
 export default function Sidebar() {
   const { user } = useAuth();

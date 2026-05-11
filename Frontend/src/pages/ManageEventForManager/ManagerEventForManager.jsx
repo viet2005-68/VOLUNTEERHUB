@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import ManagerDbHero from "../../components/ManageEventDb/ManagerDbHero";
-import Tabs from "../../components/Tabs/Tabs";
+import Tabs from "../../components/Tabs.jsx/Tabs";
 import { Outlet, useParams } from "react-router-dom";
 import { useEventDetail, useUpdateEvent } from "../../hook/useEvent";
 import { Link, LockKeyhole, Upload, X } from "lucide-react";
