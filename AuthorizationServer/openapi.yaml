@@ -294,20 +294,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/OAuth2Error"
 
-  /oauth2/jwks:
-    get:
-      tags:
-        - OAuth2
-      summary: Get JSON Web Key Set
-      operationId: getJwks
-      security: []
-      responses:
-        "200":
-          description: Public keys used to verify JWT tokens issued by this server.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/JsonWebKeySet"
 
   /oauth2/introspect:
     post:
@@ -391,38 +377,6 @@ paths:
         "401":
           description: Missing or invalid bearer token.
 
-  /connect/logout:
-    get:
-      tags:
-        - OIDC
-      summary: OpenID Connect logout
-      operationId: oidcLogout
-      security:
-        - sessionCookie: []
-      parameters:
-        - name: id_token_hint
-          in: query
-          required: false
-          schema:
-            type: string
-        - name: post_logout_redirect_uri
-          in: query
-          required: false
-          schema:
-            type: string
-            format: uri
-        - name: state
-          in: query
-          required: false
-          schema:
-            type: string
-      responses:
-        "302":
-          description: Redirect after OIDC logout.
-          headers:
-            Location:
-              schema:
-                type: string
 
 components:
   securitySchemes:
