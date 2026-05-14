@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - VolunteerHub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+            href="https://fonts.googleapis.com/css2?family=Lobster&display=swap"
+            rel="stylesheet"
+    />
+    <style>
+        @keyframes bounce {
+          0%,
+          100% {
+            transform: translateY(-25%);
+            animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+          }
+          50% {
+            transform: translateY(0);
+            animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+          }
+        }
+        .animate-bounce {
+          animation: bounce 1s infinite;
+        }
+        .font-lobster {
+          font-family: "Lobster", cursive;
+        }
+    </style>
+    <script>
+        function togglePassword() {
+          const passwordInput = document.getElementById("password");
+          const eyeIcon = document.getElementById("eyeIcon");
+
+          if (passwordInput.type === "password") {
+            passwordInput.type = "text";
+            eyeIcon.classList.remove("fa-eye");
+            eyeIcon.classList.add("fa-eye-slash");
+          } else {
+            passwordInput.type = "password";
+            eyeIcon.classList.remove("fa-eye-slash");
+            eyeIcon.classList.add("fa-eye");
+          }
+        }
+    </script>
+</head>
+<body class="bg-white min-h-screen flex items-center justify-center">
+<div
+        class="flex flex-row items-center justify-center gap-8 max-md:flex-col w-full max-w-6xl px-8 py-12"
+>
+    <!-- Left Side - Banner -->
+    <div class="flex flex-col items-center justify-center gap-6 flex-1 p-6">
+        <i
+                class="fas fa-heart text-pink-400 text-7xl max-md:text-5xl animate-bounce"
+        ></i>
+        <h1 class="font-lobster text-4xl text-center">
+          <span
+                  class="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent"
+          >
+            VolunteerHub
+          </span>
+        </h1>
+        <div
+                class="text-center text-2xl font-serif flex flex-col justify-center max-md:text-xl gap-3"
+        >
+            <p class="text-gray-800">Welcome to VolunteerHub</p>
+            <p class="text-gray-600">Connecting Hearts - Spreading Kindness</p>
+        </div>
+    </div>
+
+    <!-- Right Side - Login Form -->
+    <div
+            class="flex flex-col justify-center items-center flex-1 p-8 w-full max-w-md bg-white/70 backdrop-blur-md rounded-3xl shadow-xl border border-gray-100"
+    >
+        <div class="flex flex-col gap-6 w-full">
+            <!-- Login Header -->
+            <div class="flex flex-col gap-2 justify-center items-center">
+                <div class="text-3xl font-bold text-gray-800">Login</div>
+                <p class="text-gray-500 text-sm">Sign in to your account</p>
+            </div>
+
+            <!-- Login Form -->
+            <form th:action="@{/login}" method="post" class="space-y-5">
+                <!-- CSRF Token -->
+                <input
+                        type="hidden"
+                        th:name="${_csrf.parameterName}"
+                        th:value="${_csrf.token}"
+                />
+
+                <!-- Email Field -->
+                <div class="flex flex-col gap-2">
+                    <label for="username" class="text-gray-700 font-medium"
+                    >Email</label
+                    >
+                    <input
+                            type="text"
+                            id="username"
+                            name="username"
+                            required
+                            placeholder="Enter your email"
+                            class="border-2 border-gray-300 rounded-lg p-3 focus:outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-200 transition-all"
+                    />
+                </div>
+
+                <!-- Password Field -->
+                <div class="flex flex-col gap-2">
+                    <label for="password" class="text-gray-700 font-medium"
+                    >Password</label
+                    >
+                    <div class="relative">
+                        <input
+                                type="password"
+                                id="password"
+                                name="password"
+                                required
+                                placeholder="Enter your password"
+                                class="border-2 border-gray-300 rounded-lg p-3 pr-12 w-full focus:outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-200 transition-all"
+                        />
+                        <button
+                                type="button"
+                                onclick="togglePassword()"
+                                class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none transition-colors"
+                                aria-label="Toggle password visibility"
+                        >
+                            <i id="eyeIcon" class="fas fa-eye text-lg"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Remember Me & Forgot Password -->
+                <div class="flex flex-row gap-2 justify-between items-center">
+                    <div class="flex flex-row gap-2 items-center">
+                        <input
+                                type="checkbox"
+                                id="remember"
+                                name="remember-me"
+                                class="w-4 h-4 text-purple-600 cursor-pointer rounded focus:ring-purple-500"
+                        />
+                        <label
+                                for="remember"
+                                class="cursor-pointer text-gray-600 text-sm"
+                        >Remember me</label
+                        >
+                    </div>
+                    <div>
+                        <a
+                                href="#"
+                                class="text-purple-600 hover:text-purple-700 text-sm font-medium"
+                        >Forgot password?</a
+                        >
+                    </div>
+                </div>
+
+                <!-- Login Button -->
+                <button
+                        type="submit"
+                        class="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 text-white p-3 rounded-lg w-full cursor-pointer hover:shadow-lg hover:scale-105 transition-all duration-300 font-semibold"
+                >
+                    Login
+                </button>
+
+                <!-- Divider -->
+                <div class="flex items-center gap-4 my-4">
+                    <div class="flex-1 h-px bg-gray-300"></div>
+                    <span class="text-gray-500 text-sm">Or login with</span>
+                    <div class="flex-1 h-px bg-gray-300"></div>
+                </div>
+
+                <!-- Google Login Button -->
+                <a
+                        href="https://accounts.google.com/o/oauth2/v2/auth?client_id=485996629423-td2c31e9vppq688o0ucdjtfgb89i6lt1.apps.googleusercontent.com&redirect_uri=http://localhost:3000/login/oauth2/code/google&response_type=code&scope=openid email profile"
+                        class="w-full border-2 border-gray-300 flex justify-center items-center gap-3 p-3 rounded-lg cursor-pointer hover:shadow-md hover:border-purple-300 transition-all duration-200 bg-white"
+                >
+                    <svg class="w-6 h-6" viewBox="0 0 48 48">
+                        <path
+                                fill="#EA4335"
+                                d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"
+                        />
+                        <path
+                                fill="#4285F4"
+                                d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"
+                        />
+                        <path
+                                fill="#FBBC05"
+                                d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"
+                        />
+                        <path
+                                fill="#34A853"
+                                d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"
+                        />
+                        <path fill="none" d="M0 0h48v48H0z" />
+                    </svg>
+                    <span class="font-semibold text-gray-700"
+                    >Continue with Google</span
+                    >
+                </a>
+
+                <!-- Register Link -->
+                <div class="text-center mt-6">
+                    <p class="text-gray-600">
+                        Don't have an account?
+                        <a
+                                href="http://localhost:3000/signup"
+                                class="text-purple-600 hover:text-purple-700 font-semibold ml-1"
+                        >Register</a
+                        >
+                    </p>
+                </div>
+
+                <!-- Back to Home -->
+                <div class="text-center mt-2">
+                    <a
+                            href="http://localhost:3000/"
+                            class="inline-flex items-center gap-2 text-gray-600 hover:text-purple-600 transition-colors text-sm"
+                    >
+                        <i class="fas fa-home"></i>
+                        <span>Back to home</span>
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>
