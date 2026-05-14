@@ -29,7 +29,7 @@ public class Event {
     @Column(length = 1000)
     private String description;
 
-    @Column(name = "image_url")
+    @Column(name = "image_url", columnDefinition = "text")
     private String imageUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)

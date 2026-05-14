@@ -254,4 +254,43 @@ public class EventService {
                 status.name(), PageRequest.of(page, size));
         return eventMapper.toDtoPage(events);
     }
+
+    public Long countEvents() {
+        return eventRepository.countEvents();
+    }
+
+    public EventResponseCSV convertToExportData(Event event) {
+        return EventResponseCSV.builder()
+                .id(event.getId())
+                .name(event.getName())
+                .ownerId(event.getOwnerId())
+                .status(event.getStatus().name())
+                .categoryName(event.getCategory() != null
+                        ? event.getCategory().getName()
+                        : "Uncategorized")
+                .fullAddress(event.getAddress() != null
+                        ? event.getAddress().getStreet() + ", " + event.getAddress().getDistrict() + ", "
+                                + event.getAddress().getProvince()
+                        : "Online/Unknown")
+                .startTime(event.getStartTime().toString())
+                .endTime(event.getEndTime().toString())
+                .capacity(event.getCapacity())
+                .badgeCount(event.getBadges() == null ? 0 : event.getBadges().size())
+                .build();
+    }
+
+    public List<EventResponseCSV> getDataForExport() {
+        List<Event> events = eventRepository.findAllForExport();
+        return events.stream()
+                .map(this::convertToExportData)
+                .collect(Collectors.toList());
+    }
+
+    public Long countEventsByOwnerId(String ownerId) {
+        return eventRepository.countEventsByOwnerId(ownerId);
+    }
+
+    public Long countActiveEventsByOwnerId(String ownerId) {
+        return eventRepository.countByOwnerIdAndStatus(ownerId, EventStatus.APPROVED);
+    }
 }

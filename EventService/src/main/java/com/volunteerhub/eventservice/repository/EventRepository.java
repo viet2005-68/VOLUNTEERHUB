@@ -45,4 +45,16 @@ public interface EventRepository extends JpaRepository<Event, Long>, JpaSpecific
     )
     Page<Event> searchEventsByRegexAndOwnerIdAndStatus(@Param("keyword") String keyword, @Param("ownerId") String ownerId,
                                                         @Param("status") String status, Pageable pageable);
+
+    @Query("SELECT e FROM Event e LEFT JOIN FETCH e.category LEFT JOIN FETCH e.address")
+    List<Event> findAllForExport();
+
+    @Query("SELECT COUNT(*) FROM Event")
+    Long countEvents();
+
+    @Query("SELECT COUNT(e) FROM Event e WHERE e.ownerId = :ownerId")
+    Long countEventsByOwnerId(@Param("ownerId") String ownerId);
+
+    @Query("SELECT COUNT(e) FROM Event e WHERE e.ownerId = :ownerId AND e.status = :status")
+    Long countByOwnerIdAndStatus(@Param("ownerId") String ownerId, @Param("status") EventStatus status);
 }
