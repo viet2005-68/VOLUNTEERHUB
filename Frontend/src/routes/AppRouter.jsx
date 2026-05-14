@@ -1,4 +1,5 @@
 // src/routes/AppRouter.jsx
+import { Suspense, lazy } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import RequireRole from "../components/Protected/RequireRole";
 import AdminPage from "../pages/DemoPages/AdminPage";
@@ -31,7 +32,6 @@ import UserManager from "../components/Admin/UserManager";
 import ExportData from "../components/Admin/ExportData";
 import ReportAdmin from "../components/Report/ReportAdmin";
 import Notifications from "../pages/Notification/Notifications";
-import LandingPage from "../pages/Landing";
 import SignUpForm from "../pages/Home/SignUp";
 import OAuth2Callback from "../pages/Auth/OAuth2Callback";
 import Settingpage from "../pages/Setting/Settingpage";
@@ -39,6 +39,8 @@ import BanUser from "../pages/Auth/BanUser";
 import Analytics from "../pages/Analysis/Analytics";
 import AdminAnalytics from "../pages/Analysis/AdminAnalytics";
 import CompleteProfile from "../pages/Profile/CompleteProfile";
+
+const LandingPage = lazy(() => import("../pages/Landing"));
 
 function AppRouter() {
   return (
@@ -54,7 +56,14 @@ function AppRouter() {
       <Route path="/unauthorized" element={<Unauthorized />} />
       <Route path="/banned" element={<BanUser />} />
       <Route path="/complete-profile" element={<CompleteProfile />} />
-      <Route path="/" element={<LandingPage />} />
+      <Route
+        path="/"
+        element={
+          <Suspense fallback={null}>
+            <LandingPage />
+          </Suspense>
+        }
+      />
       <Route path="/setting" element={<Settingpage />} />
       {/* Protected routes */}
       <Route element={<MainLayout />}>

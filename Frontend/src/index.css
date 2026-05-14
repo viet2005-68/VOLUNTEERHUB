@@ -9,6 +9,10 @@
     --font-ibm-plex-sans: "IBM Plex Sans", sans-serif;
     --font-jost: "Jost", sans-serif;
     --font-roboto: "Roboto", sans-serif;
+    --color-green: #00522d;
+    --color-pink-1: #fce5df;
+    --color-pink-2: #f8c4b4;
+    --color-pink-3: #db3c8a;
     /* Define animation */
     --animate-movingY: move 3s linear infinite;
     --animate-rotating: rotate 15s linear infinite;

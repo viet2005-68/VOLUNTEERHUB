@@ -36,14 +36,13 @@ components:
         - REJECTED
         - COMPLETED
         - ABSENT
-      description: Status of a user's registration for an event
+      description: Status of a useEXPLORECTRL + SPACE￼...r's registration for an event
 
     EventStatus:
       type: string
       enum:
         - PENDING
         - APPROVED
-        - REJECTED
       description: Status of an event
 
     UserEventRequest:

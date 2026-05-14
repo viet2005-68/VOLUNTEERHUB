@@ -1,0 +1,254 @@
+import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
+import { animate, createTimeline, stagger } from 'animejs'
+import MagneticButton from './MagneticButton'
+import { splitText } from '../../pages/Landing/motion/textReveal'
+import bolt from '../../pages/Landing/assets/images/bolt-shape-loader.webp'
+
+const slides = [
+  {
+    image: '/media/site/9e2180cad6-1764264569/agence-foudre-1-600x-q80.avif',
+    kicker: 'Agence social média',
+    title: 'Human Social Club',
+    side: 'Stratégie qui électrise les conversations.',
+    theme: 'cream',
+  },
+  {
+    image: '/media/site/1be50e9049-1764268151/yelloh-1-600x-q80.avif',
+    kicker: 'Case du mois',
+    title: 'Yelloh! Village',
+    side: 'Un contenu solaire, direct, impossible à scroller sans sourire.',
+    theme: 'blue',
+  },
+  {
+    image: '/media/site/70daac3e59-1764268976/solty-hotels-1-600x-q80.avif',
+    kicker: 'Social hospitality',
+    title: 'Solty Hotels',
+    side: 'Des images chaudes pour transformer un lieu en réflexe social.',
+    theme: 'green',
+  },
+]
+
+const sideImages = [
+  '/media/site/0ee0e5dc47-1765190556/mg-@agence.foudre-137-600x-q80.avif',
+  '/media/site/b89fc535d3-1764264576/agence-foudre-3-600x-q80.avif',
+]
+
+const clamp = (value, min = 0, max = 1) => Math.min(max, Math.max(min, value))
+const map = (start, end, progress) => start + (end - start) * progress
+const segment = (progress, start, end) => clamp((progress - start) / (end - start || 1))
+
+const MERGE_START = 0.1
+const MERGE_END = 0.3
+const SECOND_SLIDE_START = 0.4
+const THIRD_SLIDE_START = 0.75
+const HERO_SEQUENCE_END = 0.98
+
+function Hero() {
+  const rootRef = useRef(null)
+  const stageRef = useRef(null)
+  const cardStackRef = useRef(null)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  useEffect(() => {
+    const root = rootRef.current
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (!root || reduce) return undefined
+
+    const split = splitText(root.querySelector('[data-hero-title]'), 'lines, words')
+    const tl = createTimeline({ autoplay: false })
+      .add(root.querySelectorAll('.hero-big-logo span'), {
+        translateY: ['110%', '0%'],
+        rotate: ['2deg', '0deg'],
+        duration: 900,
+        delay: stagger(45),
+        ease: 'easeOutExpo',
+      })
+      .add(root.querySelectorAll('.hero-title .word'), {
+        translateY: ['112%', '0%'],
+        opacity: [0, 1],
+        delay: stagger(34),
+        duration: 760,
+        ease: 'easeOutExpo',
+      }, '-=520')
+      .add(root.querySelectorAll('[data-hero-ui]'), {
+        translateY: [30, 0],
+        opacity: [0, 1],
+        delay: stagger(90),
+        duration: 680,
+        ease: 'easeOutCubic',
+      }, '-=460')
+
+    tl.play()
+
+    return () => {
+      tl.pause()
+      split?.revert?.()
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!mounted) return undefined
+
+    const root = rootRef.current
+    const stage = stageRef.current
+    const cardStack = cardStackRef.current
+    if (!root || !stage || !cardStack) return undefined
+
+    let frame = 0
+    let currentIndex = -1
+    const center = cardStack.querySelector('.hero-sequence-card--center')
+    const left = cardStack.querySelector('.hero-sequence-card--left')
+    const right = cardStack.querySelector('.hero-sequence-card--right')
+    const bg = stage.querySelector('.hero-sequence-bg')
+    const kicker = stage.querySelector('.hero-sequence-kicker')
+    const title = stage.querySelector('.hero-sequence-title')
+    const side = stage.querySelector('.hero-sequence-side')
+    const currentImage = center?.querySelector('.hero-sequence-image--current')
+    const incomingImage = center?.querySelector('.hero-sequence-image--incoming')
+
+    const setSlide = (index) => {
+      if (index === currentIndex) return
+      const previousSlide = slides[currentIndex] || slides[index]
+      currentIndex = index
+      const slide = slides[index]
+      stage.dataset.theme = slide.theme
+      if (currentImage) currentImage.src = previousSlide.image
+      if (incomingImage) incomingImage.src = slide.image
+      if (kicker) kicker.textContent = slide.kicker
+      if (title) title.textContent = slide.title
+      if (side) side.textContent = slide.side
+      animate(currentImage, {
+        translateZ: [0, -90],
+        rotateY: ['0deg', '-16deg'],
+        scale: [1, 0.94],
+        opacity: [1, 0.72],
+        filter: ['brightness(1)', 'brightness(0.82)'],
+        duration: 920,
+        ease: 'easeOutExpo',
+      })
+      animate(incomingImage, {
+        translateZ: [120, 0],
+        rotateY: ['58deg', '0deg'],
+        rotateX: ['4deg', '0deg'],
+        scale: [0.92, 1],
+        opacity: [0, 1],
+        duration: 980,
+        ease: 'easeOutExpo',
+        onBegin: () => {
+          if (incomingImage) incomingImage.style.opacity = '1'
+        },
+        onComplete: () => {
+          if (currentImage) {
+            currentImage.src = slide.image
+            currentImage.style.transform = ''
+            currentImage.style.opacity = ''
+            currentImage.style.filter = ''
+          }
+          if (incomingImage) {
+            incomingImage.style.opacity = '0'
+            incomingImage.style.transform = 'translateZ(120px) rotateY(58deg) rotateX(4deg) scale(0.92)'
+          }
+        },
+      })
+      animate([kicker, title, side], {
+        translateY: [28, 0],
+        opacity: [0, 1],
+        delay: stagger(70),
+        duration: 520,
+        ease: 'easeOutCubic',
+      })
+    }
+
+    const render = () => {
+      const rect = root.getBoundingClientRect()
+      const progress = clamp(-rect.top / (rect.height - window.innerHeight || 1))
+      const mergeIn = segment(progress, MERGE_START, MERGE_END)
+      const spread = 1 - mergeIn
+      const nextIndex = progress < SECOND_SLIDE_START ? 0 : progress < THIRD_SLIDE_START ? 1 : 2
+      const inHeroSequence = progress >= 0 && progress <= HERO_SEQUENCE_END
+
+      setSlide(nextIndex)
+      if (!inHeroSequence && progress > HERO_SEQUENCE_END) {
+        stage.dataset.theme = slides[0].theme
+      }
+
+      cardStack.classList.toggle('is-card-active', inHeroSequence)
+      cardStack.classList.toggle('is-card-hidden', !inHeroSequence)
+      cardStack.classList.toggle('is-card-merged', spread < 0.08)
+      stage.classList.toggle('is-card-active', inHeroSequence)
+
+      const sideX = Math.min(360, window.innerWidth * 0.22)
+      left.style.opacity = spread
+      right.style.opacity = spread
+      left.style.transform = `translate(-50%, -50%) translate3d(${-sideX * spread}px, ${map(0, -12, spread)}px, 0) rotate(${-7 * spread}deg) scale(${map(0.9, 0.96, spread)})`
+      right.style.transform = `translate(-50%, -50%) translate3d(${sideX * spread}px, ${map(0, -12, spread)}px, 0) rotate(${7 * spread}deg) scale(${map(0.9, 0.96, spread)})`
+      center.style.transform = `translate(-50%, -50%) translate3d(0, 0, 0) scale(${map(1, 1.03, spread)})`
+      bg.style.opacity = segment(progress, 0.22, 0.38)
+    }
+
+    const onScroll = () => {
+      cancelAnimationFrame(frame)
+      frame = requestAnimationFrame(render)
+    }
+
+    render()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('resize', onScroll)
+
+    return () => {
+      cancelAnimationFrame(frame)
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', onScroll)
+    }
+  }, [mounted])
+
+  const cardStack = (
+    <div ref={cardStackRef} className="hero-card-stack" aria-hidden="true">
+      <figure className="hero-sequence-card hero-sequence-card--left">
+        <img src={sideImages[0]} alt="" />
+      </figure>
+      <figure className="hero-sequence-card hero-sequence-card--center" data-cursor="card">
+        <img className="hero-sequence-image hero-sequence-image--current" src={slides[0].image} alt="" />
+        <img className="hero-sequence-image hero-sequence-image--incoming" src={slides[0].image} alt="" />
+        <span className="hero-card-badge"><img src={bolt} alt="" /></span>
+      </figure>
+      <figure className="hero-sequence-card hero-sequence-card--right">
+        <img src={sideImages[1]} alt="" />
+      </figure>
+    </div>
+  )
+
+  return (
+    <>
+      {mounted && createPortal(cardStack, document.body)}
+      <section ref={rootRef} id="top" className="hero-section hero-sequence">
+        <div ref={stageRef} className="hero-sticky-stage" data-theme="cream">
+          <div className="hero-sequence-bg" aria-hidden="true" />
+
+          <div className="hero-big-logo" aria-label="VolunteerHub">
+            {'VolunteerHub'.split('').map((letter, index) => (
+              <span key={`${letter}-${index}`}>{letter}</span>
+            ))}
+          </div>
+
+          <div className="hero-bottom-copy" data-hero-ui>
+            <p className="hero-sequence-kicker">{slides[0].kicker}</p>
+            <h1 className="hero-title hero-sequence-title" data-hero-title>{slides[0].title}</h1>
+          </div>
+
+          <aside className="hero-side-case" data-hero-ui>
+            <p className="hero-sequence-side">{slides[0].side}</p>
+            <MagneticButton href="#contact">Voir le case</MagneticButton>
+          </aside>
+        </div>
+      </section>
+    </>
+  )
+}
+
+export default Hero
