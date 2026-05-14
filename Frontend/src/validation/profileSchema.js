@@ -1,6 +1,14 @@
 import * as yup from "yup";
 
 const phoneRegex = /^(\+?[0-9]{7,15}|0[0-9]{9,14})$/;
+const minimumAge = 16;
+
+const getAgeByYear = (dateString) => {
+    const birthYear = Number(String(dateString || "").slice(0, 4));
+    if (!Number.isInteger(birthYear)) return null;
+
+    return new Date().getFullYear() - birthYear;
+};
 
 const profileSchema = yup.object({
     name: yup.string().nullable(),
@@ -20,7 +28,15 @@ const profileSchema = yup.object({
     dateOfBirth: yup
         .string()
         .trim()
-        .required("Date of birth is required."),
+        .required("Date of birth is required.")
+        .test(
+            "minimum-age-by-year",
+            "You must be at least 16 years old.",
+            (value) => {
+                const ageByYear = getAgeByYear(value);
+                return ageByYear !== null && ageByYear >= minimumAge;
+            }
+        ),
     address: yup.object({
         province: yup
             .string()

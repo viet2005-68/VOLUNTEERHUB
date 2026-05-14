@@ -31,6 +31,15 @@ import profileSchema from "../../validation/profileSchema";
 import { ValidationError } from "yup";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 
+const MINIMUM_PROFILE_AGE = 16;
+
+const getAgeByYear = (dateString) => {
+  const birthYear = Number(String(dateString || "").slice(0, 4));
+  if (!Number.isInteger(birthYear)) return null;
+
+  return new Date().getFullYear() - birthYear;
+};
+
 const composeAddress = ({ street, districtName, provinceName }) =>
   [street, districtName, provinceName]
     .map((part) => part?.trim())
@@ -100,6 +109,7 @@ export default function Settingpage() {
   const [errors, setErrors] = useState({});
   const { data: profile, isLoading } = useProfile();
   const { mutate: updateProfile } = useUpdateUserProfile();
+  const maxAllowedBirthDate = `${new Date().getFullYear() - MINIMUM_PROFILE_AGE}-12-31`;
 
   // Callback khi provinces được fetch xong
   const handleProvincesLoaded = useCallback((provincesData) => {
@@ -298,7 +308,20 @@ export default function Settingpage() {
       return;
     }
 
-    clearFieldError(name);
+    if (name === "dateOfBirth") {
+      const ageByYear = getAgeByYear(value);
+      if (value && (ageByYear === null || ageByYear < MINIMUM_PROFILE_AGE)) {
+        setErrors((prev) => ({
+          ...prev,
+          dateOfBirth: "You must be at least 16 years old.",
+        }));
+      } else {
+        clearFieldError(name);
+      }
+    } else {
+      clearFieldError(name);
+    }
+
     setFormData((prev) => {
       if (!prev) return prev;
       if (prev[name] === value) return prev;
@@ -825,6 +848,7 @@ export default function Settingpage() {
                     value={formData.dateOfBirth}
                     onChange={handleInputChange}
                     disabled={!isEditing}
+                    max={maxAllowedBirthDate}
                     className={getInputClasses("dateOfBirth")}
                   />
                   {isEditing && errors.dateOfBirth && (

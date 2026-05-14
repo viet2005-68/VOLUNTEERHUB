@@ -403,7 +403,7 @@ export default function OAuth2Callback() {
                 />
               </svg>
             </div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">
+            <h2 className="mb-2 font-['Beni','Bebas_Neue',Impact,ui-sans-serif] text-[44px] font-black uppercase leading-[0.75] text-[#00522d]">
               Authentication Error
             </h2>
             <p className="text-gray-600 mb-4">{error}</p>
@@ -433,8 +433,8 @@ export default function OAuth2Callback() {
                 ></path>
               </svg>
             </div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">
-              Completing Sign In...
+            <h2 className="mb-2 font-['Beni','Bebas_Neue',Impact,ui-sans-serif] text-[44px] font-black uppercase leading-[0.75] text-[#00522d]">
+              Completing sign&nbsp;in...
             </h2>
             <p className="text-gray-600">Please wait while we log you in</p>
           </div>
@@ -455,7 +455,7 @@ export default function OAuth2Callback() {
                 />
               </svg>
             </div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">
+            <h2 className="mb-2 font-['Beni','Bebas_Neue',Impact,ui-sans-serif] text-[44px] font-black uppercase leading-[0.75] text-[#00522d]">
               Success!
             </h2>
             <p className="text-gray-600">Redirecting to dashboard...</p>
