@@ -16,4 +16,33 @@ public interface EventRepository extends JpaRepository<Event, Long>, JpaSpecific
 
     @EntityGraph(attributePaths = { "category", "address" })
     List<Event> findByIdIn(List<Long> ids);
+
+    @Query(
+            value = "SELECT * FROM event e WHERE e.name ~* :keyword OR e.description ~* :keyword",
+            countQuery = "SELECT COUNT(*) FROM event e WHERE e.name ~* :keyword OR e.description ~* :keyword",
+            nativeQuery = true
+    )
+    Page<Event> searchEventsByRegex(@Param("keyword") String keyword, Pageable pageable);
+
+    @Query(
+            value = "SELECT * FROM event e WHERE (e.name ~* :keyword OR e.description ~* :keyword) AND e.status = :status",
+            countQuery = "SELECT COUNT(*) FROM event e WHERE (e.name ~* :keyword OR e.description ~* :keyword) AND e.status = :status",
+            nativeQuery = true
+    )
+    Page<Event> searchEventsByRegexAndStatus(@Param("keyword") String keyword, @Param("status") String status, Pageable pageable);
+
+    @Query(
+            value = "SELECT * FROM event e WHERE (e.name ~* :keyword OR e.description ~* :keyword) AND e.owner_id = :ownerId",
+            countQuery = "SELECT COUNT(*) FROM event e WHERE (e.name ~* :keyword OR e.description ~* :keyword) AND e.owner_id = :ownerId",
+            nativeQuery = true
+    )
+    Page<Event> searchEventsByRegexAndOwnerId(@Param("keyword") String keyword, @Param("ownerId") String ownerId, Pageable pageable);
+
+    @Query(
+            value = "SELECT * FROM event e WHERE (e.name ~* :keyword OR e.description ~* :keyword) AND e.owner_id = :ownerId AND e.status = :status",
+            countQuery = "SELECT COUNT(*) FROM event e WHERE (e.name ~* :keyword OR e.description ~* :keyword) AND e.owner_id = :ownerId AND e.status = :status",
+            nativeQuery = true
+    )
+    Page<Event> searchEventsByRegexAndOwnerIdAndStatus(@Param("keyword") String keyword, @Param("ownerId") String ownerId,
+                                                        @Param("status") String status, Pageable pageable);
 }

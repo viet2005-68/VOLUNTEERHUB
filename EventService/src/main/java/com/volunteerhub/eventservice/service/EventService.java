@@ -226,4 +226,32 @@ public class EventService {
         eventPublisher.publishEvent(eventMapper.toRejectedMessage(event, request.getReason()));
         return eventMapper.toDto(eventRepository.save(event));
     }
+
+    public Page<EventResponse> searchByKeyword(String keyword, String ownerId, EventStatus status, Integer pageNum,
+                                               Integer pageSize) {
+        PageNumAndSizeResponse pageNumAndSizeResponse = PaginationValidation.validate(pageNum, pageSize);
+        int page = pageNumAndSizeResponse.getPageNum();
+        int size = pageNumAndSizeResponse.getPageSize();
+
+        if (ownerId == null && status == null) {
+            Page<Event> events = eventRepository.searchEventsByRegex(keyword.trim(), PageRequest.of(page, size));
+            return eventMapper.toDtoPage(events);
+        }
+
+        if (status != null && ownerId == null) {
+            Page<Event> events = eventRepository.searchEventsByRegexAndStatus(keyword.trim(), status.name(),
+                    PageRequest.of(page, size));
+            return eventMapper.toDtoPage(events);
+        }
+
+        if (status == null) {
+            Page<Event> events = eventRepository.searchEventsByRegexAndOwnerId(keyword.trim(), ownerId,
+                    PageRequest.of(page, size));
+            return eventMapper.toDtoPage(events);
+        }
+
+        Page<Event> events = eventRepository.searchEventsByRegexAndOwnerIdAndStatus(keyword.trim(), ownerId,
+                status.name(), PageRequest.of(page, size));
+        return eventMapper.toDtoPage(events);
+    }
 }
