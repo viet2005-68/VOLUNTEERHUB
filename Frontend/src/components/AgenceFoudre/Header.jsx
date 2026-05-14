@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { animate } from 'animejs'
 import MagneticButton from './MagneticButton'
+import { LOGIN_LINK } from '../../constant/constNavigate'
 
 function Header({ menuOpen = false, onToggleMenu = () => {} }) {
   const headerRef = useRef(null)
@@ -37,8 +38,8 @@ function Header({ menuOpen = false, onToggleMenu = () => {} }) {
         <a href="#projets" data-cursor="link">Projets</a>
         <a href="#contact" data-cursor="link">Contact</a>
       </nav>
-      <MagneticButton className="menu-button" onClick={onToggleMenu} aria-expanded={menuOpen} aria-label="Ouvrir le menu">
-        {menuOpen ? 'Close' : 'Menu'}
+      <MagneticButton className="menu-button" href={LOGIN_LINK} aria-label="Join us">
+        Join us
       </MagneticButton>
     </header>
   )

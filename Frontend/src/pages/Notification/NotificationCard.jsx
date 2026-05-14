@@ -362,8 +362,8 @@ function NotificationCard({ noti }) {
             }}
             disabled={markAsReadMutation.isPending}
             className={`${
-              noti?.isRead ? "hidden" : "text-white"
-            } flex items-center gap-2 mb-2 bg-blue-400 hover:bg-blue-500 transition duration-300 border px-2 py-1 rounded-lg w-full disabled:opacity-50 disabled:cursor-not-allowed`}
+              noti?.isRead ? "hidden" : "text-pale-canvas"
+            } mb-2 flex w-full items-center gap-2 rounded-[10px] border border-deep-forest bg-deep-forest px-3 py-2 font-bold transition-all duration-300 hover:-translate-y-0.5 hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50`}
           >
             <span className="w-4">
               <Check />
@@ -376,7 +376,7 @@ function NotificationCard({ noti }) {
               handleDelete(noti?.id);
             }}
             disabled={deleteNotificationMutation.isPending}
-            className="text-white bg-red-500 hover:bg-red-600 transition duration-300 flex items-center gap-2 border px-4 py-1 rounded-lg w-full disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex w-full items-center gap-2 rounded-[10px] border-2 border-deep-forest bg-transparent px-4 py-2 font-bold text-deep-forest transition-all duration-300 hover:-translate-y-0.5 hover:bg-deep-forest hover:text-pale-canvas disabled:cursor-not-allowed disabled:opacity-50"
           >
             <span>
               <Trash className="w-4" />

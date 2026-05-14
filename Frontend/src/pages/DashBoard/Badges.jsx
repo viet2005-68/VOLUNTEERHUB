@@ -73,12 +73,12 @@ const dumpdata = [
 ];
 export default function Badges() {
   return (
-    <div className="bg-white p-5 rounded-xl shadow-sm flex flex-col gap-10">
+    <div className="rounded-2xl border border-deep-forest/15 bg-pale-canvas p-5 flex flex-col gap-10 text-deep-forest">
       <div>
-        <p className="text-2xl font-semibold max-sm:text-md">
+        <p className="text-2xl font-bold max-sm:text-md">
           Achievement Badges
         </p>
-        <p className="text-gray-500">
+        <p className="text-deep-forest/65">
           Your volunteer milestones and recognition
         </p>
       </div>

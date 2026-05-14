@@ -107,18 +107,18 @@ export default function MainLayout() {
     // Chờ redirect hoặc check ban status
     console.log("MainLayout: Waiting for user or checking ban status");
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-pale-canvas text-deep-forest">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-foudre-pink mx-auto mb-4"></div>
+          <p className="text-deep-forest/70">Loading...</p>
         </div>
       </div>
     );
   }
   return (
-    <div className="min-h-screen bg-soft-gradient flex flex-col overflow-x-hidden">
+    <div className="min-h-screen bg-soft-gradient flex flex-col overflow-x-hidden text-deep-forest">
       {/* Navbar fixed (desktop / tablet) */}
-      <header className="fixed top-0 left-0 right-0 z-50 border-b shadow-sm bg-white border-b-gray-400/60">
+      <header className="fixed top-0 left-0 right-0 z-50 border-b border-deep-forest/15 bg-pale-canvas/90 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center">
           <NavBar />
         </div>
@@ -136,8 +136,8 @@ export default function MainLayout() {
 
       {/* Nội dung chính */}
       <main
-        className={`flex-1 px-4 sm:px-6 lg:px-8 pb-20 ${
-          shouldShowBanner ? "pt-32" : "pt-20"
+        className={`flex-1 px-4 sm:px-6 lg:px-8 pb-30 ${
+          shouldShowBanner ? "pt-36" : "pt-22"
         }`}
       >
         {/* thêm pb-20 để tránh bị che bởi BottomNav */}
@@ -153,7 +153,7 @@ export default function MainLayout() {
       {showScrollTop && (
         <button
           onClick={scrollToTop}
-          className="fixed bottom-24 right-6 z-40 w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 via-blue-400 to-blue-600 text-white flex items-center justify-center shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-300 animate-bounce"
+          className="fixed bottom-24 right-6 z-40 w-12 h-12 rounded-full bg-foudre-pink text-pale-canvas flex items-center justify-center border border-pale-canvas/60 hover:bg-deep-forest hover:scale-105 transition-all duration-300 animate-bounce"
           aria-label="Scroll to top"
         >
           <ArrowUp className="w-6 h-6" />

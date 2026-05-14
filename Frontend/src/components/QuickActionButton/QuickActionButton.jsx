@@ -20,15 +20,15 @@ function QuickActionButton({
 
   return (
     <div
-      className={`flex flex-col items-center justify-center cursor-pointer p-3 rounded-lg hover:bg-gray-100 transition hover:scale-100 gap-3 border-1 border-gray-600/20 shadow-xs ${
+      className={`flex cursor-pointer flex-col items-center justify-center gap-3 rounded-[10px] border-2 p-5 transition-colors ${
         active
-          ? "text-indigo-300 bg-gray-800 hover:bg-gray-800/10 hover:text-indigo-600"
-          : "text-black"
+          ? "border-deep-forest bg-deep-forest text-pale-canvas"
+          : "border-ash-whisper bg-pale-canvas text-deep-forest hover:border-bubblegum-blush hover:bg-ash-whisper"
       }`}
       onClick={handleClick}
     >
       <Icon size={24} />
-      <div className="text-sm mt-1">{label}</div>
+      <div className="mt-1 text-sm font-bold leading-[0.85]">{label}</div>
     </div>
   );
 }

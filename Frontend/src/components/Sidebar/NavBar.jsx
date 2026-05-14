@@ -30,26 +30,26 @@ export default function NavBar() {
   const displayName = user?.name ?? "Guest";
   const roleLabel = user?.role ? normalizeRole(user.role) : "Guest";
   return (
-    <div className="flex flex-row justify-between w-full">
+    <div className="flex flex-row justify-between w-full text-deep-forest">
       <div className="flex items-center -space-x-1">
         <span className="w-12">
           <img src={Logo} alt="logo" className="max-h-max" />
         </span>
-        <span className="max-sm:hidden font-semibold font-lobster text-2xl max-sm:text-xl">
+        <span className="max-sm:hidden font-beni text-4xl leading-[0.7] text-foudre-pink uppercase max-sm:text-3xl">
           VolunteerHub
         </span>
       </div>
       <div className="self-center">
-        <ul className="hidden md:flex items-center gap-8 max-w-1/2 text-lg  text-gray-700">
+        <ul className="hidden md:flex items-center gap-8 max-w-1/2 text-sm font-bold uppercase text-deep-forest">
           <li
             onClick={() => {
               navigate("/dashboard");
               setNavChoice("Dashboard");
             }}
-            className={`cursor-pointer hover:underline hover:decoration-red-500 decoration-2 underline-offset-4 transform duration-150 ${
+            className={`cursor-pointer rounded-[10px] px-4 py-3 transition-colors hover:bg-ash-whisper ${
               navChoice === "Dashboard"
-                ? "underline decoration-red-400 underline-offset-2"
-                : ""
+                ? "bg-deep-forest text-pale-canvas"
+                : "text-deep-forest"
             }`}
           >
             DashBoard
@@ -59,10 +59,10 @@ export default function NavBar() {
               navigate("/opportunities");
               setNavChoice("Opportunities");
             }}
-            className={`cursor-pointer hover:underline hover:decoration-red-500 decoration-2 underline-offset-4 ${
+            className={`cursor-pointer rounded-[10px] px-4 py-3 transition-colors hover:bg-ash-whisper ${
               navChoice === "Opportunities"
-                ? "underline decoration-red-400 underline-offset-2"
-                : ""
+                ? "bg-deep-forest text-pale-canvas"
+                : "text-deep-forest"
             }`}
           >
             Opportunities
@@ -73,10 +73,10 @@ export default function NavBar() {
               navigate("/leaderboard");
               setNavChoice("Leaderboard");
             }}
-            className={`cursor-pointer hover:underline hover:decoration-red-500 decoration-2 underline-offset-4 ${
+            className={`cursor-pointer rounded-[10px] px-4 py-3 transition-colors hover:bg-ash-whisper ${
               navChoice === "Leaderboard"
-                ? "underline decoration-red-400 underline-offset-2"
-                : ""
+                ? "bg-deep-forest text-pale-canvas"
+                : "text-deep-forest"
             }`}
           >
             Leaderboard
@@ -85,13 +85,13 @@ export default function NavBar() {
       </div>
       <div className="flex items-center gap-8">
         <BellDot
-          className="cursor-pointer hover:text-red-400"
+          className="cursor-pointer text-deep-forest transition-colors hover:text-foudre-pink"
           onClick={() => navigate("/dashboard/notifications")}
         />
         <DropDown
           trigger={
             <div className="flex flex-row items-center gap-3">
-              <div className="bg-red-400 flex items-center flex-col rounded-full w-10 h-10 justify-center">
+              <div className="flex h-10 w-10 flex-col items-center justify-center rounded-full border-2 border-ash-whisper bg-pale-canvas">
                 <img
                   src={`https://api.dicebear.com/9.x/avataaars/svg?seed=${displayName}`}
                   alt="avatar"
@@ -99,20 +99,20 @@ export default function NavBar() {
                 />
               </div>
               <div className="flex flex-col text-left">
-                <span>{displayName}</span>
-                <span className="text-gray-700 text-sm">{roleLabel}</span>
+                <span className="font-bold text-deep-forest">{displayName}</span>
+                <span className="text-deep-forest/65 text-sm">{roleLabel}</span>
               </div>
             </div>
           }
         >
           <DropDownItem
-            className="cursor-pointer"
+            className="cursor-pointer text-deep-forest hover:text-foudre-pink"
             handleClick={() => navigate("/setting")}
           >
             <span>Setting</span>
           </DropDownItem>
           <DropDownItem
-            className="cursor-pointer"
+            className="cursor-pointer text-deep-forest hover:text-foudre-pink"
             handleClick={async () => {
               try {
                 console.log("[NavBar] Calling logout()...");

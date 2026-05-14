@@ -24,13 +24,15 @@ export default function Tabs({
 
   const baseClass =
     variant === "header"
-      ? "w-full rounded-full bg-blue-100  py-1 flex flex-1 items-center justify-around max-sm:py-0.5 max-sm:gap-0.5 text-center"
+      ? "w-full rounded-[20px] bg-ash-whisper p-1.5 flex flex-1 items-center justify-around gap-2 overflow-x-auto text-center"
       : "inline-flex gap-2 items-center";
 
   const tabClass = (isActive) =>
     [
-      "flex-1 ml-1 mr-1 py-1 rounded-2xl text-sm font-medium text-center max-sm:text-xs",
-      isActive ? "bg-white shadow-sm" : "text-gray-700",
+      "flex-1 min-w-fit px-5 py-3 rounded-[10px] text-sm font-bold leading-[0.85] text-center max-sm:text-xs transition-colors",
+      isActive
+        ? "bg-bubblegum-blush text-pale-canvas"
+        : "text-deep-forest hover:bg-bubblegum-blush/40",
     ].join(" ");
 
   return (

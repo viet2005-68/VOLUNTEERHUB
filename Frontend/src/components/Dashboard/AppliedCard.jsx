@@ -22,9 +22,9 @@ function AppliedCard({
   const eventId = event?.id || registration?.eventId;
 
   const statusBg = () => {
-    if (status?.toLowerCase() === "pending") return "bg-white";
-    else if (status?.toLowerCase() === "approved") return "bg-green-500/50";
-    else return "bg-white";
+    if (status?.toLowerCase() === "pending") return "bg-ash-whisper text-foudre-pink";
+    else if (status?.toLowerCase() === "approved") return "bg-bubblegum-blush text-deep-forest";
+    else return "bg-ash-whisper text-deep-forest";
   };
 
   const handleUnregister = async () => {
@@ -55,16 +55,16 @@ function AppliedCard({
 
             {/* DESKTOP CONTENT */}
             <div className="hidden sm:flex flex-col flex-1 gap-1 cursor-pointer">
-              <div className="font-semibold text-[18px]">{title}</div>
-              <div className="flex items-center gap-2 text-gray-600 text-[15px]">
+              <div className="font-bold text-[18px] text-deep-forest">{title}</div>
+              <div className="flex items-center gap-2 text-deep-forest/65 text-[15px]">
                 <Building2 size={16} className="flex-shrink-0" />
                 <span>{organization}</span>
               </div>
-              <div className="flex items-center gap-2 text-gray-600 text-[15px]">
+              <div className="flex items-center gap-2 text-deep-forest/65 text-[15px]">
                 <Calendar size={16} className="flex-shrink-0" />
                 <span>{date}</span>
               </div>
-              <div className="flex items-center gap-2 text-gray-600 text-[15px]">
+              <div className="flex items-center gap-2 text-deep-forest/65 text-[15px]">
                 <MapPin size={16} className="flex-shrink-0" />
                 <span>{location}</span>
               </div>
@@ -81,7 +81,7 @@ function AppliedCard({
                     e.stopPropagation();
                     setOpen(!open);
                   }}
-                  className="text-gray-500 flex-shrink-0 p-2 -m-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="text-deep-forest/65 flex-shrink-0 p-2 -m-2 hover:bg-ash-whisper rounded-lg transition-colors"
                 >
                   {open ? (
                     <FiChevronUp size={20} />
@@ -96,9 +96,9 @@ function AppliedCard({
           {/* STATUS + CANCEL BUTTON */}
           <div className="flex flex-col gap-2 items-center md:self-center max-sm:flex-row max-sm:justify-between max-sm:mt-2">
             <div
-              className={`inline-flex items-center ${statusBg()} px-2 py-1 rounded-full border border-gray-600/20 text-[14px]`}
+              className={`inline-flex items-center ${statusBg()} px-2 py-1 rounded-lg border border-deep-forest/15 text-[14px]`}
             >
-              <span className="text-yellow-500">
+              <span className="text-foudre-pink">
                 <FiClock size={14} />
               </span>
               <span className="ml-1 font-medium">{status}</span>
@@ -109,7 +109,7 @@ function AppliedCard({
                 setShowConfirm(true);
               }}
               disabled={unregisterMutation.isPending}
-              className="bg-red-500 text-white px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5"
+              className="bg-foudre-pink text-pale-canvas px-3 py-1.5 rounded-lg text-sm font-bold hover:bg-deep-forest transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5"
             >
               <X size={16} />
               <span>
@@ -121,7 +121,7 @@ function AppliedCard({
 
         {/* MOBILE DROPDOWN CONTENT */}
         {open && (
-          <div className="sm:hidden px-2 pt-2 pb-3 text-gray-600 text-[14px] border-t border-gray-100 mt-2 space-y-1">
+          <div className="sm:hidden px-2 pt-2 pb-3 text-deep-forest/65 text-[14px] border-t border-deep-forest/15 mt-2 space-y-1">
             <p>
               <b>Organization:</b> {organization}
             </p>
@@ -147,22 +147,22 @@ function AppliedCard({
           onClick={(e) => e.stopPropagation()}
         >
           <div
-            className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6"
+            className="bg-pale-canvas rounded-2xl border border-deep-forest/15 max-w-md w-full p-6 text-deep-forest"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-semibold text-gray-900">
+              <h3 className="text-xl font-bold text-deep-forest">
                 Cancel Registration
               </h3>
               <button
                 onClick={() => setShowConfirm(false)}
-                className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
+                className="p-1 hover:bg-ash-whisper rounded-lg transition-colors"
               >
                 <X size={20} />
               </button>
             </div>
 
-            <p className="text-gray-600 mb-6">
+            <p className="text-deep-forest/65 mb-6">
               Are you sure you want to cancel your registration for{" "}
               <span className="font-semibold">{title}</span>? This action cannot
               be undone.
@@ -172,14 +172,14 @@ function AppliedCard({
               <button
                 onClick={() => setShowConfirm(false)}
                 disabled={unregisterMutation.isPending}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50"
+                className="flex-1 px-4 py-2 border border-deep-forest/20 rounded-lg text-deep-forest hover:bg-ash-whisper transition-colors disabled:opacity-50"
               >
                 Keep Registration
               </button>
               <button
                 onClick={handleUnregister}
                 disabled={unregisterMutation.isPending}
-                className="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 px-4 py-2 bg-foudre-pink text-pale-canvas rounded-lg hover:bg-deep-forest transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {unregisterMutation.isPending ? "Canceling..." : "Yes, Cancel"}
               </button>

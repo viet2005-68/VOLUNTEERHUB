@@ -1,22 +1,92 @@
 @import "tailwindcss";
 @import "leaflet/dist/leaflet.css";
 
+@font-face {
+    font-family: "Beni";
+    src: url("/assets/beni-black-D6bI5x7v.woff2") format("woff2");
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Clash Grotesk";
+    src: url("/assets/clash-grotesk-medium-BFcfYDn8.woff2") format("woff2");
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Clash Grotesk";
+    src: url("/assets/clash-grotesk-bold-jtyxvzy-.woff2") format("woff2");
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
 @plugin "tailwind-scrollbar" {
     nocompatible: true;
 }
+
 @theme {
-    --font-lobster: "Lobster", cursive;
-    --font-ibm-plex-sans: "IBM Plex Sans", sans-serif;
-    --font-jost: "Jost", sans-serif;
-    --font-roboto: "Roboto", sans-serif;
+    --font-clash-grotesk: "Clash Grotesk", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --font-beni: "Beni", ui-sans-serif, system-ui, sans-serif;
+    --font-lobster: "Beni", ui-sans-serif, system-ui, sans-serif;
+    --font-ibm-plex-sans: "Clash Grotesk", ui-sans-serif, system-ui, sans-serif;
+    --font-jost: "Clash Grotesk", ui-sans-serif, system-ui, sans-serif;
+    --font-roboto: "Clash Grotesk", ui-sans-serif, system-ui, sans-serif;
+
+    --color-pale-canvas: #fff8f6;
+    --color-deep-forest: #00522d;
+    --color-foudre-pink: #db3c8a;
+    --color-ash-whisper: #fce5df;
+    --color-bubblegum-blush: #f29ebd;
+    --color-slate-tint: #d1cfe4;
+    --color-midnight-ink: #000000;
     --color-green: #00522d;
     --color-pink-1: #fce5df;
-    --color-pink-2: #f8c4b4;
+    --color-pink-2: #f29ebd;
     --color-pink-3: #db3c8a;
-    /* Define animation */
+
+    --spacing-8: 8px;
+    --spacing-12: 12px;
+    --spacing-20: 20px;
+    --spacing-60: 60px;
+    --spacing-120: 120px;
+    --spacing-140: 140px;
+
+    --radius-lg: 10px;
+    --radius-2xl: 20px;
+    --radius-3xl: 25px;
+
     --animate-movingY: move 3s linear infinite;
     --animate-rotating: rotate 15s linear infinite;
     --animate-scaleUp: scaleUp 3s linear infinite;
+}
+
+:root {
+    --color-pale-canvas: #fff8f6;
+    --color-deep-forest: #00522d;
+    --color-foudre-pink: #db3c8a;
+    --color-ash-whisper: #fce5df;
+    --color-bubblegum-blush: #f29ebd;
+    --color-slate-tint: #d1cfe4;
+    --color-midnight-ink: #000000;
+    --font-clash-grotesk: "Clash Grotesk", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --font-beni: "Beni", ui-sans-serif, system-ui, sans-serif;
+    --text-caption: 10px;
+    --text-body: 14px;
+    --text-subheading: 20px;
+    --text-heading: 30px;
+    --text-heading-lg: 46px;
+    --text-display: 230px;
+    --leading-tight-brand: 0.85;
+    --leading-display: 0.7;
+    --radius-buttons: 10px;
+    --radius-badges: 10px;
+    --radius-cards: 20px;
+    --radius-feature-card: 25px;
 }
 
 @keyframes move {
@@ -24,6 +94,7 @@
         transform: translateY(-1rem);
     }
 }
+
 @keyframes rotate {
     0% {
         transform: rotate(0deg);
@@ -45,84 +116,6 @@
     }
 }
 
-
-body {
-    @apply bg-gray-50 text-black font-jost overflow-x-hidden
-
-}
-
-.nav-link {
-    @apply text-lg font-bold duration-300;
-}
-
-.nav-link:hover {
-    @apply text-yellow-500;
-}
-
-.section {
-    @apply py-20 md:py-28;
-}
-
-h1 {
-    @apply text-3xl md:text-4xl xl:text-5xl font-bold;
-}
-
-.btn {
-    @apply border border-purple-300 text-white bg-gradient-to-r from-purple-400 via-fuchsia-400 to-pink-400 rounded-2xl px-5 py-2 duration-300 cursor-pointer;
-}
-
-.btn span {
-    @apply font-bold;
-}
-
-.btn:hover {
-    @apply opacity-90 from-purple-500 via-fuchsia-500 to-pink-500;
-}
-
-.btn_outline {
-    @apply bg-transparent;
-}
-
-.btn_outline:hover {
-    @apply bg-gradient-to-r from-purple-400 via-fuchsia-400 to-pink-400 text-white;
-}
-
-.btn_outline {
-    @apply border border-purple-400 text-purple-500;
-}
-
-.title-landing {
-    @apply font-lobster bg-gradient-to-r from-purple-500 via-fuchsia-500 to-pink-500 bg-clip-text text-transparent
-}
-
-h2 {
-    @apply text-3xl md:text-4xl xl:text-5xl font-bold
-}
-
-h3 {
-    @apply text-2xl md:text-3xl xl:text-4xl font-bold
-}
-
-.swiper-pagination {
-    position: relative !important;
-    margin-top: 2rem !important;
-}
-
-@keyframes gradient-x {
-    0%, 100% {
-      background-position: 0% 50%;
-    }
-    50% {
-      background-position: 100% 50%;
-    }
-  }
-  
-  .animate-gradient-x {
-    background-size: 200% 200%;
-    animation: gradient-x 2s ease infinite;
-  }
-
-/* Fade in animation for hero section */
 @keyframes fade-in {
     from {
         opacity: 0;
@@ -134,74 +127,175 @@ h3 {
     }
 }
 
+* {
+    box-sizing: border-box;
+    scroll-behavior: smooth;
+}
+
+body {
+    @apply bg-pale-canvas text-deep-forest font-clash-grotesk overflow-x-hidden;
+    margin: 0;
+    font-weight: 500;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: geometricPrecision;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+button,
+input,
+textarea,
+select {
+    font: inherit;
+}
+
+button {
+    transition: transform 0.2s ease, background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+    outline: 3px solid rgb(219 60 138 / 0.36);
+    outline-offset: 3px;
+}
+
+.nav-link {
+    @apply text-lg font-bold text-deep-forest duration-300;
+}
+
+.nav-link:hover {
+    @apply text-foudre-pink;
+}
+
+.section {
+    @apply py-20 md:py-28;
+}
+
+h1,
+h2,
+h3 {
+    @apply text-deep-forest;
+    margin: 0;
+}
+
+h1 {
+    @apply font-beni text-foudre-pink text-5xl md:text-7xl xl:text-8xl uppercase;
+    line-height: 0.7;
+}
+
+h2 {
+    @apply font-beni text-4xl md:text-6xl xl:text-7xl uppercase;
+    line-height: 0.7;
+}
+
+h3 {
+    @apply font-clash-grotesk text-2xl md:text-3xl xl:text-4xl font-bold;
+    line-height: 0.85;
+}
+
+.btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-foudre-pink bg-bubblegum-blush px-5 py-3 text-sm font-bold uppercase text-pale-canvas duration-300 cursor-pointer;
+}
+
+.btn span {
+    @apply font-bold;
+}
+
+.btn:hover {
+    @apply bg-foudre-pink text-pale-canvas;
+    transform: translateY(-1px);
+}
+
+.btn_outline {
+    @apply border-deep-forest bg-transparent text-deep-forest;
+}
+
+.btn_outline:hover {
+    @apply border-foudre-pink bg-ash-whisper text-foudre-pink;
+}
+
+.title-landing {
+    @apply font-beni text-foudre-pink uppercase;
+    line-height: 0.7;
+}
+
+.swiper-pagination {
+    position: relative !important;
+    margin-top: 2rem !important;
+}
+
+.animate-gradient-x {
+    background-size: 100% 100%;
+    animation: none;
+}
+
 .animate-fade-in {
     animation: fade-in 0.8s ease-out forwards;
 }
 
-/* Smooth transitions for all interactive elements */
-* {
-    scroll-behavior: smooth;
-}
-
-/* Custom scrollbar for brand consistency */
 ::-webkit-scrollbar {
     width: 10px;
 }
 
 ::-webkit-scrollbar-track {
-    background: #e5e7eb;
+    background: var(--color-ash-whisper);
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #9ca3af;
-    border-radius: 5px;
+    background: var(--color-foudre-pink);
+    border-radius: 999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #6b7280;
+    background: var(--color-deep-forest);
 }
 
-/* Enhanced button hover effects */
-button {
-    transition: all 0.3s ease;
-}
-
-/* Swiper pagination custom styling for brand colors */
 .swiper-pagination-bullet {
-    background: #d1d5db !important;
-    opacity: 0.6 !important;
+    background: var(--color-ash-whisper) !important;
+    opacity: 1 !important;
 }
 
 .swiper-pagination-bullet-active {
-    background: #6b7280 !important;
+    background: var(--color-foudre-pink) !important;
     opacity: 1 !important;
     transform: scale(1.2);
 }
 
 .no-scrollbar::-webkit-scrollbar {
-  display: none;
+    display: none;
 }
 
 .no-scrollbar {
-  -ms-overflow-style: none; /* IE + Edge */
-  scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;
+    scrollbar-width: none;
 }
 
-/* Soft gradient background similar to SettingPage */
-.bg-soft-gradient {
-  @apply relative bg-slate-50;
-  background-image: 
-    radial-gradient(circle at top, rgba(167, 139, 250, 0.08), transparent 55%),
-    linear-gradient(to bottom right, rgba(240, 171, 252, 0.15), transparent 40%);
-}
-
-
+.bg-soft-gradient,
 .bg-soft-gradient-bold {
-  @apply relative bg-slate-50;
-  background-image: 
-    /* Soft purple radial gradient from top */
-    radial-gradient(circle at top, rgba(139, 92, 246, 0.12), transparent 55%),
+    @apply relative bg-pale-canvas;
+    background-image:
+        radial-gradient(circle at top left, rgb(219 60 138 / 0.10), transparent 34vw),
+        radial-gradient(circle at bottom right, rgb(0 82 45 / 0.08), transparent 38vw);
+}
 
-    /* Fuchsia-pink diagonal gradient */
-    linear-gradient(to bottom right, rgba(192, 132, 252, 0.25), transparent 40%);
+.foudre-card {
+    @apply rounded-2xl border border-deep-forest/15 bg-pale-canvas p-6 text-deep-forest;
+}
+
+.foudre-card-accent {
+    @apply rounded-3xl bg-foudre-pink p-8 text-pale-canvas;
+}
+
+.foudre-badge {
+    @apply inline-flex items-center rounded-lg bg-foudre-pink px-3 py-2 text-sm font-bold text-pale-canvas;
+}
+
+.foudre-badge-subtle {
+    @apply inline-flex items-center rounded-lg bg-ash-whisper px-3 py-2 text-sm font-bold text-foudre-pink;
 }

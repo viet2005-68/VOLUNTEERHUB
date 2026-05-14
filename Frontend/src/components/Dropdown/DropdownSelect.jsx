@@ -8,6 +8,7 @@ export default function DropdownSelect({
   options = [],
   className = "",
   placeholder = "Select...",
+  disabled = false,
 }) {
   const [open, setOpen] = useState(false);
   const ref = useClickOutside(() => setOpen(false));
@@ -19,8 +20,11 @@ export default function DropdownSelect({
       {/* Trigger */}
       <button
         type="button"
-        onClick={() => setOpen(!open)}
-        className="flex justify-between items-center w-full rounded-2xl border border-gray-300 bg-white px-3 py-2 text-gray-800 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        disabled={disabled}
+        onClick={() => !disabled && setOpen(!open)}
+        className={`flex w-full items-center justify-between rounded-[10px] border-2 border-ash-whisper bg-pale-canvas px-4 py-4 text-left text-sm font-bold leading-[0.85] text-deep-forest transition-colors hover:bg-ash-whisper focus:outline-none focus-visible:border-foudre-pink disabled:cursor-not-allowed disabled:opacity-60 ${
+          open ? "border-foudre-pink bg-ash-whisper" : ""
+        }`}
       >
         <span className="truncate">
           {selected ? selected.label : placeholder}
@@ -33,7 +37,7 @@ export default function DropdownSelect({
       </button>
 
       {open && (
-        <ul className="absolute left-0 mt-2 w-full bg-white rounded-2xl shadow-lg ring-1 ring-black/5 overflow-y-auto max-h-60 z-50">
+        <ul className="absolute left-0 top-full z-[10050] mt-2 max-h-64 w-full overflow-y-auto rounded-[10px] border-2 border-ash-whisper bg-pale-canvas py-2 text-sm font-bold leading-[1.2] text-deep-forest">
           {options.map((opt) => (
             <li
               key={opt.value}
@@ -41,12 +45,12 @@ export default function DropdownSelect({
                 onChange(opt.value);
                 setOpen(false);
               }}
-              className={`flex justify-between items-center px-4 py-2  text-gray-800 hover:bg-gray-100 cursor-pointer ${
-                opt.value === value ? "bg-gray-100 text-blue-600" : ""
+              className={`flex cursor-pointer items-center justify-between px-4 py-3 font-medium transition-colors hover:bg-ash-whisper ${
+                opt.value === value ? "bg-ash-whisper text-foudre-pink" : ""
               }`}
             >
-              <span>{opt.label}</span>
-              {opt.value === value && <FiCheck className="w-4 h-4" />}
+              <span className="truncate">{opt.label}</span>
+              {opt.value === value && <FiCheck className="h-4 w-4 shrink-0" />}
             </li>
           ))}
         </ul>

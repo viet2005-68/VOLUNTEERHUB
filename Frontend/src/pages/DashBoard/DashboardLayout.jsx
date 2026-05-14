@@ -92,16 +92,16 @@ export default function DashboardLayout() {
   const headerItems = getHeaderItems(user?.role);
 
   return (
-    <header className="mb-6">
-      <div className="flex flex-col gap-2 my-8">
-        <p className="text-4xl font-bold">
-          <span className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent animate-gradient-x bg-[length:200%_200%] ">
-            Welcome back
-          </span>
-          , {user?.name}
+    <header className="mb-10">
+      <div className="my-8 rounded-[25px] bg-deep-forest px-6 pb-10 pt-14 text-pale-canvas md:px-10 md:pb-12 md:pt-16">
+        <p className="font-beni text-[76px] font-black uppercase leading-[0.75] text-pale-canvas md:text-[130px]">
+          Welcome back
+        </p>
+        <p className="mt-1 text-2xl font-bold leading-[0.85] text-bubblegum-blush md:text-3xl">
+          {user?.name}
         </p>
 
-        <p className="text-gray-500">
+        <p className="mt-6 max-w-2xl text-base font-medium leading-[1.2] text-pale-canvas/90">
           Track your volunteer activities and discover new opportunities.
         </p>
       </div>

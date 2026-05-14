@@ -287,8 +287,8 @@ export default function EventLayout() {
   };
 
   return (
-    <div className="grid grid-cols-12 gap-6 max-sm:gap-0 bg-white rounded-lg shadow-sm overflow-hidden">
-      <main className="col-span-8 max-sm:col-span-12 p-6 max-sm:p-0">
+    <div className="grid grid-cols-12 gap-6 overflow-hidden rounded-[25px] border-2 border-ash-whisper bg-pale-canvas text-deep-forest max-sm:gap-0">
+      <main className="col-span-8 p-6 max-sm:col-span-12 max-sm:p-0">
         <div className="flex flex-col w-full">
           <EventHero
             id={id}
@@ -393,7 +393,7 @@ export default function EventLayout() {
           </div>
 
           {/* tab links */}
-          <div className="w-full sm:border-b border-gray-300 mb-0 max-sm:px-4">
+          <div className="mb-6 w-full max-sm:px-4">
             <Tabs
               items={headerItems}
               defaultKey={activeTab}
@@ -407,7 +407,7 @@ export default function EventLayout() {
         </div>
       </main>
 
-      <aside className="col-span-4 max-sm:hidden p-6 bg-gray-50 flex flex-col gap-4">
+      <aside className="col-span-4 flex flex-col gap-4 bg-ash-whisper/35 p-6 max-sm:hidden">
         <RegistrationCard
           id={eventData?.id}
           duration={calculateDuration(eventData?.startTime, eventData?.endTime)}

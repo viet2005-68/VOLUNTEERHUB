@@ -1,30 +1,9 @@
-@font-face {
-  font-family: 'Beni';
-  src: url('../assets/fonts/beni-black.woff2') format('woff2');
-  font-weight: 900;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Clash Grotesk';
-  src: url('../assets/fonts/clash-grotesk-medium.woff2') format('woff2');
-  font-weight: 500;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Clash Grotesk';
-  src: url('../assets/fonts/clash-grotesk-bold.woff2') format('woff2');
-  font-weight: 700;
-  font-display: swap;
-}
-
 :root {
-  --foudre-green: #00522d;
-  --foudre-pink: #db3c8a;
-  --foudre-cream: #fff8f6;
-  --foudre-peach: #f8c4b4;
-  --foudre-ink: #06351f;
+  --foudre-green: var(--color-deep-forest, #00522d);
+  --foudre-pink: var(--color-foudre-pink, #db3c8a);
+  --foudre-cream: var(--color-pale-canvas, #fff8f6);
+  --foudre-peach: var(--color-bubblegum-blush, #f29ebd);
+  --foudre-ink: var(--color-deep-forest, #00522d);
 }
 
 .agence-foudre-page {
@@ -106,7 +85,7 @@
   position: absolute;
   width: clamp(190px, 34vw, 520px);
   max-width: none;
-  filter: drop-shadow(0 32px 68px rgb(0 30 17 / 0.24));
+  filter: none;
   will-change: transform, opacity;
 }
 
@@ -248,7 +227,7 @@
 }
 
 .hero-sticky-stage[data-theme='blue'] {
-  background: #2f91bd;
+  background: var(--foudre-pink);
   color: var(--foudre-cream);
 }
 
@@ -333,8 +312,8 @@
   overflow: hidden;
   margin: 0;
   border-radius: 16px;
-  background: #f4eef1;
-  box-shadow: 0 30px 80px rgb(0 45 24 / 0.17);
+  background: var(--color-ash-whisper, #fce5df);
+  box-shadow: none;
   transform: translate(-50%, -50%);
   transform-origin: 50% 50%;
   will-change: transform, opacity;
@@ -386,7 +365,7 @@
   opacity: 0;
   transform: translateZ(120px) rotateY(58deg) rotateX(4deg) scale(0.92);
   transform-origin: 50% 50%;
-  box-shadow: 0 42px 90px rgb(0 45 24 / 0.24);
+  box-shadow: none;
 }
 
 .hero-sequence-card--center {
@@ -487,9 +466,9 @@
   width: min(30vw, 430px);
   border-radius: 30px;
   padding: clamp(20px, 2.5vw, 34px);
-  background: #2f91bd;
+  background: var(--foudre-pink);
   color: var(--foudre-cream);
-  box-shadow: 0 28px 70px rgb(0 45 24 / 0.14);
+  box-shadow: none;
 }
 
 .hero-side-case p {

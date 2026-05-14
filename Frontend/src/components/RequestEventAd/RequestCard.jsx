@@ -73,18 +73,18 @@ const RequestCard = ({ data }) => {
   };
 
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 bg-white border border-gray-600/20 rounded-xl shadow-sm mb-3 gap-4">
+    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 bg-pale-canvas border border-deep-forest/15 rounded-2xl mb-3 gap-4 text-deep-forest">
       <div className="flex items-center gap-3">
         <img
           src={avatar}
           alt={displayName}
-          className="w-10 h-10 rounded-full bg-gray-100 object-cover"
+          className="w-10 h-10 rounded-full bg-ash-whisper object-cover"
         />
         <div className="flex gap-2 flex-col">
-          <h4 className="font-semibold text-gray-900">{displayName}</h4>
-          <p className="text-sm text-gray-500">Event: {eventName}</p>
-          {address && <p className="text-xs text-gray-400">{address}</p>}
-          {timeRange && <p className="text-xs text-gray-400">{timeRange}</p>}
+          <h4 className="font-bold text-deep-forest">{displayName}</h4>
+          <p className="text-sm text-deep-forest/65">Event: {eventName}</p>
+          {address && <p className="text-xs text-deep-forest/50">{address}</p>}
+          {timeRange && <p className="text-xs text-deep-forest/50">{timeRange}</p>}
           {data?.status && (
             <p className="text-xs mt-1">
               Status: <span className="font-medium">{data.status}</span>
@@ -95,7 +95,7 @@ const RequestCard = ({ data }) => {
 
       <div className="flex flex-row sm:flex-row items-stretch sm:items-center gap-5 sm:gap-3">
         <button
-          className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-black text-white rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors disabled:opacity-60"
+          className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-deep-forest text-pale-canvas rounded-lg text-sm font-bold hover:bg-foudre-pink transition-colors disabled:opacity-60"
           onClick={handleApprove}
           disabled={
             isSubmitting || !data?.userId || !(data?.eventId || data?.event?.id)
@@ -106,7 +106,7 @@ const RequestCard = ({ data }) => {
         </button>
 
         <button
-          className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-red-600 text-white border border-gray-200 rounded-lg text-sm font-medium transition-transform hover:scale-105 duration-150 disabled:opacity-60"
+          className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-foudre-pink text-pale-canvas border border-foudre-pink rounded-lg text-sm font-bold transition-transform hover:scale-105 duration-150 disabled:opacity-60"
           onClick={handleReject}
           disabled={
             isSubmitting || !data?.userId || !(data?.eventId || data?.event?.id)

@@ -6,32 +6,32 @@ const stats = [
     label: "System Uptime",
     value: "99.8%",
     icon: Activity,
-    color: "text-green-600",
+    color: "text-deep-forest",
   },
   {
     label: "Response Time",
     value: "1.2s",
     icon: Clock,
-    color: "text-blue-600",
+    color: "text-foudre-pink",
   },
   {
     label: "Active Sessions",
     value: "247",
     icon: UsersIcon,
-    color: "text-purple-600",
+    color: "text-bubblegum-blush",
   },
   {
     label: "Error Rate",
     value: "0.03%",
     icon: AlertCircle,
-    color: "text-green-600",
+    color: "text-deep-forest",
   },
 ];
 
 function PlatformHealth() {
   return (
-    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-      <h4 className="text-lg font-semibold text-gray-900 mb-6">
+    <div className="rounded-2xl border border-deep-forest/15 bg-pale-canvas p-6 text-deep-forest">
+      <h4 className="text-lg font-bold text-deep-forest mb-6">
         Platform Health
       </h4>
 
@@ -40,7 +40,7 @@ function PlatformHealth() {
           const Icon = stat.icon;
           return (
             <div key={index} className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">{stat.label}</span>
+              <span className="text-sm text-deep-forest/65">{stat.label}</span>
               <span className={`text-lg font-bold ${stat.color}`}>
                 {stat.value}
               </span>

@@ -844,7 +844,7 @@ function OverviewEventManager() {
         <div className="flex flex-col gap-6">
           {/* Quick Actions Card */}
           <Card>
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-4 mx-4">
               <h4 className="text-lg font-bold text-gray-900 mb-2">
                 Quick Actions
               </h4>

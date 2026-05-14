@@ -247,21 +247,25 @@ function CreateEvent({ onSuccess, onCancel }) {
     >
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
         <div className="flex flex-col gap-2">
-          <label htmlFor="name">Event Title *</label>
+          <label htmlFor="name" className="text-sm font-bold uppercase leading-[0.85] text-deep-forest">
+            Event Title *
+          </label>
           <input
             type="text"
             id="name"
             {...register("name")}
             placeholder="Beach Cleanup Drive"
-            className="w-full rounded-2xl border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full rounded-lg border border-deep-forest/20 bg-pale-canvas px-4 py-3 text-deep-forest placeholder:text-deep-forest/45 transition focus:border-foudre-pink focus:outline-none focus:ring-2 focus:ring-foudre-pink/25"
             required
           />
           {errors.name && (
-            <p className="text-sm text-red-500">{errors.name.message}</p>
+            <p className="text-sm font-medium leading-[1.2] text-foudre-pink">{errors.name.message}</p>
           )}
         </div>
         <div className="flex flex-col gap-2">
-          <label htmlFor="category">Category *</label>
+          <label htmlFor="category" className="text-sm font-bold uppercase leading-[0.85] text-deep-forest">
+            Category *
+          </label>
           <Controller
             name="categoryName"
             control={control}
@@ -276,7 +280,7 @@ function CreateEvent({ onSuccess, onCancel }) {
             )}
           />
           {errors.categoryName && (
-            <p className="text-sm text-red-500">
+            <p className="text-sm font-medium leading-[1.2] text-foudre-pink">
               {errors.categoryName.message}
             </p>
           )}
@@ -284,45 +288,49 @@ function CreateEvent({ onSuccess, onCancel }) {
       </div>
 
       <div className="flex flex-col gap-2">
-        <label htmlFor="description">Description *</label>
+        <label htmlFor="description" className="text-sm font-bold uppercase leading-[0.85] text-deep-forest">
+          Description *
+        </label>
         <textarea
           id="description"
           rows={4}
           {...register("description")}
           placeholder="Describe your volunteer opportunity..."
-          className="w-full rounded-2xl border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full rounded-lg border border-deep-forest/20 bg-pale-canvas px-4 py-3 text-deep-forest placeholder:text-deep-forest/45 transition focus:border-foudre-pink focus:outline-none focus:ring-2 focus:ring-foudre-pink/25"
           required
         />
         {errors.description && (
-          <p className="text-sm text-red-500">{errors.description.message}</p>
+          <p className="text-sm font-medium leading-[1.2] text-foudre-pink">{errors.description.message}</p>
         )}
       </div>
 
       <div className="flex flex-col gap-2">
-        <label htmlFor="imageFile">Event Image (Optional)</label>
+        <label htmlFor="imageFile" className="text-sm font-bold uppercase leading-[0.85] text-deep-forest">
+          Event Image (Optional)
+        </label>
         {previewImage ? (
           <div className="flex items-center gap-3">
             <div
-              className="relative w-32 h-32 flex-shrink-0 cursor-pointer group"
+              className="group relative h-32 w-32 flex-shrink-0 cursor-pointer"
               onClick={() => setShowImageModal(true)}
             >
               <img
                 src={previewImage}
                 alt="Preview"
-                className="w-full h-full object-cover rounded-lg border-2 border-gray-300 group-hover:border-blue-500 transition"
+                className="h-full w-full rounded-2xl border-2 border-foudre-pink object-cover transition group-hover:border-deep-forest"
               />
-              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition rounded-lg flex items-center justify-center">
+              <div className="absolute inset-0 flex items-center justify-center rounded-2xl bg-deep-forest/0 transition group-hover:bg-deep-forest/30">
                 <span className="text-white opacity-0 group-hover:opacity-100 text-sm font-medium">
                   Click to view
                 </span>
               </div>
             </div>
             <div className="flex flex-col gap-2">
-              <p className="text-sm text-gray-600">Image selected</p>
+              <p className="text-sm font-medium leading-[0.85] text-deep-forest/70">Image selected</p>
               <button
                 type="button"
                 onClick={handleRemoveImage}
-                className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition text-sm font-medium inline-flex items-center gap-2"
+                className="inline-flex items-center gap-2 rounded-lg bg-foudre-pink px-4 py-2 text-sm font-bold text-pale-canvas transition hover:bg-deep-forest"
               >
                 <Trash2 /> Remove
               </button>
@@ -334,69 +342,77 @@ function CreateEvent({ onSuccess, onCancel }) {
             id="imageFile"
             accept="image/*"
             {...register("imageFile")}
-            className="w-full rounded-2xl border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full rounded-lg border border-deep-forest/20 bg-pale-canvas px-4 py-3 text-deep-forest placeholder:text-deep-forest/45 transition focus:border-foudre-pink focus:outline-none focus:ring-2 focus:ring-foudre-pink/25"
           />
         )}
         {errors.imageFile && (
-          <p className="text-sm text-red-500">{errors.imageFile.message}</p>
+          <p className="text-sm font-medium leading-[1.2] text-foudre-pink">{errors.imageFile.message}</p>
         )}
       </div>
 
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
         <div className="flex flex-col gap-2">
-          <label htmlFor="startTime">Start Time *</label>
+          <label htmlFor="startTime" className="text-sm font-bold uppercase leading-[0.85] text-deep-forest">
+            Start Time *
+          </label>
           <input
             type="datetime-local"
             id="startTime"
             {...register("startTime")}
-            className="w-full rounded-2xl border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full rounded-lg border border-deep-forest/20 bg-pale-canvas px-4 py-3 text-deep-forest placeholder:text-deep-forest/45 transition focus:border-foudre-pink focus:outline-none focus:ring-2 focus:ring-foudre-pink/25"
             required
           />
           {errors.startTime && (
-            <p className="text-sm text-red-500">{errors.startTime.message}</p>
+            <p className="text-sm font-medium leading-[1.2] text-foudre-pink">{errors.startTime.message}</p>
           )}
         </div>
         <div className="flex flex-col gap-2">
-          <label htmlFor="endTime">End Time *</label>
+          <label htmlFor="endTime" className="text-sm font-bold uppercase leading-[0.85] text-deep-forest">
+            End Time *
+          </label>
           <input
             type="datetime-local"
             id="endTime"
             {...register("endTime")}
-            className="w-full rounded-2xl border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full rounded-lg border border-deep-forest/20 bg-pale-canvas px-4 py-3 text-deep-forest placeholder:text-deep-forest/45 transition focus:border-foudre-pink focus:outline-none focus:ring-2 focus:ring-foudre-pink/25"
             required
           />
           {errors.endTime && (
-            <p className="text-sm text-red-500">{errors.endTime.message}</p>
+            <p className="text-sm font-medium leading-[1.2] text-foudre-pink">{errors.endTime.message}</p>
           )}
         </div>
       </div>
 
       <div className="flex flex-col gap-5">
         <div className="flex flex-col gap-2">
-          <label htmlFor="capacity">Max Volunteers *</label>
+          <label htmlFor="capacity" className="text-sm font-bold uppercase leading-[0.85] text-deep-forest">
+            Max Volunteers *
+          </label>
           <input
             type="number"
             id="capacity"
             {...register("capacity", { valueAsNumber: true })}
             min="1"
-            className="w-full rounded-2xl border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full rounded-lg border border-deep-forest/20 bg-pale-canvas px-4 py-3 text-deep-forest placeholder:text-deep-forest/45 transition focus:border-foudre-pink focus:outline-none focus:ring-2 focus:ring-foudre-pink/25"
             required
           />
           {errors.capacity && (
-            <p className="text-sm text-red-500">{errors.capacity.message}</p>
+            <p className="text-sm font-medium leading-[1.2] text-foudre-pink">{errors.capacity.message}</p>
           )}
         </div>
         <div className="flex flex-col gap-2">
-          <label htmlFor="registrationDeadline">Registration Deadline *</label>
+          <label htmlFor="registrationDeadline" className="text-sm font-bold uppercase leading-[0.85] text-deep-forest">
+            Registration Deadline *
+          </label>
           <input
             type="datetime-local"
             id="registrationDeadline"
             {...register("registrationDeadline")}
-            className="w-full rounded-2xl border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full rounded-lg border border-deep-forest/20 bg-pale-canvas px-4 py-3 text-deep-forest placeholder:text-deep-forest/45 transition focus:border-foudre-pink focus:outline-none focus:ring-2 focus:ring-foudre-pink/25"
             required
           />
           {errors.registrationDeadline && (
-            <p className="text-sm text-red-500">
+            <p className="text-sm font-medium leading-[1.2] text-foudre-pink">
               {errors.registrationDeadline.message}
             </p>
           )}
@@ -404,10 +420,10 @@ function CreateEvent({ onSuccess, onCancel }) {
       </div>
 
       <div className="flex flex-col gap-2">
-        <label>Location *</label>
+        <label className="text-sm font-bold uppercase leading-[0.85] text-deep-forest">Location *</label>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3 z-50">
           <div className="flex flex-col gap-2">
-            <label htmlFor="province" className="text-sm text-gray-600">
+            <label htmlFor="province" className="text-sm font-medium leading-[0.85] text-deep-forest/70">
               Province
             </label>
             <Controller
@@ -430,15 +446,15 @@ function CreateEvent({ onSuccess, onCancel }) {
               id="province"
               {...register("province")}
               placeholder="Da Nang"
-              className="hidden w-full rounded-2xl border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="hidden w-full rounded-lg border border-deep-forest/20 bg-pale-canvas px-4 py-3 text-deep-forest placeholder:text-deep-forest/45 transition focus:border-foudre-pink focus:outline-none focus:ring-2 focus:ring-foudre-pink/25"
               disabled
             />
             {errors.province && (
-              <p className="text-sm text-red-500">{errors.province.message}</p>
+              <p className="text-sm font-medium leading-[1.2] text-foudre-pink">{errors.province.message}</p>
             )}
           </div>
           <div className="flex flex-col gap-2">
-            <label htmlFor="district" className="text-sm text-gray-600">
+            <label htmlFor="district" className="text-sm font-medium leading-[0.85] text-deep-forest/70">
               District
             </label>
             <Controller
@@ -470,15 +486,15 @@ function CreateEvent({ onSuccess, onCancel }) {
               id="district"
               {...register("district")}
               placeholder="Da Nang"
-              className="hidden w-full rounded-2xl border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="hidden w-full rounded-lg border border-deep-forest/20 bg-pale-canvas px-4 py-3 text-deep-forest placeholder:text-deep-forest/45 transition focus:border-foudre-pink focus:outline-none focus:ring-2 focus:ring-foudre-pink/25"
               disabled
             />
             {errors.district && (
-              <p className="text-sm text-red-500">{errors.district.message}</p>
+              <p className="text-sm font-medium leading-[1.2] text-foudre-pink">{errors.district.message}</p>
             )}
           </div>
           <div className="flex flex-col gap-2">
-            <label htmlFor="street" className="text-sm text-gray-600">
+            <label htmlFor="street" className="text-sm font-medium leading-[0.85] text-deep-forest/70">
               Street
             </label>
             <input
@@ -486,11 +502,11 @@ function CreateEvent({ onSuccess, onCancel }) {
               id="street"
               {...register("street")}
               placeholder="123 Beach St"
-              className="w-full rounded-2xl border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-lg border border-deep-forest/20 bg-pale-canvas px-4 py-3 text-deep-forest placeholder:text-deep-forest/45 transition focus:border-foudre-pink focus:outline-none focus:ring-2 focus:ring-foudre-pink/25"
               required
             />
             {errors.street && (
-              <p className="text-sm text-red-500">{errors.street.message}</p>
+              <p className="text-sm font-medium leading-[1.2] text-foudre-pink">{errors.street.message}</p>
             )}
           </div>
         </div>
@@ -503,7 +519,7 @@ function CreateEvent({ onSuccess, onCancel }) {
         </div>
       </div>
 
-      <div className="flex gap-3 pt-4 border-t border-gray-200">
+      <div className="flex gap-3 border-t border-deep-forest/15 pt-4">
         <button
           type="button"
           onClick={() => {
@@ -512,14 +528,14 @@ function CreateEvent({ onSuccess, onCancel }) {
             setPreviewImage(null);
             onCancel?.();
           }}
-          className="flex-1 rounded-2xl border border-gray-300 px-5 py-3 text-base font-medium text-gray-600 hover:bg-gray-50 transition"
+          className="flex-1 rounded-lg border border-deep-forest bg-transparent px-5 py-3 text-base font-bold uppercase text-deep-forest transition hover:border-foudre-pink hover:bg-ash-whisper hover:text-foudre-pink"
         >
           Cancel
         </button>
         <button
           type="submit"
           disabled={createEventMutation.isPending}
-          className="flex-1 rounded-2xl bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 px-5 py-3 text-base font-semibold text-white shadow-lg hover:bg-green-500 transition disabled:cursor-not-allowed disabled:opacity-60"
+          className="flex-1 rounded-lg bg-bubblegum-blush px-5 py-3 text-base font-bold uppercase text-pale-canvas transition hover:bg-foudre-pink disabled:cursor-not-allowed disabled:opacity-60"
         >
           {createEventMutation.isPending ? "Creating..." : "Create Event"}
         </button>
@@ -528,13 +544,13 @@ function CreateEvent({ onSuccess, onCancel }) {
       {/* Image Preview Modal */}
       {showImageModal && previewImage && (
         <div
-          className="fixed inset-0 bg-black/80 flex items-center justify-center z-[9999] p-4"
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-deep-forest/85 p-4"
           onClick={() => setShowImageModal(false)}
         >
           <div className="relative max-w-4xl max-h-[90vh]">
             <button
               onClick={() => setShowImageModal(false)}
-              className="absolute -top-10 right-0 text-white hover:text-white hover:bg-red-500 text-2xl font-bold rounded-full"
+              className="absolute -top-10 right-0 rounded-full bg-pale-canvas p-2 text-deep-forest transition hover:bg-foudre-pink hover:text-pale-canvas"
               aria-label="Close"
             >
               <X className="h-6 w-6" />
@@ -542,7 +558,7 @@ function CreateEvent({ onSuccess, onCancel }) {
             <img
               src={previewImage}
               alt="Preview full size"
-              className="max-w-full max-h-[85vh] object-contain rounded-lg"
+              className="max-h-[85vh] max-w-full rounded-2xl object-contain"
               onClick={(e) => e.stopPropagation()}
             />
           </div>

@@ -143,7 +143,7 @@ function UserCard({ data, onBanUser, onUnbanUser, onEdit, onView }) {
             {currentStatus === USER_STATUS.ACTIVE && (
               <button
                 onClick={BanUser}
-                className="p-2 bg-red-500/90 text-white hover:bg-red-600 rounded-lg transition-colors"
+                className="rounded-[10px] bg-red-500/90 p-2 text-pale-canvas transition-all hover:-translate-y-0.5 hover:brightness-110"
                 title="Ban user"
               >
                 <Ban className="w-4 h-4" />

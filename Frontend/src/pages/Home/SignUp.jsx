@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Link } from "react-router-dom";
+import { LOGIN_LINK } from "../../constant/constNavigate";
 import {
   FiCheck,
   FiEye,
@@ -352,12 +353,12 @@ export default function SignUpForm() {
             <div className="mt-8 space-y-3 text-center text-sm text-slate-500 sm:text-left">
               <p className="text-center">
                 Already have an account?{" "}
-                <Link
-                  to="http://localhost:7070/login"
+                <a
+                  href={LOGIN_LINK}
                   className="font-semibold text-indigo-600 transition hover:text-indigo-700"
                 >
                   Sign in here
-                </Link>
+                </a>
               </p>
               <div className="flex flex-col items-center justify-between gap-2 sm:flex-row">
                 <span className="hidden text-xs uppercase tracking-[0.35em] text-slate-400 sm:block">

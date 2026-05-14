@@ -28,15 +28,15 @@ function CompleteCard({
           {/* DESKTOP INFO */}
           <div className="hidden sm:flex flex-col justify-center gap-1 cursor-pointer flex-1">
             <div className="font-semibold text-[18px]">{title}</div>
-            <div className="flex items-center gap-2 text-gray-600 text-sm">
+            <div className="flex items-center gap-2 text-deep-forest/65 text-sm">
               <Building2 size={16} className="flex-shrink-0" />
               <span>{organization}</span>
             </div>
-            <div className="flex items-center gap-2 text-gray-600 text-sm">
+            <div className="flex items-center gap-2 text-deep-forest/65 text-sm">
               <Calendar size={16} className="flex-shrink-0" />
               <span>{date}</span>
             </div>
-            <div className="flex items-center gap-2 text-gray-600 text-sm">
+            <div className="flex items-center gap-2 text-deep-forest/65 text-sm">
               <Clock size={16} className="flex-shrink-0" />
               <span>{hours}</span>
             </div>
@@ -53,7 +53,7 @@ function CompleteCard({
                   e.stopPropagation();
                   setOpen(!open);
                 }}
-                className="text-gray-500 flex-shrink-0 p-2 -m-2 hover:bg-gray-100 rounded-lg transition-colors"
+                className="text-deep-forest/65 flex-shrink-0 p-2 -m-2 hover:bg-ash-whisper rounded-lg transition-colors"
               >
                 {open ? <FiChevronUp size={20} /> : <FiChevronDown size={20} />}
               </button>
@@ -63,15 +63,15 @@ function CompleteCard({
 
         {/* STATUS BUTTON */}
         <div className="flex flex-row gap-2 justify-around max-sm:self-start max-sm:mt-2 items-center">
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-green-100 border border-green-200">
-            <Check className="w-4 h-4 text-green-600" />
-            <span className="text-green-700 font-medium text-sm">
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-bubblegum-blush border border-deep-forest/15">
+            <Check className="w-4 h-4 text-deep-forest" />
+            <span className="text-deep-forest font-bold text-sm">
               Completed
             </span>
           </div>
           <button
             onClick={(e) => e.stopPropagation()}
-            className="px-4 py-1.5 rounded-lg bg-gray-900 text-white hover:bg-gray-800 transition-colors cursor-pointer text-sm font-medium"
+            className="px-4 py-1.5 rounded-lg bg-deep-forest text-pale-canvas hover:bg-foudre-pink transition-colors cursor-pointer text-sm font-bold"
           >
             View Certificate
           </button>
@@ -80,7 +80,7 @@ function CompleteCard({
 
       {/* MOBILE DROPDOWN INFO */}
       {open && (
-        <div className="sm:hidden px-3 pt-2 pb-3 text-gray-600 text-sm border-t border-gray-100 mt-2 space-y-1">
+        <div className="sm:hidden px-3 pt-2 pb-3 text-deep-forest/65 text-sm border-t border-deep-forest/15 mt-2 space-y-1">
           <p>
             <b>Organization:</b> {organization}
           </p>

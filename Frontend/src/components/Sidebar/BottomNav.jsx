@@ -48,7 +48,7 @@ export default function BottomNav() {
   const isActive = (path) => location.pathname.startsWith(path);
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg z-50">
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-pale-canvas/95 border-t border-deep-forest/15 backdrop-blur-xl z-50">
       <div className="max-w-3xl mx-auto flex justify-between items-center px-3 py-2">
         {navItems.map((item) => {
           const Icon = item.icon;
@@ -56,15 +56,15 @@ export default function BottomNav() {
             <button
               key={item.key}
               onClick={() => navigate(item.to)}
-              className={`flex flex-col items-center text-xs focus:outline-none ${
-                isActive(item.to) ? "text-blue-600" : "text-gray-600"
+              className={`flex flex-col items-center text-xs font-bold focus:outline-none transition-colors ${
+                isActive(item.to) ? "text-foudre-pink" : "text-deep-forest/65"
               }`}
             >
               <div className="relative">
                 <Icon className="w-6 h-6" />
 
                 {item.key === "messages" && (
-                  <span className="absolute -top-2 -right-3 bg-red-500 text-white text-[10px] rounded-full px-1">
+                  <span className="absolute -top-2 -right-3 bg-foudre-pink text-pale-canvas text-[10px] rounded-lg px-1">
                     {/* Replace with real unread count */}3
                   </span>
                 )}
@@ -78,7 +78,7 @@ export default function BottomNav() {
         {user && user.role === "MANAGER" && (
           <button
             onClick={() => setIsCreateModalOpen(true)}
-            className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-red-500 hover:bg-red-600 text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg transition-all duration-200 active:scale-95"
+            className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-bubblegum-blush hover:bg-foudre-pink text-deep-forest hover:text-pale-canvas rounded-full w-14 h-14 flex items-center justify-center border border-foudre-pink/30 transition-all duration-200 active:scale-95"
             aria-label="Create Event"
             title="Create Event"
           >

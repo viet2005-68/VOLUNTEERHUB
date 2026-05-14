@@ -81,14 +81,14 @@ function NewEventsAnnounced({ className }) {
           </>
         )}
         {isError && (
-          <div className="text-sm text-red-500">
+          <div className="text-sm font-bold text-foudre-pink">
             Failed to load new announcements.
           </div>
         )}
         {!isLoading && !isError && cards.length === 0 && (
-          <div className="text-sm text-gray-500 flex flex-col gap-6 mt-5 items-center">
+          <div className="text-sm text-deep-forest/65 flex flex-col gap-6 mt-5 items-center">
             <div className="w-12 h-12 mx-auto">
-              <BellOff className="w-full h-full text-gray-500" />
+              <BellOff className="w-full h-full text-deep-forest/45" />
             </div>
             <div>No new announcements.</div>
           </div>

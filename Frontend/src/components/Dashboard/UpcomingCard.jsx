@@ -22,8 +22,8 @@ function UpcomingCard({
 
   const bgColor =
     status.toLowerCase() === "confirm"
-      ? "bg-black text-white"
-      : "bg-white text-black";
+      ? "bg-deep-forest text-pale-canvas"
+      : "bg-ash-whisper text-deep-forest";
 
   const handleUnregister = async () => {
     if (!eventId) {
@@ -52,16 +52,16 @@ function UpcomingCard({
             />
             {/* DESKTOP INFO */}
             <div className="hidden sm:flex flex-col justify-center gap-1 cursor-pointer flex-1">
-              <div className="font-semibold text-[18px]">{title}</div>
-              <div className="flex items-center gap-2 text-gray-600 text-sm">
+              <div className="font-bold text-[18px] text-deep-forest">{title}</div>
+              <div className="flex items-center gap-2 text-deep-forest/65 text-sm">
                 <Building2 size={16} className="flex-shrink-0" />
                 <span>{organization}</span>
               </div>
-              <div className="flex items-center gap-2 text-gray-600 text-sm">
+              <div className="flex items-center gap-2 text-deep-forest/65 text-sm">
                 <Calendar size={16} className="flex-shrink-0" />
                 <span>{date}</span>
               </div>
-              <div className="flex items-center gap-2 text-gray-600 text-sm">
+              <div className="flex items-center gap-2 text-deep-forest/65 text-sm">
                 <MapPin size={16} className="flex-shrink-0" />
                 <span>{location}</span>
               </div>
@@ -78,7 +78,7 @@ function UpcomingCard({
                     e.stopPropagation();
                     setOpen(!open);
                   }}
-                  className="text-gray-500 flex-shrink-0 p-2 -m-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="text-deep-forest/65 flex-shrink-0 p-2 -m-2 hover:bg-ash-whisper rounded-lg transition-colors"
                 >
                   {open ? (
                     <FiChevronUp size={20} />
@@ -99,7 +99,7 @@ function UpcomingCard({
             </div>
             <button
               onClick={(e) => e.stopPropagation()}
-              className="bg-black text-white px-3 py-1 rounded-md flex w-[80px] flex-row gap-1 items-center hover:scale-105 active:scale-95 duration-200 transition-all"
+              className="bg-deep-forest text-pale-canvas px-3 py-1 rounded-lg flex w-[80px] flex-row gap-1 items-center hover:bg-foudre-pink hover:scale-105 active:scale-95 duration-200 transition-all"
             >
               <span>Checkin</span> <LogIn className="w-4" />
             </button>
@@ -109,7 +109,7 @@ function UpcomingCard({
                 setShowConfirm(true);
               }}
               disabled={unregisterMutation.isPending}
-              className="bg-red-500 text-white px-3 py-1 rounded-md w-[80px] flex flex-row gap-1 items-center hover:scale-105 active:scale-95 duration-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-foudre-pink text-pale-canvas px-3 py-1 rounded-lg w-[80px] flex flex-row gap-1 items-center hover:bg-deep-forest hover:scale-105 active:scale-95 duration-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <span>{unregisterMutation.isPending ? "..." : "Cancel"}</span>{" "}
               <Trash className="w-4" />
@@ -119,7 +119,7 @@ function UpcomingCard({
 
         {/* MOBILE DROPDOWN INFO */}
         {open && (
-          <div className="sm:hidden px-3 pt-2 pb-3 text-gray-600 text-sm border-t border-gray-100 mt-2 space-y-1">
+          <div className="sm:hidden px-3 pt-2 pb-3 text-deep-forest/65 text-sm border-t border-deep-forest/15 mt-2 space-y-1">
             <p>
               <b>Organization:</b> {organization}
             </p>
@@ -140,22 +140,22 @@ function UpcomingCard({
           onClick={(e) => e.stopPropagation()}
         >
           <div
-            className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6"
+            className="bg-pale-canvas rounded-2xl border border-deep-forest/15 max-w-md w-full p-6 text-deep-forest"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-semibold text-gray-900">
+              <h3 className="text-xl font-bold text-deep-forest">
                 Cancel Registration
               </h3>
               <button
                 onClick={() => setShowConfirm(false)}
-                className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
+                className="p-1 hover:bg-ash-whisper rounded-lg transition-colors"
               >
                 <X size={20} />
               </button>
             </div>
 
-            <p className="text-gray-600 mb-6">
+            <p className="text-deep-forest/65 mb-6">
               Are you sure you want to cancel your registration for{" "}
               <span className="font-semibold">{title}</span>? This action cannot
               be undone.
@@ -165,14 +165,14 @@ function UpcomingCard({
               <button
                 onClick={() => setShowConfirm(false)}
                 disabled={unregisterMutation.isPending}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50"
+                className="flex-1 px-4 py-2 border border-deep-forest/20 rounded-lg text-deep-forest hover:bg-ash-whisper transition-colors disabled:opacity-50"
               >
                 Keep Registration
               </button>
               <button
                 onClick={handleUnregister}
                 disabled={unregisterMutation.isPending}
-                className="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 px-4 py-2 bg-foudre-pink text-pale-canvas rounded-lg hover:bg-deep-forest transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {unregisterMutation.isPending ? "Canceling..." : "Yes, Cancel"}
               </button>

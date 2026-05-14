@@ -185,7 +185,7 @@ function EventAdminManager() {
           <button
             onClick={() => setShowExportMenu(!showExportMenu)}
             disabled={isExporting}
-            className="flex items-center justify-center gap-2 px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+            className="flex items-center justify-center gap-2 whitespace-nowrap rounded-[10px] bg-deep-forest px-4 py-3 font-bold text-pale-canvas transition-colors disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Download className="w-5 h-5" />
             <span className="max-sm:hidden">
