@@ -15,6 +15,7 @@ import {
 import signUpSchema from "../../validation/signUpSchema";
 import useSignUp from "../../hook/useSignUp";
 import { ROLES } from "../../constant/role";
+import DropdownSelect from "../../components/Dropdown/DropdownSelect";
 import "../../../src/index.css";
 import { FaHeart } from "react-icons/fa";
 import { Home } from "lucide-react";
@@ -23,214 +24,204 @@ import { handvoluteer } from "../../assets/Login";
 export default function SignUpForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const inputBase =
+    "w-full rounded-[10px] border-2 bg-pale-canvas py-4 text-sm font-bold leading-[0.85] text-deep-forest outline-none transition placeholder:text-deep-forest/50 focus:border-foudre-pink focus:bg-pale-canvas focus:ring-4 focus:ring-foudre-pink/20";
+  const textInputPadding = "pl-14 pr-4";
+  const passwordInputPadding = "pl-14 pr-14";
+  const invalidInput =
+    "border-foudre-pink bg-pale-canvas focus:border-foudre-pink focus:ring-foudre-pink/25";
+  const validInput = "border-ash-whisper";
+  const labelClass = "text-sm font-bold text-deep-forest";
+  const iconClass = "h-5 w-5 text-foudre-pink";
+  const roleOptions = [
+    { value: ROLES.USER, label: "Volunteer (User)" },
+    { value: ROLES.MANAGER, label: "Organization Manager" },
+    { value: ROLES.ADMIN, label: "Administrator" },
+  ];
 
   const {
     register,
     handleSubmit,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(signUpSchema),
+    defaultValues: {
+      roles: ROLES.USER,
+    },
   });
 
   const mutation = useSignUp();
+  const selectedRole = watch("roles");
 
   const onSubmit = (data) => mutation.mutate(data);
 
   return (
-    <section className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-rose-50 via-white to-indigo-50 py-16 px-4 sm:px-6 lg:px-8">
-      <div
-        className="pointer-events-none absolute inset-x-0 top-0 hidden h-[420px] bg-gradient-to-b from-purple-100/60 to-transparent blur-3xl md:block"
-        aria-hidden="true"
-      />
-      <div className="relative z-10 grid w-full max-w-6xl items-stretch gap-12 lg:grid-cols-[1.15fr_1fr]">
-        <div className="flex flex-col gap-15 rounded-3xl border border-white/60 bg-white/70 p-10 shadow-[0_22px_65px_-40px_rgba(76,29,149,0.55)] backdrop-blur">
-          <div className="space-y-6">
-            <span className="inline-flex items-center gap-2 self-start rounded-full bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-rose-500/10 px-4 py-1 text-sm font-semibold text-indigo-600 ring-1 ring-indigo-100">
-              <FaHeart className="h-4 w-4 text-rose-500" />
-              VolunteerHub
-            </span>
-            <h3 className="text-4xl font-semibold leading-snug text-slate-900 sm:text-5xl">
-              Make a difference with VolunteerHub
-            </h3>
-            <p className="max-w-xl text-lg text-slate-600">
-              Together we can make volunteering easier and more impactful than
-              ever before.
-            </p>
-            <ul className="space-y-4 text-slate-600">
-              <li className="flex items-start gap-3">
-                <span className="mt-1 flex h-8 w-8 items-center justify-center rounded-full bg-indigo-500/10 text-indigo-600 ring-1 ring-indigo-200">
-                  <FiCheck className="h-4 w-4" />
-                </span>
-                <div>
-                  <p className="font-semibold text-slate-800">
-                    Tailored opportunities
-                  </p>
-                  <p className="text-sm text-slate-600">
-                    Receive matches based on causes you care about most.
-                  </p>
+    <section className="min-h-screen bg-pale-canvas px-4 py-10 font-clash-grotesk text-deep-forest sm:px-6 lg:px-8">
+      <div className="mx-auto grid min-h-[calc(100vh-80px)] w-full max-w-7xl items-stretch gap-5 lg:grid-cols-[1.05fr_0.95fr]">
+        <div className="relative flex overflow-hidden rounded-[25px] bg-deep-forest p-7 text-pale-canvas sm:p-8 lg:p-9">
+          <div className="relative z-10 flex min-h-full w-full flex-col gap-7">
+            <div className="space-y-5">
+              <span className="inline-flex w-fit items-center gap-2 rounded-[10px] bg-foudre-pink px-3 py-2 text-sm font-bold text-pale-canvas">
+                <FaHeart className="h-4 w-4" />
+                VolunteerHub
+              </span>
+              <div>
+                <p className="mb-3 text-xl font-bold leading-[1.2] text-bubblegum-blush sm:text-2xl">
+                  Community first. Action always.
+                </p>
+                <h1 className="max-w-[720px] font-beni text-[74px] uppercase leading-[0.7] text-foudre-pink sm:text-[104px] lg:text-[118px]">
+                  Join the volunteer movement
+                </h1>
+              </div>
+              <p className="max-w-2xl text-lg font-medium leading-[1.2] text-pale-canvas/80 sm:text-xl">
+                Create your profile, discover causes that fit you, and help
+                teams organize impact with a cleaner VolunteerHub experience.
+              </p>
+            </div>
+
+            <div className="grid gap-4 border-y border-pale-canvas/20 py-5 sm:grid-cols-3">
+              {[
+                ["Tailored", "Find opportunities by cause, time, and role."],
+                ["Collaborative", "Coordinate with organizations in one hub."],
+                ["Measurable", "Track hours, badges, and real community impact."],
+              ].map(([title, description]) => (
+                <div
+                  key={title}
+                  className="grid grid-cols-[36px_1fr] gap-3 text-pale-canvas"
+                >
+                  <span className="flex size-9 items-center justify-center rounded-full bg-bubblegum-blush text-deep-forest">
+                    <FiCheck className="h-5 w-5" />
+                  </span>
+                  <div>
+                    <p className="text-lg font-bold leading-[0.85]">{title}</p>
+                    <p className="mt-3 text-sm font-medium leading-[1.2] text-pale-canvas/70">
+                      {description}
+                    </p>
+                  </div>
                 </div>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="mt-1 flex h-8 w-8 items-center justify-center rounded-full bg-indigo-500/10 text-indigo-600 ring-1 ring-indigo-200">
-                  <FiCheck className="h-4 w-4" />
-                </span>
-                <div>
-                  <p className="font-semibold text-slate-800">
-                    Collaborate effortlessly
-                  </p>
-                  <p className="text-sm text-slate-600">
-                    Coordinate volunteers and keep every team aligned in real
-                    time.
-                  </p>
-                </div>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="mt-1 flex h-8 w-8 items-center justify-center rounded-full bg-indigo-500/10 text-indigo-600 ring-1 ring-indigo-200">
-                  <FiCheck className="h-4 w-4" />
-                </span>
-                <div>
-                  <p className="font-semibold text-slate-800">
-                    Track your impact
-                  </p>
-                  <p className="text-sm text-slate-600">
-                    Monitor volunteer hours and celebrate the progress you make
-                    together.
-                  </p>
-                </div>
-              </li>
-            </ul>
-          </div>
-          <div className="relative overflow-hidden rounded-2xl border border-white/60 shadow-inner">
-            <div className="relative overflow-hidden rounded-[1.75rem]">
+              ))}
+            </div>
+
+            <div className="relative hidden min-h-[280px] flex-1 overflow-hidden rounded-[20px] lg:block">
               <img
                 src={handvoluteer}
                 alt="Volunteers joining hands"
                 className="h-full w-full object-cover"
               />
-              <div className="absolute inset-0" />
-              <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-                <p className="text-xs uppercase tracking-[0.35em] text-white/70">
-                  Community first
+              <div className="absolute bottom-5 left-5 rounded-[10px] bg-foudre-pink px-4 py-3 text-pale-canvas">
+                <p className="text-sm font-bold leading-[0.85]">
+                  12,000+ volunteer hours
                 </p>
-                <p className="mt-2 text-lg font-semibold leading-snug sm:text-xl">
-                  12,000+ volunteer hours coordinated through VolunteerHub
+                <p className="mt-2 text-xs font-medium leading-[1.2]">
+                  Coordinated through VolunteerHub
                 </p>
               </div>
             </div>
           </div>
         </div>
+
         <div className="relative">
-          <div className="relative h-full rounded-3xl border border-white/60 bg-white/90 p-8 sm:p-10 shadow-[0_26px_65px_-40px_rgba(76,29,149,0.45)] backdrop-blur">
-            <div className="space-y-3 text-center sm:text-left">
-              <span className="inline-flex items-center justify-center gap-2 self-start rounded-full bg-indigo-500/10 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-indigo-600 ring-1 ring-indigo-200">
+          <div className="relative h-full rounded-[20px] border border-deep-forest/10 bg-ash-whisper p-6 sm:p-8 lg:p-10">
+            <div className="space-y-4 text-center sm:text-left">
+              <span className="inline-flex items-center justify-center rounded-[10px] bg-foudre-pink px-3 py-2 text-sm font-bold uppercase text-pale-canvas">
                 Create account
               </span>
-
-              <p className="text-sm text-slate-500 sm:text-base">
+              <h2 className="font-beni text-[64px] uppercase leading-[0.7] text-deep-forest sm:text-[82px]">
+                Start here
+              </h2>
+              <p className="text-base font-medium leading-[1.2] text-deep-forest/70">
                 Manage events, mobilize volunteers, and make an impact faster.
               </p>
             </div>
-            <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-6">
+
+            <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-5">
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-700">
-                  Username
-                </label>
+                <label className={labelClass}>Username</label>
                 <div className="relative">
                   <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-                    <FiUser className="h-5 w-5 text-slate-400" />
+                    <FiUser className={iconClass} />
                   </div>
                   <input
                     {...register("username")}
                     type="text"
-                    className={`w-full rounded-2xl border bg-white/60 px-3 py-3 pl-11 text-sm text-slate-700 shadow-sm transition focus:outline-none focus:ring-2 ${
-                      errors.username
-                        ? "border-rose-300 focus:border-rose-400 focus:ring-rose-400"
-                        : "border-slate-200 focus:border-indigo-500/70 focus:ring-indigo-500"
+                    className={`${inputBase} ${textInputPadding} ${
+                      errors.username ? invalidInput : validInput
                     }`}
                     placeholder="Enter your username"
                   />
                 </div>
                 {errors.username && (
-                  <p className="text-xs font-medium text-rose-500 sm:text-sm">
+                  <p className="text-sm font-bold text-foudre-pink">
                     {errors.username.message}
                   </p>
                 )}
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-700">
-                  Full Name
-                </label>
+                <label className={labelClass}>Full Name</label>
                 <div className="relative">
                   <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-                    <FiUserCheck className="h-5 w-5 text-slate-400" />
+                    <FiUserCheck className={iconClass} />
                   </div>
                   <input
                     {...register("name")}
                     type="text"
-                    className={`w-full rounded-2xl border bg-white/60 px-3 py-3 pl-11 text-sm text-slate-700 shadow-sm transition focus:outline-none focus:ring-2 ${
-                      errors.name
-                        ? "border-rose-300 focus:border-rose-400 focus:ring-rose-400"
-                        : "border-slate-200 focus:border-indigo-500/70 focus:ring-indigo-500"
+                    className={`${inputBase} ${textInputPadding} ${
+                      errors.name ? invalidInput : validInput
                     }`}
                     placeholder="Enter your full name"
                   />
                 </div>
                 {errors.name && (
-                  <p className="text-xs font-medium text-rose-500 sm:text-sm">
+                  <p className="text-sm font-bold text-foudre-pink">
                     {errors.name.message}
                   </p>
                 )}
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-700">
-                  Email Address
-                </label>
+                <label className={labelClass}>Email Address</label>
                 <div className="relative">
                   <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-                    <FiMail className="h-5 w-5 text-slate-400" />
+                    <FiMail className={iconClass} />
                   </div>
                   <input
                     {...register("email")}
                     type="email"
-                    className={`w-full rounded-2xl border bg-white/60 px-3 py-3 pl-11 text-sm text-slate-700 shadow-sm transition focus:outline-none focus:ring-2 ${
-                      errors.email
-                        ? "border-rose-300 focus:border-rose-400 focus:ring-rose-400"
-                        : "border-slate-200 focus:border-indigo-500/70 focus:ring-indigo-500"
+                    className={`${inputBase} ${textInputPadding} ${
+                      errors.email ? invalidInput : validInput
                     }`}
                     placeholder="Enter your email"
                   />
                 </div>
                 {errors.email && (
-                  <p className="text-xs font-medium text-rose-500 sm:text-sm">
+                  <p className="text-sm font-bold text-foudre-pink">
                     {errors.email.message}
                   </p>
                 )}
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-700">
-                  Password
-                </label>
+                <label className={labelClass}>Password</label>
                 <div className="relative">
                   <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-                    <FiLock className="h-5 w-5 text-slate-400" />
+                    <FiLock className={iconClass} />
                   </div>
                   <input
                     {...register("password")}
                     type={showPassword ? "text" : "password"}
-                    className={`w-full rounded-2xl border bg-white/60 px-3 py-3 pl-11 pr-12 text-sm text-slate-700 shadow-sm transition focus:outline-none focus:ring-2 ${
-                      errors.password
-                        ? "border-rose-300 focus:border-rose-400 focus:ring-rose-400"
-                        : "border-slate-200 focus:border-indigo-500/70 focus:ring-indigo-500"
+                    className={`${inputBase} ${passwordInputPadding} ${
+                      errors.password ? invalidInput : validInput
                     }`}
                     placeholder="Create a password"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 flex items-center pr-4 text-slate-400 transition hover:text-slate-600"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                    className="absolute inset-y-0 right-0 flex items-center rounded-full px-4 text-deep-forest/50 transition hover:text-foudre-pink"
                   >
                     {showPassword ? (
                       <FiEyeOff className="h-5 w-5" />
@@ -240,34 +231,33 @@ export default function SignUpForm() {
                   </button>
                 </div>
                 {errors.password && (
-                  <p className="text-xs font-medium text-rose-500 sm:text-sm">
+                  <p className="text-sm font-bold text-foudre-pink">
                     {errors.password.message}
                   </p>
                 )}
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-700">
-                  Confirm Password
-                </label>
+                <label className={labelClass}>Confirm Password</label>
                 <div className="relative">
                   <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-                    <FiLock className="h-5 w-5 text-slate-400" />
+                    <FiLock className={iconClass} />
                   </div>
                   <input
                     {...register("confirmPassword")}
                     type={showConfirmPassword ? "text" : "password"}
-                    className={`w-full rounded-2xl border bg-white/60 px-3 py-3 pl-11 pr-12 text-sm text-slate-700 shadow-sm transition focus:outline-none focus:ring-2 ${
-                      errors.confirmPassword
-                        ? "border-rose-300 focus:border-rose-400 focus:ring-rose-400"
-                        : "border-slate-200 focus:border-indigo-500/70 focus:ring-indigo-500"
+                    className={`${inputBase} ${passwordInputPadding} ${
+                      errors.confirmPassword ? invalidInput : validInput
                     }`}
                     placeholder="Confirm your password"
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute inset-y-0 right-0 flex items-center pr-4 text-slate-400 transition hover:text-slate-600"
+                    aria-label={
+                      showConfirmPassword ? "Hide password" : "Show password"
+                    }
+                    className="absolute inset-y-0 right-0 flex items-center rounded-full px-4 text-deep-forest/50 transition hover:text-foudre-pink"
                   >
                     {showConfirmPassword ? (
                       <FiEyeOff className="h-5 w-5" />
@@ -277,30 +267,29 @@ export default function SignUpForm() {
                   </button>
                 </div>
                 {errors.confirmPassword && (
-                  <p className="text-xs font-medium text-rose-500 sm:text-sm">
+                  <p className="text-sm font-bold text-foudre-pink">
                     {errors.confirmPassword.message}
                   </p>
                 )}
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-700">
-                  I want to join as
-                </label>
-                <select
-                  {...register("roles")}
-                  className={`w-full appearance-none rounded-2xl border bg-white/60 px-4 py-3 text-sm text-slate-700 shadow-sm transition focus:outline-none focus:ring-2 ${
-                    errors.roles
-                      ? "border-rose-300 focus:border-rose-400 focus:ring-rose-400"
-                      : "border-slate-200 focus:border-indigo-500/70 focus:ring-indigo-500"
-                  }`}
-                >
-                  <option value={ROLES.USER}>Volunteer (User)</option>
-                  <option value={ROLES.MANAGER}>Organization Manager</option>
-                  <option value={ROLES.ADMIN}>Administrator</option>
-                </select>
+                <label className={labelClass}>I want to join as</label>
+                <input type="hidden" {...register("roles")} />
+                <DropdownSelect
+                  value={selectedRole}
+                  onChange={(value) =>
+                    setValue("roles", value, {
+                      shouldDirty: true,
+                      shouldValidate: true,
+                    })
+                  }
+                  options={roleOptions}
+                  className="w-full [&>button]:border-foudre-pink [&>button]:bg-pale-canvas [&>button]:text-deep-forest [&>button:hover]:bg-pale-canvas [&>ul]:border-foudre-pink [&>ul]:bg-pale-canvas [&>ul]:text-deep-forest [&>ul>li]:bg-pale-canvas [&>ul>li]:text-deep-forest [&>ul>li:hover]:bg-bubblegum-blush [&>ul>li:hover]:text-deep-forest [&>ul>li:first-child]:bg-ash-whisper [&>ul>li:first-child]:text-foudre-pink"
+                  placeholder="Select role"
+                />
                 {errors.roles && (
-                  <p className="text-xs font-medium text-rose-500 sm:text-sm">
+                  <p className="text-sm font-bold text-foudre-pink">
                     {errors.roles.message}
                   </p>
                 )}
@@ -309,16 +298,16 @@ export default function SignUpForm() {
               <button
                 type="submit"
                 disabled={mutation.isPending}
-                className={`group relative w-full overflow-hidden rounded-2xl bg-gradient-to-r from-indigo-500 via-purple-500 to-rose-500 px-6 py-3 text-sm font-semibold text-white shadow-lg transition focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${
+                className={`w-full rounded-[10px] bg-foudre-pink px-6 py-5 text-base font-bold text-pale-canvas transition focus:outline-none focus:ring-4 focus:ring-foudre-pink/25 focus:ring-offset-2 focus:ring-offset-ash-whisper ${
                   mutation.isPending
                     ? "cursor-not-allowed opacity-70"
-                    : "hover:scale-[1.01] hover:shadow-indigo-500/30"
+                    : "hover:bg-deep-forest"
                 }`}
               >
                 {mutation.isPending ? (
                   <div className="flex items-center justify-center gap-3">
                     <svg
-                      className="h-5 w-5 animate-spin text-white/90"
+                      className="h-5 w-5 animate-spin text-pale-canvas"
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
                       viewBox="0 0 24 24"
@@ -345,28 +334,28 @@ export default function SignUpForm() {
               </button>
 
               {mutation.isError && (
-                <div className="rounded-2xl border border-rose-200 bg-rose-50/80 p-4 text-sm text-rose-600 shadow-sm">
+                <div className="rounded-2xl border border-foudre-pink/30 bg-pale-canvas p-4 text-sm font-bold leading-[1.2] text-foudre-pink">
                   <p>{mutation.error.message}</p>
                 </div>
               )}
             </form>
-            <div className="mt-8 space-y-3 text-center text-sm text-slate-500 sm:text-left">
-              <p className="text-center">
+            <div className="mt-8 space-y-5 text-center text-sm font-medium text-deep-forest/70 sm:text-left">
+              <p className="text-center leading-[1.2]">
                 Already have an account?{" "}
                 <a
                   href={LOGIN_LINK}
-                  className="font-semibold text-indigo-600 transition hover:text-indigo-700"
+                  className="font-bold text-foudre-pink transition hover:text-deep-forest"
                 >
                   Sign in here
                 </a>
               </p>
               <div className="flex flex-col items-center justify-between gap-2 sm:flex-row">
-                <span className="hidden text-xs uppercase tracking-[0.35em] text-slate-400 sm:block">
+                <span className="hidden text-xs font-bold uppercase text-deep-forest/50 sm:block">
                   Explore first
                 </span>
                 <Link
                   to="/"
-                  className="inline-flex items-center gap-2 rounded-full bg-slate-100/70 px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-indigo-50 hover:text-indigo-600"
+                  className="inline-flex items-center gap-2 rounded-full bg-pale-canvas px-4 py-3 text-sm font-bold text-deep-forest transition hover:bg-bubblegum-blush"
                 >
                   <Home className="h-4 w-4" />
                   Back to home
