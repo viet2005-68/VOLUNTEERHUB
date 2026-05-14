@@ -14,4 +14,6 @@ import java.util.List;
 
 public interface EventRepository extends JpaRepository<Event, Long>, JpaSpecificationExecutor<Event> {
 
+    @EntityGraph(attributePaths = { "category", "address" })
+    List<Event> findByIdIn(List<Long> ids);
 }

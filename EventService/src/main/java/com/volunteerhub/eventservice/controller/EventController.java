@@ -48,11 +48,15 @@ public class EventController {
                 street, sortedBy, order));
     }
 
+    @GetMapping("/by-ids")
+    public ResponseEntity<List<EventResponse>> getAllEventsByIds(@RequestParam List<Long> eventIds) {
+        return ResponseEntity.ok(eventService.findByIds(eventIds));
+    }
+
     @GetMapping("/{eventId}")
     public ResponseEntity<EventResponse> getEventById(@PathVariable Long eventId) {
         return ResponseEntity.ok(eventService.findById(eventId));
     }
-
 
     @GetMapping("/owned")
     public ResponseEntity<Page<EventResponse>> getAllOwnedEvents(@RequestParam(required = false) Integer pageNum,

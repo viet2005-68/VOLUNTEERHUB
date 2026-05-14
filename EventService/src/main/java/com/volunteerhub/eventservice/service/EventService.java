@@ -50,6 +50,12 @@ public class EventService {
                 .orElseThrow(() -> new NoSuchElementException("No such event with id " + id)));
     }
 
+    public List<EventResponse> findByIds(List<Long> ids) {
+        return eventRepository.findByIdIn(ids).stream()
+                .map(eventMapper::toDto)
+                .toList();
+    }
+
     public Page<EventResponse> findAll(Integer pageNum, Integer pageSize, EventStatus status,
             String categoryName, LocalDateTime startAfter, LocalDateTime endBefore,
             String province, String district, String street,
