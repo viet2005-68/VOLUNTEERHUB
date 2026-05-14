@@ -593,7 +593,7 @@ function CompleteProfile() {
             <button
               type="submit"
               disabled={updateProfileMutation.isPending}
-              className="flex flex-1 items-center justify-center gap-2 rounded-[10px] bg-[#f29ebd] px-6 py-5 text-base font-bold leading-[0.85] text-[#fff8f6] transition-colors hover:bg-[#db3c8a] disabled:cursor-not-allowed disabled:opacity-60"
+              className="flex flex-1 items-center justify-center gap-2 rounded-[10px] border-2 border-[#00522d] bg-[#db3c8a] px-6 py-5 text-base font-bold leading-[0.85] text-[#fff8f6] transition-transform duration-200 hover:-translate-y-0.5 hover:bg-[#00522d] focus:outline-none focus:ring-4 focus:ring-[#f29ebd] disabled:cursor-not-allowed disabled:border-[#f29ebd] disabled:bg-[#f29ebd] disabled:opacity-70"
             >
               {updateProfileMutation.isPending ? (
                 <>
