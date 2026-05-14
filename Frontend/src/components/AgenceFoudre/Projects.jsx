@@ -1,11 +1,11 @@
 import tinhnguyen from '../../assets/landing/tinhnguyen.jpg'
 import nhatrac from '../../assets/landing/nhatrac.webp'
-import moitruong from '../../assets/landing/moitruong.jpg'
+import tnv from '../../assets/landing/tnv.png'
 import trongcay from '../../assets/landing/trongcay.jpg'
 const projects = [
   ['Teach for Tomorrow', 'Education support', tinhnguyen],
   ['Clean City Day', 'Environment action', nhatrac],
-  ['Green Neighborhood', 'Tree planting', moitruong],
+  ['Green Neighborhood', 'Tree planting', tnv],
   ['Community Kitchen', 'Care and relief', trongcay],
 ]
 

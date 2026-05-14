@@ -76,7 +76,7 @@ const MERGE_START = 0.04
 const MERGE_END = 0.16
 const SECOND_SLIDE_START = 0.24
 const THIRD_SLIDE_START = 0.52
-const HERO_SEQUENCE_END = 0.98
+const HERO_SEQUENCE_END = 0.9
 
 function Hero() {
   const rootRef = useRef(null)

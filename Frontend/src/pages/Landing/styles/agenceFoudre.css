@@ -309,14 +309,14 @@
 
 .hero-section {
   position: relative;
-  min-height: 190vh;
+  min-height: 145vh;
   padding: 0;
   background: var(--foudre-cream);
 }
 
 .hero-sticky-stage {
   position: relative;
-  min-height: 205vh;
+  min-height: 145vh;
   overflow: visible;
   background: var(--foudre-cream);
   color: var(--foudre-green);
