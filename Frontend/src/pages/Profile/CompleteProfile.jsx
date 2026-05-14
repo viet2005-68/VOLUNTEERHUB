@@ -23,12 +23,22 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 
+const MINIMUM_PROFILE_AGE = 16;
+
+const getAgeByYear = (dateString) => {
+  const birthYear = Number(String(dateString || "").slice(0, 4));
+  if (!Number.isInteger(birthYear)) return null;
+
+  return new Date().getFullYear() - birthYear;
+};
+
 function CompleteProfile() {
   const navigate = useNavigate();
   const { data: profileData, isLoading: isLoadingProfile } = useProfile();
   const { data: validation, isLoading: isValidating } =
     useProfileCompleteness();
   const updateProfileMutation = useUpdateUserProfile();
+  const maxAllowedBirthDate = `${new Date().getFullYear() - MINIMUM_PROFILE_AGE}-12-31`;
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -303,6 +313,12 @@ function CompleteProfile() {
       return;
     }
 
+    const ageByYear = getAgeByYear(formData.dateOfBirth);
+    if (formData.dateOfBirth && (ageByYear === null || ageByYear < MINIMUM_PROFILE_AGE)) {
+      toast.error("You must be at least 16 years old to complete your profile");
+      return;
+    }
+
     // Prepare payload with address object
     const addressPayload = {
       province: formData.provinceName || formData.address?.province || "",
@@ -477,6 +493,7 @@ function CompleteProfile() {
                   name="dateOfBirth"
                   value={formData.dateOfBirth}
                   onChange={handleChange}
+                  max={maxAllowedBirthDate}
                   className="w-full rounded-[10px] border-2 border-[#fce5df] bg-white px-4 py-4 pl-11 text-sm font-medium leading-[1.2] text-[#00522d] placeholder:text-[#00522d]/55 focus:border-[#db3c8a] focus:outline-none"
                   required={isFieldRequired("dateOfBirth")}
                 />
