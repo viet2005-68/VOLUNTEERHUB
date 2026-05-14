@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -26,21 +27,29 @@ public class FileStorageService {
             throw new IllegalArgumentException("File is empty. Please upload a valid file");
         }
 
+        String downloadToken = UUID.randomUUID().toString();
         String uniqueID = UUID.randomUUID().toString();
         String objectName = uniqueID + "_" + file.getOriginalFilename();
 
-        // Upload to Firebase Storage
         BlobId blobId = BlobId.of(bucketName, objectName);
-        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType(file.getContentType()).build();
-        storage.create(blobInfo, file.getBytes());
+        BlobInfo blobInfo = BlobInfo.newBuilder(blobId)
+                .setContentType(file.getContentType())
+                .setMetadata(Map.of("firebaseStorageDownloadTokens", downloadToken))
+                .build();
+        storage.createFrom(blobInfo, new java.io.ByteArrayInputStream(file.getBytes()));
 
-        // Return public URL
-        String encodedObjectName = URLEncoder.encode(objectName, StandardCharsets.UTF_8);
+        String encodedObjectName = encodeUrlPart(objectName);
+        String encodedToken = encodeUrlPart(downloadToken);
         return String.format(
-                "https://firebasestorage.googleapis.com/v0/b/%s/o/%s?alt=media",
+                "https://firebasestorage.googleapis.com/v0/b/%s/o/%s?alt=media&token=%s",
                 bucketName,
-                encodedObjectName
+                encodedObjectName,
+                encodedToken
         );
+    }
+
+    private String encodeUrlPart(String value) {
+        return URLEncoder.encode(value, StandardCharsets.UTF_8).replace("+", "%20");
     }
 
 }
