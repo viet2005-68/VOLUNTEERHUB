@@ -84,7 +84,7 @@ function ScrollScene() {
         <MenuOverlay open={menuOpen} onClose={() => setMenuOpen(false)} />
         <main ref={scrollRef} className="scroll-container" data-scroll-container>
           <Hero />
-          <Marquee items={['Social', 'Motion', 'Brand', 'Reels', 'Community']} />
+          <Marquee items={['Volunteer', 'Action', 'Care', 'Impact', 'Community']} />
           <Agency />
           <Manifesto />
           <Projects />

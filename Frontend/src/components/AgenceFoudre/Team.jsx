@@ -1,11 +1,15 @@
 import { useEffect, useRef, useState } from 'react'
 import { animate } from 'animejs'
+import nuoiemImage from '../../assets/landing/nuoiem.jpg'
+import baove from '../../assets/landing/baove.jpg'
+import tinhnguyen from '../../assets/landing/tinhnguyen.jpg'
+import trongcay from '../../assets/landing/trongcay.jpg'
 
 const members = [
-  ['Margaux', 'Direction creative', '/media/site/0ee0e5dc47-1765190556/mg-@agence.foudre-137-600x-q80.avif', '/media/site/e705d77393-1766136288/margaux-audio.mp3'],
-  ['Mathieu', 'Strategie social media', '/media/site/b89fc535d3-1764264576/agence-foudre-3-600x-q80.avif', '/media/site/e9bbd985e2-1766136304/mathieu-audio.mp3'],
-  ['Florent', 'Content creator', '/media/site/9e2180cad6-1764264569/agence-foudre-1-600x-q80.avif', '/media/site/b6db5aab54-1766136315/florent_3.mp3'],
-  ['Johane', 'Image & production', '/media/site/018bae38b6-1764705366/mamy-grand-shooting-600x-q80.avif', '/media/site/a39e6834f4-1766136357/johane-audio.mp3'],
+  ['Mentors', 'Education support', nuoiemImage, '/media/site/e705d77393-1766136288/margaux-audio.mp3'],
+  ['Protectors', 'Community safety', baove, '/media/site/e9bbd985e2-1766136304/mathieu-audio.mp3'],
+  ['Helpers', 'Event volunteers', tinhnguyen, '/media/site/b6db5aab54-1766136315/florent_3.mp3'],
+  ['Planters', 'Green action', trongcay, '/media/site/a39e6834f4-1766136357/johane-audio.mp3'],
 ]
 
 function Team() {
@@ -45,8 +49,8 @@ function Team() {
     <section id="team" className="team-section section-pad">
       <audio ref={audioRef} onEnded={() => setPlaying(false)} />
       <div className="team-copy">
-        <p className="section-label">Team</p>
-        <h2 data-animate="line-reveal">Des voix qui frappent juste.</h2>
+        <p className="section-label">Volunteer teams</p>
+        <h2 data-animate="line-reveal">Every mission needs people who show up.</h2>
       </div>
       <article ref={cardRef} className="team-card" data-cursor="audio">
         <img src={member[2]} alt={member[0]} />
@@ -54,13 +58,13 @@ function Team() {
           <span>{member[1]}</span>
           <h3>{member[0].split('').join(' ')}</h3>
           <button type="button" onClick={toggleAudio} className={playing ? 'is-playing' : ''} data-cursor="audio">
-            {playing ? 'Pause audio' : 'Play audio'}
+            {playing ? 'Pause story' : 'Hear story'}
           </button>
         </div>
       </article>
       <div className="team-dots">
         {members.map(([name], index) => (
-          <button key={name} type="button" className={index === active ? 'is-active' : ''} onClick={() => setMember(index)} aria-label={`Voir ${name}`} />
+          <button key={name} type="button" className={index === active ? 'is-active' : ''} onClick={() => setMember(index)} aria-label={`View ${name}`} />
         ))}
       </div>
     </section>

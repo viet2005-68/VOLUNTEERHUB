@@ -1,12 +1,12 @@
 function Footer() {
   return (
     <footer className="site-footer" data-animate="cards">
-      <a href="#top" className="footer-logo" data-cursor="link">Foudre</a>
-      <p>Social agency for brands that want to move faster than the feed.</p>
-      <nav aria-label="Social links">
-        <a href="mailto:hello@foudre.test" data-cursor="link">Email</a>
-        <a href="#top" data-cursor="link">Instagram</a>
-        <a href="#top" data-cursor="link">LinkedIn</a>
+      <a href="#top" className="footer-logo" data-cursor="link">VolunteerHub</a>
+      <p>A community platform for people and organizations ready to turn care into action.</p>
+      <nav aria-label="Footer links">
+        <a href="mailto:hello@volunteerhub.test" data-cursor="link">Email</a>
+        <a href="#projects" data-cursor="link">Impact</a>
+        <a href="#contact" data-cursor="link">Join</a>
       </nav>
     </footer>
   )

@@ -1,7 +1,13 @@
 import { useEffect, useRef } from 'react'
 import { animate, stagger } from 'animejs'
 
-const links = ['Manifesto', 'Services', 'Projets', 'Team', 'Contact']
+const links = [
+  ['Mission', '#manifesto'],
+  ['Services', '#services'],
+  ['Projects', '#projects'],
+  ['Teams', '#team'],
+  ['Contact', '#contact'],
+]
 
 function MenuOverlay({ open, onClose }) {
   const overlayRef = useRef(null)
@@ -33,14 +39,14 @@ function MenuOverlay({ open, onClose }) {
     <aside ref={overlayRef} className="menu-overlay" aria-hidden={!open}>
       <nav aria-label="Menu principal">
         <ul>
-          {links.map((link) => (
-            <li key={link}>
-              <a href={`#${link.toLowerCase()}`} onClick={onClose} data-cursor="link">{link}</a>
+          {links.map(([label, href]) => (
+            <li key={label}>
+              <a href={href} onClick={onClose} data-cursor="link">{label}</a>
             </li>
           ))}
         </ul>
       </nav>
-      <p>Une direction sociale, des idées qui claquent, une exécution qui frappe vite.</p>
+      <p>Find causes, gather teams, and make every volunteer hour count.</p>
     </aside>
   )
 }

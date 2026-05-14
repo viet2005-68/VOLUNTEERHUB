@@ -59,9 +59,9 @@ function Loader({ onComplete }) {
   }, [onComplete])
 
   return (
-    <div ref={loaderRef} className="loader" aria-label="Chargement Agence Foudre">
+    <div ref={loaderRef} className="loader" aria-label="Loading VolunteerHub">
       <div className="loader-copy" aria-hidden="true">
-        {['Se faire entendre.', 'Se faire remarquer.', 'Prendre la lumière.'].map((line) => (
+        {['Find a cause.', 'Join a team.', 'Show your impact.'].map((line) => (
           <span className="loader-line" key={line}><span className="loader-word">{line}</span></span>
         ))}
       </div>

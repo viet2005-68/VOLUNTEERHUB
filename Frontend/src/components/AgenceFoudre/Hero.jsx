@@ -4,35 +4,69 @@ import { animate, createTimeline, stagger } from 'animejs'
 import MagneticButton from './MagneticButton'
 import { splitText } from '../../pages/Landing/motion/textReveal'
 import bolt from '../../pages/Landing/assets/images/bolt-shape-loader.webp'
-
+import domixi from '../../assets/landing/domixi.jpg'
+import treem from '../../assets/landing/treem.jpg'
+import dayhoc from '../../assets/landing/dayhoc.avif'
+import tinhnguyen from '../../assets/landing/tinhnguyen.webp'
+import bodoi from '../../assets/landing/bodoi.webp'
 const slides = [
   {
-    image: '/media/site/9e2180cad6-1764264569/agence-foudre-1-600x-q80.avif',
-    kicker: 'Agence social média',
-    title: 'Human Social Club',
-    side: 'Stratégie qui électrise les conversations.',
+    image: domixi,
+    kicker: 'VolunteerHub platform',
+    title: 'Volunteer action network',
+    side: 'Find causes, join trusted teams, and turn free time into visible impact.',
     theme: 'cream',
   },
   {
-    image: '/media/site/1be50e9049-1764268151/yelloh-1-600x-q80.avif',
-    kicker: 'Case du mois',
-    title: 'Yelloh! Village',
-    side: 'Un contenu solaire, direct, impossible à scroller sans sourire.',
+    image: bodoi,
+    kicker: 'Featured mission',
+    title: 'Teach and mentor',
+    side: 'Support education projects that need patient hands, steady time, and real care.',
     theme: 'blue',
   },
   {
-    image: '/media/site/70daac3e59-1764268976/solty-hotels-1-600x-q80.avif',
-    kicker: 'Social hospitality',
-    title: 'Solty Hotels',
-    side: 'Des images chaudes pour transformer un lieu en réflexe social.',
+    image: treem,
+    kicker: 'Local care',
+    title: 'Community days',
+    side: 'Clean parks, plant trees, support shelters, and make every neighborhood easier to love.',
     theme: 'green',
   },
 ]
 
 const sideImages = [
-  '/media/site/0ee0e5dc47-1765190556/mg-@agence.foudre-137-600x-q80.avif',
-  '/media/site/b89fc535d3-1764264576/agence-foudre-3-600x-q80.avif',
+  dayhoc,
+  tinhnguyen,
 ]
+
+const tickerItems = [
+  'Find a cause',
+  'Join a team',
+  'Track impact',
+  'Show up',
+]
+
+function HeroStageTickers() {
+  const repeated = [...tickerItems, ...tickerItems, ...tickerItems]
+
+  return (
+    <div className="hero-stage-tickers" aria-hidden="true">
+      <div className="hero-stage-ticker hero-stage-ticker--left">
+        <div className="hero-stage-ticker__track">
+          {repeated.map((item, index) => (
+            <span key={`hero-left-${item}-${index}`}>{item}</span>
+          ))}
+        </div>
+      </div>
+      <div className="hero-stage-ticker hero-stage-ticker--right">
+        <div className="hero-stage-ticker__track">
+          {repeated.map((item, index) => (
+            <span key={`hero-right-${item}-${index}`}>{item}</span>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
 
 const clamp = (value, min = 0, max = 1) => Math.min(max, Math.max(min, value))
 const map = (start, end, progress) => start + (end - start) * progress
@@ -229,6 +263,7 @@ function Hero() {
       <section ref={rootRef} id="top" className="hero-section hero-sequence">
         <div ref={stageRef} className="hero-sticky-stage" data-theme="cream">
           <div className="hero-sequence-bg" aria-hidden="true" />
+          <HeroStageTickers />
 
           <div className="hero-big-logo" aria-label="VolunteerHub">
             {'VolunteerHub'.split('').map((letter, index) => (
@@ -243,7 +278,7 @@ function Hero() {
 
           <aside className="hero-side-case" data-hero-ui>
             <p className="hero-sequence-side">{slides[0].side}</p>
-            <MagneticButton href="#contact">Voir le case</MagneticButton>
+            <MagneticButton href="#contact">Start volunteering</MagneticButton>
           </aside>
         </div>
       </section>

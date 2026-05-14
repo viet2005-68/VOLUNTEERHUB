@@ -2,17 +2,22 @@ import { useState } from 'react'
 import { animate } from 'animejs'
 import ImageReveal from './ImageReveal'
 import bolt from '../../pages/Landing/assets/images/bolt-shape-scroll.png'
+import vietnam from '../../assets/landing/vietnam.jpg'
+import volunteer from '../../assets/landing/volunteer.png'
+import congvien from '../../assets/landing/congvien.webp'
 
 const services = [
-  ['Stratégie', 'Architecture éditoriale, plateformes, angles et calendrier de prises de parole.'],
-  ['Production', 'Photos, reels, motion cuts, formats courts et direction de plateau.'],
-  ['Community', 'Conversation, modération créative, réactivité et rituels de marque.'],
+  ['Discover', 'Browse verified opportunities by cause, schedule, location, and the kind of help each team needs.'],
+  ['Coordinate', 'Manage registrations, updates, volunteer lists, and event roles without losing the human energy.'],
+  ['Celebrate', 'Track hours, badges, completions, and the local impact created by every mission.'],
 ]
 
+const serviceImages = [vietnam, volunteer, congvien]
+
 const process = [
-  ['01', 'Allumer', 'Trouver la tension sociale et la transformer en territoire créatif.'],
-  ['02', 'Frapper', 'Produire des formats courts, nets, reconnaissables et mémorisables.'],
-  ['03', 'Résonner', 'Lire les signaux, amplifier les réponses et garder le rythme.'],
+  ['01', 'Choose a cause', 'Pick education, environment, health, relief, or any mission that fits your values.'],
+  ['02', 'Join a team', 'Apply, get approved, and receive the details you need before the event starts.'],
+  ['03', 'Show impact', 'Complete the mission, record participation, and keep building your volunteer story.'],
 ]
 
 function Services() {
@@ -29,14 +34,14 @@ function Services() {
   return (
     <section id="services" className="services-section section-pad">
       <div className="frapper-section" data-animate="line-reveal" data-parallax="90">
-        <h2 className="frapper-word">FRAPPER FORT</h2>
+        <h2 className="frapper-word">SHOW UP STRONG</h2>
         <img src={bolt} alt="" aria-hidden="true" />
       </div>
 
       <div className="services-grid" data-animate="cards">
         {services.map(([title, copy], index) => (
           <article key={title} className="service-card" onMouseEnter={onCardEnter} onMouseLeave={onCardLeave} data-cursor="card">
-            <ImageReveal src={`/media/site/${index === 0 ? 'b89fc535d3-1764264576/agence-foudre-3-600x-q80.avif' : index === 1 ? '0ee0e5dc47-1765190556/mg-@agence.foudre-137-600x-q80.avif' : 'cca40ed208-1764264583/agence-foudre-2-600x-q80.avif'}`} alt="" />
+            <ImageReveal src={serviceImages[index]} alt="" />
             <span>0{index + 1}</span>
             <h3>{title}</h3>
             <p>{copy}</p>
