@@ -349,25 +349,30 @@
 }
 
 .hero-big-logo {
-  position: sticky;
-  top: clamp(145px, 15vw, 230px);
+  position: fixed;
+  top: clamp(210px, 24vh, 290px);
   left: 50%;
-  z-index: 1;
+  z-index: 40;
   display: flex;
   width: max-content;
-  max-width: 96vw;
+  max-width: none;
   justify-content: center;
   overflow: visible;
-  transform: translateX(-50%) translateY(-60%);
+  transform: translate(-50%, -50%);
   color: var(--foudre-green);
   font-family: 'Beni', sans-serif;
-  font-size: clamp(200px, 7.6vw, 300px);
+  font-size: clamp(132px, 14.2vw, 282px);
   line-height: 0.72;
   letter-spacing: 0em;
   text-align: center;
   text-transform: uppercase;
   transition: color 0.45s ease, opacity 0.45s ease;
+  white-space: nowrap;
   pointer-events: none;
+}
+
+.hero-sticky-stage:not(.is-card-active) .hero-big-logo {
+  opacity: 0;
 }
 
 .hero-sticky-stage:not([data-theme='cream']) .hero-big-logo {
@@ -380,11 +385,11 @@
 
 .hero-card-stack {
   position: fixed;
-  top: 56%;
+  top: 50%;
   left: 50%;
   z-index: 120;
-  width: min(62vw, 980px);
-  height: min(58vw, 760px);
+  width: min(58vw, 920px);
+  height: min(50vw, 700px);
   opacity: 1;
   visibility: visible;
   transform: translate(-50%, -50%);
@@ -467,9 +472,9 @@
 
 .hero-sequence-card--center {
   z-index: 5;
-  width: min(34vw, 560px);
-  height: min(47.2vw, 778px);
-  min-height: 420px;
+  width: min(30vw, 540px);
+  height: min(42vw, 680px);
+  min-height: 390px;
   aspect-ratio: 0.72;
   background: var(--foudre-pink);
   pointer-events: auto;
@@ -478,9 +483,9 @@
 .hero-sequence-card--left,
 .hero-sequence-card--right {
   z-index: 3;
-  width: min(28vw, 420px);
-  height: min(38.8vw, 583px);
-  min-height: 340px;
+  width: min(23vw, 360px);
+  height: min(33vw, 510px);
+  min-height: 300px;
   aspect-ratio: 0.72;
   opacity: 1;
 }
@@ -581,6 +586,21 @@
   font-size: clamp(76px, 8.3vw, 156px);
 }
 
+.hero-floating-ui[data-theme='cream'] .hero-bottom-copy {
+  top: auto;
+  bottom: clamp(34px, 4vw, 70px);
+  left: clamp(28px, 3.6vw, 68px);
+  max-width: min(360px, 22vw);
+}
+
+.hero-floating-ui[data-theme='cream'] .hero-sequence-kicker {
+  color: rgb(0 82 45 / 0.42);
+}
+
+.hero-floating-ui[data-theme='cream'] .hero-sequence-title {
+  font-size: clamp(62px, 5.5vw, 104px);
+}
+
 .hero-floating-ui:not([data-theme='cream']) .hero-sequence-title {
   color: var(--foudre-cream);
 }
@@ -588,7 +608,7 @@
 .hero-side-case {
   position: absolute;
   right: clamp(24px, 4vw, 78px);
-  bottom: clamp(58px, 7vw, 110px);
+  bottom: clamp(72px, 8vw, 128px);
   z-index: 2;
   width: min(26vw, 390px);
   padding: 0;
@@ -612,6 +632,12 @@
   font-size: clamp(18px, 1.6vw, 26px);
   font-weight: 700;
   line-height: 1.05;
+}
+
+.hero-floating-ui[data-theme='cream'] .hero-side-case {
+  right: clamp(30px, 4.6vw, 90px);
+  bottom: clamp(78px, 8.5vw, 138px);
+  width: min(23vw, 360px);
 }
 
 .hero-floating-ui[data-theme='cream'] .hero-side-case p {
@@ -1036,9 +1062,12 @@
   }
 
   .hero-big-logo {
-    top: 100px;
-    width: 94vw;
-    font-size: clamp(112px, 30vw, 220px);
+    top: clamp(150px, 22vh, 210px);
+    left: 50%;
+    width: max-content;
+    max-width: none;
+    transform: translate(-50%, -50%);
+    font-size: clamp(88px, 20vw, 170px);
   }
 
   .hero-card-stack {
