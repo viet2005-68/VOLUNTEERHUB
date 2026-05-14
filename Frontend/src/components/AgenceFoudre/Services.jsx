@@ -4,7 +4,7 @@ import ImageReveal from './ImageReveal'
 import bolt from '../../pages/Landing/assets/images/bolt-shape-scroll.png'
 import vietnam from '../../assets/landing/vietnam.jpg'
 import volunteer from '../../assets/landing/volunteer.png'
-import congvien from '../../assets/landing/congvien.webp'
+import chua from '../../assets/landing/chua.jpg'
 
 const services = [
   ['Discover', 'Browse verified opportunities by cause, schedule, location, and the kind of help each team needs.'],
@@ -12,7 +12,7 @@ const services = [
   ['Celebrate', 'Track hours, badges, completions, and the local impact created by every mission.'],
 ]
 
-const serviceImages = [vietnam, volunteer, congvien]
+const serviceImages = [vietnam, volunteer, chua]
 
 const process = [
   ['01', 'Choose a cause', 'Pick education, environment, health, relief, or any mission that fits your values.'],

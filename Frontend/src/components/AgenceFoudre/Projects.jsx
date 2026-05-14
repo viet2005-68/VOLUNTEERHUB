@@ -14,7 +14,7 @@ function Projects() {
     <section id="projects" className="projects-section section-pad" data-horizontal-section>
       <div className="projects-intro">
         <p className="section-label">Impact stories</p>
-        <h2 data-animate="line-reveal">Real missions, clear roles, visible impact.</h2>
+        <h2 data-animate="line-reveal" data-threshold="0.96">Real missions, clear roles, visible impact.</h2>
       </div>
       <div className="project-track" data-horizontal-track>
         {projects.map(([title, tag, image]) => (
