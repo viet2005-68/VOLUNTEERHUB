@@ -16,8 +16,6 @@ paths:
         - Notification
       summary: Lấy danh sách thông báo
       description: Lấy danh sách thông báo của user đang đăng nhập (phân trang).
-      security:
-        - bearerAuth: []
       parameters:
         - name: pageNum
           in: query
@@ -51,8 +49,6 @@ paths:
         - Notification
       summary: Đánh dấu thông báo đã đọc
       description: Cập nhật trạng thái isRead = true cho một thông báo cụ thể.
-      security:
-        - bearerAuth: []
       parameters:
         - name: notificationId
           in: path
@@ -75,8 +71,6 @@ paths:
         - Notification
       summary: Xoá thông báo
       description: Xoá một thông báo cụ thể của user.
-      security:
-        - bearerAuth: []
       parameters:
         - name: notificationId
           in: path
@@ -94,11 +88,6 @@ paths:
                 $ref: '#/components/schemas/NotificationResponse'
 
 components:
-  securitySchemes:
-    bearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
   schemas:
     NotificationResponse:
       type: object
