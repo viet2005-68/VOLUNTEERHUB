@@ -15,15 +15,10 @@ public class RabbitMQConfig {
 
     public static final String NOTIFICATION_EXCHANGE = "user-notification-exchange";
     public static final String NOTIFICATION_USER_ROUTING_KEY = "user-notification.user";
-    public static final String NOTIFICATION_HANDLER = "user-notification-handler-exchange";
+
     @Bean
     public TopicExchange notificationExchange() {
         return new TopicExchange(NOTIFICATION_EXCHANGE);
-    }
-
-    @Bean
-    public TopicExchange notificationHandlerExchange() {
-        return new TopicExchange(NOTIFICATION_HANDLER);
     }
 
     @Bean
