@@ -220,7 +220,6 @@ public class UserService {
         }
         user.setStatus(UserStatus.BANNED);
         userRepository.save(user);
-        customRedisTemplate.opsForValue().set(userId + "_status", UserStatus.BANNED.toString(), Duration.ofHours(1));
         return userMapper.toResponse(user);
     }
 
@@ -233,15 +232,6 @@ public class UserService {
         }
         user.setStatus(UserStatus.ACTIVE);
         userRepository.save(user);
-        customRedisTemplate.opsForValue().set(userId + "_status", UserStatus.ACTIVE.toString(), Duration.ofHours(1));
         return userMapper.toResponse(user);
     }
-
-    @PreAuthorize("hasRole('SYSTEM')")
-    public UserStatus getUserStatus(String userId) {
-        User user = this.findEntityById(userId);
-        customRedisTemplate.opsForValue().set(userId + "_status", user.getStatus().toString(), Duration.ofHours(1));
-        return user.getStatus();
-    }
-
 }
