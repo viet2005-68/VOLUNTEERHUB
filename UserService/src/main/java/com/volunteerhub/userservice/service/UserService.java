@@ -46,11 +46,6 @@ public class UserService {
         return user;
     }
 
-    public User findByEmail(String email) {
-        return userRepository.findByEmail(email).orElseThrow(() ->
-                new NoSuchElementException("No such user with email " + email));
-    }
-
     public List<UserResponse> findAllByIds(List<String> userIds) {
         return userRepository.findAllByIds(userIds).stream().map(userMapper::toResponse).toList();
     }
@@ -125,12 +120,6 @@ public class UserService {
         }
         if (userRequest.getPhoneNumber() != null) {
             existedUser.setPhoneNumber(userRequest.getPhoneNumber());
-        }
-        if (userRequest.getAddress() != null && userRequest.getAddress().getDistrict() != null &&
-                userRequest.getAddress().getProvince() != null && userRequest.getAddress().getStreet() != null) {
-            Address address = addressService.findOrCreateAddress(userRequest.getAddress());
-            existedUser.setAddress(address);
-            existedUser.setAddressId(address.getId());
         }
 
         if (userRequest.isDarkMode()) {
@@ -227,9 +216,6 @@ public class UserService {
     @PreAuthorize("hasRole('ADMIN')")
     public UserResponse unbanUser(String userId) {
         User user = this.findEntityById(userId);
-        if (user.getStatus().equals(UserStatus.ACTIVE)) {
-            throw new IllegalArgumentException("Invalid state transition");
-        }
         user.setStatus(UserStatus.ACTIVE);
         userRepository.save(user);
         return userMapper.toResponse(user);

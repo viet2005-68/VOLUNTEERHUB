@@ -21,12 +21,6 @@ public class AddressService {
     public Address findOrCreateAddress(AddressRequest request) {
         return addressRepository.findByProvinceAndDistrictAndStreet(
                 request.getProvince(), request.getDistrict(), request.getStreet()
-        ).orElseGet(() -> {
-            Address newAddress = new Address();
-            newAddress.setProvince(request.getProvince());
-            newAddress.setDistrict(request.getDistrict());
-            newAddress.setStreet(request.getStreet());
-            return addressRepository.save(newAddress);
-        });
+        );
     }
 }
