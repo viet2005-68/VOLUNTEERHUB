@@ -1,6 +1,6 @@
 services:
   notification-service-db:
-    image: postgres:latest
+    image: postgres:14-bookworm
     restart: always
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
