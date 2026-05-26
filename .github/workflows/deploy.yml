@@ -128,11 +128,19 @@ jobs:
         with:
           token: ${{ secrets.GHCR_TOKEN }}
 
-      - name: Install kubectl
-        uses: azure/setup-kubectl@v4
+      - name: Install kubectl and Helm
+        shell: bash
+        run: |
+          set -euo pipefail
+          KUBECTL_VERSION="$(curl -fsSL https://dl.k8s.io/release/stable.txt)"
+          curl -fsSLo kubectl "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
+          chmod +x kubectl
+          sudo mv kubectl /usr/local/bin/kubectl
 
-      - name: Install Helm
-        uses: azure/setup-helm@v4
+          curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+          kubectl version --client
+          helm version
 
       - name: Prepare kubeconfig and SSH tunnel
         shell: bash
