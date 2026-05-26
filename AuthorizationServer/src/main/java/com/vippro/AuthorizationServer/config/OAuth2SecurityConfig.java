@@ -75,16 +75,7 @@ public class OAuth2SecurityConfig {
                         .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login")))
                 .with(authorizationServerConfigure, authorizationServer -> authorizationServer
                         .oidc(Customizer.withDefaults()));
-        http.cors(c -> {
-            CorsConfigurationSource source = request -> {
-                CorsConfiguration corsConfiguration = new CorsConfiguration();
-                corsConfiguration.setAllowedOrigins(List.of(allowedOrigins));
-                corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE"));
-                corsConfiguration.setAllowedHeaders(List.of("*"));
-                return corsConfiguration;
-            };
-            c.configurationSource(source);
-        });
+        http.cors(c -> c.configurationSource(corsConfigurationSource()));
         return http.build();
     }
 
@@ -107,18 +98,33 @@ public class OAuth2SecurityConfig {
                 }));
         http.csrf(csrf -> csrf
                 .ignoringRequestMatchers("/logout", "/api/v1/users/register", "/api/v1/users/login"));
-        http.cors(c -> {
-            CorsConfigurationSource source = request -> {
-                CorsConfiguration corsConfiguration = new CorsConfiguration();
-                corsConfiguration.setAllowedOrigins(List.of(allowedOrigins));
-                corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE"));
-                corsConfiguration.setAllowedHeaders(List.of("*"));
-                corsConfiguration.setAllowCredentials(true);
-                return corsConfiguration;
-            };
-            c.configurationSource(source);
-        });
+        http.cors(c -> c.configurationSource(corsConfigurationSource()));
         return http.build();
+    }
+
+    /**
+     * CORS policy:
+     * - Browser web clients send an Origin header → allow the configured origin with credentials.
+     * - Mobile clients (React Native, Flutter, etc.) do NOT send an Origin header (origin is null
+     *   or absent). We detect this and fall back to allowing all origins WITHOUT credentials so that
+     *   the /register and /login endpoints are reachable from any native app.
+     */
+    private CorsConfigurationSource corsConfigurationSource() {
+        return request -> {
+            String origin = request.getHeader("Origin");
+            CorsConfiguration cfg = new CorsConfiguration();
+            if (origin == null || origin.isBlank()) {
+                // Mobile / native client — allow all, no credentials
+                cfg.addAllowedOriginPattern("*");
+                cfg.setAllowCredentials(false);
+            } else {
+                cfg.setAllowedOrigins(List.of(allowedOrigins));
+                cfg.setAllowCredentials(true);
+            }
+            cfg.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+            cfg.setAllowedHeaders(List.of("*"));
+            return cfg;
+        };
     }
 
     // Config Client Registry

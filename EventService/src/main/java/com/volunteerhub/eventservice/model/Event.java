@@ -3,6 +3,7 @@ package com.volunteerhub.eventservice.model;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.volunteerhub.common.enums.EventStatus;
+import com.volunteerhub.common.enums.QrJoinPolicy;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -76,6 +77,11 @@ public class Event {
 
     @Column
     private String optional;
+
+    @Builder.Default
+    @Enumerated(EnumType.STRING)
+    @Column(name = "qr_join_policy", nullable = false)
+    private QrJoinPolicy qrJoinPolicy = QrJoinPolicy.REQUIRE_APPROVAL;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

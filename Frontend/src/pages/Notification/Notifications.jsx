@@ -89,7 +89,7 @@ export default function Notifications() {
           <button
             onClick={handleMarkAllAsRead}
             disabled={markAllReadMutation.isPending}
-            className="flex items-center gap-2 px-3 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center gap-2 rounded-[10px] bg-deep-forest px-4 py-3 text-sm font-bold text-pale-canvas transition-all hover:-translate-y-0.5 hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
             title="Mark all as read"
           >
             <CheckCheck className="w-4 h-4" />

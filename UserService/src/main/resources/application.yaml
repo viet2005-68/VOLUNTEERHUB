@@ -5,6 +5,11 @@ spring:
   config:
     import: optional:file:.env[.properties]
 
+  servlet:
+    multipart:
+      max-file-size: 25MB
+      max-request-size: 30MB
+
   datasource:
     url: jdbc:postgresql://${HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
     username: ${POSTGRES_USER}
@@ -38,5 +43,16 @@ eureka:
     serviceUrl:
       defaultZone: ${EUREKA_SERVER_URL}
 
+firebase:
+  projectId: ${FIREBASE_PROJECT_ID:}
+  credentials:
+    location: ${FIREBASE_CREDENTIALS_LOCATION:}
+    base64: ${FIREBASE_SERVICE_ACCOUNT_BASE64:}
+  storage:
+    bucket: ${FIREBASE_STORAGE_BUCKET:}
+
 server:
   port: ${PORT}
+  tomcat:
+    max-http-form-post-size: 30MB
+    max-swallow-size: 30MB

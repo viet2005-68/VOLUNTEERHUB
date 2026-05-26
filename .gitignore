@@ -1,1 +1,4 @@
 .env
+**/src/main/resources/*firebase-adminsdk*.json
+**/src/main/resources/firebase-service-account*.json
+target/

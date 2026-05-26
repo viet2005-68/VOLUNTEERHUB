@@ -4,6 +4,7 @@ import { useAuthStore } from "../../store/authStore";
 import { LOGIN_LINK } from "../../constant/constNavigate";
 import { ROLES } from "../../constant/role";
 import storage from "../../utils/storage";
+import { consumeRedirectAfterLogin } from "../../utils/authRedirect";
 import {
   createUserProfile,
   getUserInfo,
@@ -25,18 +26,30 @@ function exchangeCodeForToken(code, isGoogleOAuth) {
 
   const promise = (async () => {
     if (isGoogleOAuth) {
+      const googleClientId =
+        import.meta.env.VITE_GG_CLIENT_ID ||
+        "485996629423-td2c31e9vppq688o0ucdjtfgb89i6lt1.apps.googleusercontent.com";
+      const googleClientSecret = import.meta.env.VITE_GG_CLIENT_SECRET || "";
+      const googleRedirectUri =
+        import.meta.env.VITE_GOOGLE_REDIRECT_URI ||
+        "http://localhost:30080/login/oauth2/code/google";
+      const googleTokenBody = new URLSearchParams({
+        grant_type: "authorization_code",
+        code: code,
+        client_id: googleClientId,
+        redirect_uri: googleRedirectUri,
+      });
+
+      if (googleClientSecret) {
+        googleTokenBody.set("client_secret", googleClientSecret);
+      }
+
       const tokenResponse = await fetch("https://oauth2.googleapis.com/token", {
         method: "POST",
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
         },
-        body: new URLSearchParams({
-          grant_type: "authorization_code",
-          code: code,
-          client_id: import.meta.env.VITE_GG_CLIENT_ID,
-          client_secret: import.meta.env.VITE_GG_CLIENT_SECRET,
-          redirect_uri: "http://localhost:3000/login/oauth2/code/google",
-        }),
+        body: googleTokenBody,
       });
       const tokenData = await tokenResponse.json();
       return { ok: tokenResponse.ok, tokenData };
@@ -319,6 +332,7 @@ export default function OAuth2Callback() {
         setUser(user);
 
         console.log("User logged in:", user);
+        const redirectAfterLogin = consumeRedirectAfterLogin();
 
         // Wait a bit for profile creation to complete before checking
         await new Promise(resolve => setTimeout(resolve, 1000));
@@ -334,6 +348,7 @@ export default function OAuth2Callback() {
             profileValidation.missingFields?.length > 0
           ) {
             console.log("Profile incomplete, redirecting to complete profile");
+            sessionStorage.setItem("redirectAfterProfile", redirectAfterLogin);
             setTimeout(() => {
               navigate("/complete-profile");
             }, 500);
@@ -347,9 +362,8 @@ export default function OAuth2Callback() {
           // Continue to dashboard even if validation fails
         }
 
-        // Redirect to dashboard
         setTimeout(() => {
-          navigate("/dashboard");
+          navigate(redirectAfterLogin);
         }, 500);
       } catch (err) {
         console.error("OAuth2 callback error:", err);
@@ -403,7 +417,7 @@ export default function OAuth2Callback() {
                 />
               </svg>
             </div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">
+            <h2 className="mb-2 font-['Beni','Bebas_Neue',Impact,ui-sans-serif] text-[44px] font-black uppercase leading-[0.75] text-[#00522d]">
               Authentication Error
             </h2>
             <p className="text-gray-600 mb-4">{error}</p>
@@ -433,8 +447,8 @@ export default function OAuth2Callback() {
                 ></path>
               </svg>
             </div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">
-              Completing Sign In...
+            <h2 className="mb-2 font-['Beni','Bebas_Neue',Impact,ui-sans-serif] text-[44px] font-black uppercase leading-[0.75] text-[#00522d]">
+              Completing sign&nbsp;in...
             </h2>
             <p className="text-gray-600">Please wait while we log you in</p>
           </div>
@@ -455,7 +469,7 @@ export default function OAuth2Callback() {
                 />
               </svg>
             </div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">
+            <h2 className="mb-2 font-['Beni','Bebas_Neue',Impact,ui-sans-serif] text-[44px] font-black uppercase leading-[0.75] text-[#00522d]">
               Success!
             </h2>
             <p className="text-gray-600">Redirecting to dashboard...</p>

@@ -38,7 +38,18 @@ const getUserInfo = async () => {
 
 const updateUserInfo = async (userData) => {
     try {
-        const user = await axiosClient.put("/v1/users/users/me", userData);
+        const { avatarFile, ...profilePayload } = userData || {};
+        const payload = avatarFile ? new FormData() : profilePayload;
+
+        if (avatarFile) {
+            payload.append(
+                "userRequest",
+                new Blob([JSON.stringify(profilePayload)], { type: "application/json" })
+            );
+            payload.append("avatarFile", avatarFile);
+        }
+
+        const user = await axiosClient.put("/v1/users/users/me", payload);
         console.log("DONE updating user info:", user);
         return user;
     } catch (error) {

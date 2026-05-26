@@ -13,6 +13,7 @@ import com.volunteerhub.eventservice.model.Event;
 import com.volunteerhub.eventservice.publisher.EventPublisher;
 import com.volunteerhub.eventservice.repository.EventRepository;
 import com.volunteerhub.common.enums.EventStatus;
+import com.volunteerhub.common.enums.QrJoinPolicy;
 import com.volunteerhub.eventservice.specification.EventSpecification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -52,8 +53,7 @@ public class EventService {
 
     public List<EventResponse> findByIds(List<Long> ids) {
         return eventRepository.findByIdIn(ids).stream()
-                .map(eventMapper::toDto)
-                .toList();
+                .map(eventMapper::toDto).toList();
     }
 
     public Page<EventResponse> findAll(Integer pageNum, Integer pageSize, EventStatus status,
@@ -110,6 +110,9 @@ public class EventService {
                 .capacity(eventRequest.getCapacity())
                 .ownerId(userId)
                 .optional(eventRequest.getOptional())
+                .qrJoinPolicy(eventRequest.getQrJoinPolicy() == null
+                        ? QrJoinPolicy.REQUIRE_APPROVAL
+                        : eventRequest.getQrJoinPolicy())
                 .build();
 
         Event savedEvent = eventRepository.save(event);
@@ -184,11 +187,16 @@ public class EventService {
             event.setOptional(eventRequest.getOptional());
             updatedFields.put("optional", eventRequest.getOptional());
         }
+        if (eventRequest.getQrJoinPolicy() != null) {
+            event.setQrJoinPolicy(eventRequest.getQrJoinPolicy());
+            updatedFields.put("qr_join_policy", eventRequest.getQrJoinPolicy().name());
+        }
         Event savedEvent = eventRepository.save(event);
         eventPublisher.publishEvent(eventMapper.toUpdatedMessage(savedEvent, updatedFields));
         return eventMapper.toDto(savedEvent);
     }
 
+    // TODO: delete old images
     @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN')")
     public EventResponse deleteEvent(String userId, Long eventId) {
         Event event = findEntityById(eventId);
@@ -227,31 +235,26 @@ public class EventService {
         return eventMapper.toDto(eventRepository.save(event));
     }
 
-    public Page<EventResponse> searchByKeyword(String keyword, String ownerId, EventStatus status, Integer pageNum,
-                                               Integer pageSize) {
+    public Page<EventResponse> searchByKeyword(String keyword, String ownerId, EventStatus status, Integer pageNum, Integer pageSize) {
         PageNumAndSizeResponse pageNumAndSizeResponse = PaginationValidation.validate(pageNum, pageSize);
         int page = pageNumAndSizeResponse.getPageNum();
         int size = pageNumAndSizeResponse.getPageSize();
-
         if (ownerId == null && status == null) {
             Page<Event> events = eventRepository.searchEventsByRegex(keyword.trim(), PageRequest.of(page, size));
             return eventMapper.toDtoPage(events);
         }
 
         if (status != null && ownerId == null) {
-            Page<Event> events = eventRepository.searchEventsByRegexAndStatus(keyword.trim(), status.name(),
-                    PageRequest.of(page, size));
+            Page<Event> events = eventRepository.searchEventsByRegexAndStatus(keyword.trim(), status.name(), PageRequest.of(page, size));
             return eventMapper.toDtoPage(events);
         }
 
         if (status == null) {
-            Page<Event> events = eventRepository.searchEventsByRegexAndOwnerId(keyword.trim(), ownerId,
-                    PageRequest.of(page, size));
+            Page<Event> events = eventRepository.searchEventsByRegexAndOwnerId(keyword.trim(), ownerId, PageRequest.of(page, size));
             return eventMapper.toDtoPage(events);
         }
 
-        Page<Event> events = eventRepository.searchEventsByRegexAndOwnerIdAndStatus(keyword.trim(), ownerId,
-                status.name(), PageRequest.of(page, size));
+        Page<Event> events = eventRepository.searchEventsByRegexAndOwnerIdAndStatus(keyword.trim(), ownerId, status.name(), PageRequest.of(page, size));
         return eventMapper.toDtoPage(events);
     }
 
@@ -259,28 +262,35 @@ public class EventService {
         return eventRepository.countEvents();
     }
 
+    // Trong EventService hoặc Mapper
     public EventResponseCSV convertToExportData(Event event) {
         return EventResponseCSV.builder()
                 .id(event.getId())
                 .name(event.getName())
                 .ownerId(event.getOwnerId())
                 .status(event.getStatus().name())
+
                 .categoryName(event.getCategory() != null
                         ? event.getCategory().getName()
                         : "Uncategorized")
+
                 .fullAddress(event.getAddress() != null
                         ? event.getAddress().getStreet() + ", " + event.getAddress().getDistrict() + ", "
                                 + event.getAddress().getProvince()
                         : "Online/Unknown")
+
                 .startTime(event.getStartTime().toString())
                 .endTime(event.getEndTime().toString())
+
                 .capacity(event.getCapacity())
                 .badgeCount(event.getBadges() == null ? 0 : event.getBadges().size())
+
                 .build();
     }
 
     public List<EventResponseCSV> getDataForExport() {
         List<Event> events = eventRepository.findAllForExport();
+
         return events.stream()
                 .map(this::convertToExportData)
                 .collect(Collectors.toList());
@@ -292,5 +302,33 @@ public class EventService {
 
     public Long countActiveEventsByOwnerId(String ownerId) {
         return eventRepository.countByOwnerIdAndStatus(ownerId, EventStatus.APPROVED);
+    }
+
+    public Map<String, Long> countEventsByStatus() {
+        return normalizeStatusCounts(eventRepository.countEventsByStatus());
+    }
+
+    public Map<String, Long> countEventsByStatusByOwnerId(String ownerId) {
+        return normalizeStatusCounts(eventRepository.countEventsByOwnerIdAndStatus(ownerId));
+    }
+
+    private Map<String, Long> normalizeStatusCounts(List<Object[]> rows) {
+        Map<String, Long> counts = Arrays.stream(EventStatus.values())
+                .collect(Collectors.toMap(
+                        status -> status.name().toLowerCase(),
+                        status -> 0L,
+                        (left, right) -> left,
+                        LinkedHashMap::new
+                ));
+
+        for (Object[] row : rows) {
+            if (row == null || row.length < 2 || row[0] == null) {
+                continue;
+            }
+            EventStatus status = (EventStatus) row[0];
+            Long count = row[1] == null ? 0L : ((Number) row[1]).longValue();
+            counts.put(status.name().toLowerCase(), count);
+        }
+        return counts;
     }
 }

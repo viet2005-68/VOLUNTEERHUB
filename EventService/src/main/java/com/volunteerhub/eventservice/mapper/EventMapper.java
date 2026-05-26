@@ -36,6 +36,7 @@ public class EventMapper {
                 .updatedAt(event.getUpdatedAt())
                 .approvedBy(event.getApprovedBy())
                 .optional(event.getOptional())
+                .qrJoinPolicy(event.getQrJoinPolicy())
                 .build();
     }
 
@@ -59,6 +60,9 @@ public class EventMapper {
                 .status(event.getStatus())
                 .startTime(event.getStartTime())
                 .endTime(event.getEndTime())
+                .registrationDeadline(event.getRegistrationDeadline())
+                .capacity(event.getCapacity())
+                .qrJoinPolicy(event.getQrJoinPolicy())
                 .build();
     }
 
@@ -71,6 +75,10 @@ public class EventMapper {
                 .ownerId(event.getOwnerId())
                 .approvedBy(event.getApprovedBy())
                 .status(event.getStatus())
+                .startTime(event.getStartTime())
+                .endTime(event.getEndTime())
+                .registrationDeadline(event.getRegistrationDeadline())
+                .qrJoinPolicy(event.getQrJoinPolicy())
                 .build();
     }
 

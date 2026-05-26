@@ -1,14 +1,14 @@
 import { useState } from 'react'
 
 const faq = [
-  ['Vous accompagnez seulement les réseaux sociaux ?', 'Les réseaux sont le terrain principal, mais la stratégie, la production et le ton structurent tout le dispositif.'],
-  ['Peut-on démarrer avec un seul besoin ?', 'Oui. On peut commencer par un audit, une campagne, un shooting ou une ligne éditoriale courte.'],
-  ['Comment se passe le lancement ?', 'On qualifie le contexte, on choisit le niveau d accompagnement, puis on construit un plan clair en trois temps.'],
+  ['How do I start volunteering?', 'Create an account, choose a cause, apply to a mission, and follow the event instructions from your dashboard.'],
+  ['Can organizations post events?', 'Yes. Managers can create opportunities, review registrations, and keep volunteer teams updated.'],
+  ['What happens after an event?', 'Participation can be reviewed, completions are recorded, and volunteers keep building their impact profile.'],
 ]
 
 const steps = [
-  ['01', 'Votre marque', ['Nom', 'Marque']],
-  ['02', 'Votre besoin', ['Objectif', 'Budget']],
+  ['01', 'Your cause', ['Cause', 'Availability']],
+  ['02', 'Your role', ['Skills', 'Location']],
   ['03', 'Contact', ['Email', 'Message']],
 ]
 
@@ -20,7 +20,7 @@ function Contact() {
     <section id="contact" className="contact-section section-pad">
       <div className="faq-shell" data-animate="cards">
         <p className="section-label">FAQ</p>
-        <h2>Avant de lancer la foudre.</h2>
+        <h2>Ready to help where it matters?</h2>
         {faq.map(([question, answer], index) => (
           <article key={question} className={openFaq === index ? 'is-open' : ''}>
             <button type="button" onClick={() => setOpenFaq(openFaq === index ? -1 : index)} aria-expanded={openFaq === index}>
@@ -50,7 +50,7 @@ function Contact() {
             </label>
           ))}
         </div>
-        <button type="button" className="quiz-submit" onClick={() => setActiveStep((activeStep + 1) % steps.length)}>Continuer</button>
+        <button type="button" className="quiz-submit" onClick={() => setActiveStep((activeStep + 1) % steps.length)}>Continue</button>
       </form>
     </section>
   )

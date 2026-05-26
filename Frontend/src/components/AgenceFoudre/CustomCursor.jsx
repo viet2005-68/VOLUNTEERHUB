@@ -39,7 +39,7 @@ function CustomCursor() {
 
   return (
     <div ref={cursorRef} className="custom-cursor" data-state="default" aria-hidden="true">
-      <span className="custom-cursor__label">Voir</span>
+      <span className="custom-cursor__label">View</span>
     </div>
   )
 }

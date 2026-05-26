@@ -36,7 +36,8 @@ public class FileStorageService {
                 .setContentType(file.getContentType())
                 .setMetadata(Map.of("firebaseStorageDownloadTokens", downloadToken))
                 .build();
-        storage.createFrom(blobInfo, new java.io.ByteArrayInputStream(file.getBytes()));
+        storage.createFrom(blobInfo,
+                new java.io.ByteArrayInputStream(file.getBytes()));
 
         String encodedObjectName = encodeUrlPart(objectName);
         String encodedToken = encodeUrlPart(downloadToken);
@@ -51,5 +52,4 @@ public class FileStorageService {
     private String encodeUrlPart(String value) {
         return URLEncoder.encode(value, StandardCharsets.UTF_8).replace("+", "%20");
     }
-
 }

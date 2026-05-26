@@ -2,9 +2,9 @@ import { useEffect, useRef } from 'react'
 import { animate, stagger } from 'animejs'
 
 const stats = [
-  ['42', 'lancements social-first'],
-  ['7M', 'vues organiques orchestrées'],
-  ['3s', 'pour accrocher un regard'],
+  ['120+', 'open volunteer missions'],
+  ['8K', 'hours coordinated'],
+  ['24h', 'to find a cause'],
 ]
 
 function Manifesto() {
@@ -32,10 +32,10 @@ function Manifesto() {
 
   return (
     <section id="manifesto" className="manifesto section-pad">
-      <div className="section-label">Manifesto</div>
-      <h2 data-animate="line-reveal">On ne poste pas. On provoque une réaction.</h2>
+      <div className="section-label">Mission</div>
+      <h2 data-animate="line-reveal">Impact starts when showing up becomes simple.</h2>
       <p data-animate="word-reveal">
-        Foudre transforme les marques en personnages sociaux: une voix, une tension, un rythme, des images qui donnent envie de répondre avant même de comprendre pourquoi.
+        VolunteerHub turns scattered goodwill into organized action: clear roles, trusted events, committed teams, and progress people can see after every mission.
       </p>
       <div ref={statsRef} className="manifesto-stats">
         {stats.map(([value, label]) => (

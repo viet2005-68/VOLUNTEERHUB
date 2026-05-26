@@ -39,6 +39,9 @@ import BanUser from "../pages/Auth/BanUser";
 import Analytics from "../pages/Analysis/Analytics";
 import AdminAnalytics from "../pages/Analysis/AdminAnalytics";
 import CompleteProfile from "../pages/Profile/CompleteProfile";
+import CompleteQrPage from "../pages/Qr/CompleteQrPage";
+import JoinQrPage from "../pages/Qr/JoinQrPage";
+import ChatPage from "../pages/Chat/ChatPage";
 
 const LandingPage = lazy(() => import("../pages/Landing"));
 
@@ -82,6 +85,7 @@ function AppRouter() {
             <Route path="activity" element={<Activity />} />
             <Route path="badges" element={<Badges />} />
             <Route path="notifications" element={<Notifications />} />
+            <Route path="messages" element={<ChatPage />} />
             <Route path="eventmanager" element={<EventManager />} />
           </Route>
 
@@ -91,6 +95,8 @@ function AppRouter() {
 
           {/* trending events */}
           <Route path="/trending" element={<TrendingPage />} />
+          <Route path="/qr/join" element={<JoinQrPage />} />
+          <Route path="/qr/complete" element={<CompleteQrPage />} />
         </Route>
 
         {/* Admin-only route */}
@@ -116,6 +122,7 @@ function AppRouter() {
             <Route path="approve-registration" element={<RegistrationPage />} />
             <Route path="markcompletion" element={<MarkCompletionList />} />
             <Route path="notifications" element={<Notifications />} />
+            <Route path="messages" element={<ChatPage />} />
             <Route path="eventmanager" element={<EventManager />} />
             <Route path="manager-analytics" element={<Analytics />} />
           </Route>

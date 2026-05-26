@@ -1,0 +1,64 @@
+spring:
+  application:
+    name: ChatService
+
+  config:
+    import: optional:file:.env[.properties]
+
+  datasource:
+    url: jdbc:postgresql://${HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+
+  rabbitmq:
+    host: ${HOST}
+    port: ${RABBITMQ_PORT}
+    username: ${RABBITMQ_DEFAULT_USER}
+    password: ${RABBITMQ_DEFAULT_PASS}
+
+  servlet:
+    multipart:
+      max-file-size: ${CHAT_MEDIA_MAX_FILE_SIZE:10MB}
+      max-request-size: ${CHAT_MEDIA_MAX_REQUEST_SIZE:12MB}
+
+  security:
+    oauth2:
+      google:
+        issuer: ${GOOGLE_AS_URI:}
+        jwk-uri: ${GOOGLE_AS_JWK_URI:}
+      volunteerhub:
+        issuer: ${VOLUNTEER_HUB_AS_URI:}
+        jwk-uri: ${VOLUNTEER_HUB_AS_JWK_URI:}
+
+rabbitmq:
+  exchange:
+    notification: ${NOTIFICATION_EXCHANGE:notification-exchange}
+  routingKey:
+    chat: ${CHAT_NOTIFICATION_ROUTING_KEY:notification.chat}
+
+firebase:
+  projectId: ${FIREBASE_PROJECT_ID}
+  storage:
+    bucket: ${FIREBASE_STORAGE_BUCKET}
+
+chat:
+  media:
+    folder: ${CHAT_MEDIA_FOLDER:chat}
+    max-size-bytes: ${CHAT_MEDIA_MAX_SIZE_BYTES:10485760}
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_SERVER_URL}
+
+server:
+  port: ${PORT}

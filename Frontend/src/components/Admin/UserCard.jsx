@@ -92,9 +92,9 @@ function UserCard({ data, onBanUser, onUnbanUser, onEdit, onView }) {
   return (
     <>
       {/* Desktop View - Table Row */}
-      <tr className="hidden lg:table-row border-b border-gray-200 hover:bg-gray-50 transition-colors">
+      <tr className="hidden border-b-2 border-ash-whisper transition-colors hover:bg-ash-whisper/35 lg:table-row">
         <td className="px-6 py-4">
-          <span className="font-mono text-xs text-gray-600" title={id}>
+          <span className="font-mono text-xs font-bold text-deep-forest/55" title={id}>
             {id?.slice(0, 8)}...
           </span>
         </td>
@@ -102,23 +102,23 @@ function UserCard({ data, onBanUser, onUnbanUser, onEdit, onView }) {
           <img
             src={avatar}
             alt={name}
-            className="w-10 h-10 rounded-full object-cover"
+            className="h-11 w-11 rounded-full border-2 border-ash-whisper object-cover"
           />
         </td>
         <td className="px-6 py-4">
           <div className="flex flex-col">
-            <span className="font-medium text-gray-900">{name}</span>
-            <span className="text-sm text-gray-500">{email}</span>
+            <span className="font-bold text-deep-forest">{name}</span>
+            <span className="text-sm font-medium text-deep-forest/55">{email}</span>
           </div>
         </td>
         <td className="px-6 py-4">
-          <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-md text-sm font-medium capitalize">
+          <span className="rounded-[10px] bg-ash-whisper px-3 py-1.5 text-sm font-bold capitalize text-deep-forest">
             {type}
           </span>
         </td>
         <td className="px-6 py-4">
           <span
-            className={`px-3 py-1.5 rounded-lg text-sm font-medium capitalize min-w-[90px] inline-block text-center ${getStatusColor(
+            className={`inline-block min-w-[90px] rounded-[10px] px-3 py-1.5 text-center text-sm font-bold capitalize ${getStatusColor(
               currentStatus
             )}`}
             title={STATUS_CONFIG[currentStatus]?.description}
@@ -127,13 +127,13 @@ function UserCard({ data, onBanUser, onUnbanUser, onEdit, onView }) {
           </span>
         </td>
         <td className="px-6 py-4">
-          <div className="flex items-center gap-2 text-sm text-gray-700">
+          <div className="flex items-center gap-2 text-sm font-medium text-deep-forest/70">
             <span>{formatPhoneNumber(phoneNumber)}</span>
           </div>
         </td>
         <td className="px-6 py-4">
-          <div className="flex items-center gap-2 text-sm text-gray-700">
-            <Calendar className="w-4 h-4 text-gray-400" />
+          <div className="flex items-center gap-2 text-sm font-medium text-deep-forest/70">
+            <Calendar className="h-4 w-4 text-deep-forest/40" />
             <span>{formatDate(dateOfBirth)}</span>
           </div>
         </td>
@@ -143,7 +143,7 @@ function UserCard({ data, onBanUser, onUnbanUser, onEdit, onView }) {
             {currentStatus === USER_STATUS.ACTIVE && (
               <button
                 onClick={BanUser}
-                className="p-2 bg-red-500/90 text-white hover:bg-red-600 rounded-lg transition-colors"
+                className="rounded-[10px] bg-deep-forest p-2 text-pale-canvas transition-all hover:-translate-y-0.5 hover:brightness-110"
                 title="Ban user"
               >
                 <Ban className="w-4 h-4" />
@@ -153,7 +153,7 @@ function UserCard({ data, onBanUser, onUnbanUser, onEdit, onView }) {
               currentStatus === USER_STATUS.BANNED) && (
               <button
                 onClick={UnbanUser}
-                className="p-2 bg-green-500/90 text-white hover:bg-green-600 rounded-lg transition-colors"
+                className="rounded-[10px] bg-deep-forest p-2 text-pale-canvas transition-all hover:-translate-y-0.5 hover:brightness-110"
                 title="Unban user"
               >
                 <CircleCheckBig className="w-4 h-4" />
@@ -162,7 +162,7 @@ function UserCard({ data, onBanUser, onUnbanUser, onEdit, onView }) {
             {currentStatus === USER_STATUS.PENDING && (
               <button
                 onClick={() => onEdit?.(id)}
-                className="p-2 bg-green-500/90 text-white hover:bg-green-600 rounded-lg transition-colors"
+                className="rounded-[10px] bg-deep-forest p-2 text-pale-canvas transition-all hover:-translate-y-0.5 hover:brightness-110"
                 title="Approve User"
               >
                 <CircleCheckBig className="w-4 h-4" />
@@ -170,10 +170,10 @@ function UserCard({ data, onBanUser, onUnbanUser, onEdit, onView }) {
             )}
             <button
               onClick={() => onView?.(id)}
-              className="p-2 border-gray-500/20 border hover:bg-gray-100 rounded-lg transition-colors"
+              className="rounded-[10px] border-2 border-deep-forest bg-transparent p-2 text-deep-forest transition-all hover:-translate-y-0.5 hover:bg-deep-forest hover:text-pale-canvas"
               title="View Details"
             >
-              <Eye className="w-4 h-4 text-gray-600" />
+              <Eye className="h-4 w-4" />
             </button>
           </div>
         </td>
@@ -181,27 +181,27 @@ function UserCard({ data, onBanUser, onUnbanUser, onEdit, onView }) {
 
       {/* Mobile View - Expandable Card */}
       <tr className="lg:hidden">
-        <td colSpan="6" className="p-0">
-          <div className="bg-white border-1 border-gray-200 rounded-2xl mb-5 shadow-md">
+        <td colSpan="8" className="p-0">
+          <div className="mb-5 rounded-[20px] border-2 border-ash-whisper bg-white text-deep-forest">
             {/* Compact Header - Always Visible */}
             <div
-              className="p-4 cursor-pointer active:bg-gray-50 transition-colors"
+              className="cursor-pointer p-4 transition-colors active:bg-ash-whisper/50"
               onClick={() => setIsExpanded(!isExpanded)}
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="flex-1 min-w-0">
                   {/* Title */}
-                  <p className="font-semibold text-gray-900 text-base leading-tight mb-1">
+                  <p className="mb-1 text-base font-bold leading-tight text-deep-forest">
                     {name}
                   </p>
 
                   {/* Type & Status */}
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-xs text-gray-500 capitalize">
+                    <span className="rounded-[10px] bg-ash-whisper px-2.5 py-1 text-xs font-bold capitalize text-deep-forest">
                       {type}
                     </span>
                     <span
-                      className={`px-2 py-0.5 rounded-md text-xs font-medium capitalize ${getStatusColor(
+                      className={`rounded-[10px] px-2.5 py-1 text-xs font-bold capitalize ${getStatusColor(
                         currentStatus
                       )}`}
                     >
@@ -212,23 +212,23 @@ function UserCard({ data, onBanUser, onUnbanUser, onEdit, onView }) {
 
                 {/* Toggle Button */}
                 <button
-                  className="flex-shrink-0 p-1 hover:bg-gray-100 rounded-full transition-colors"
+                  className="flex-shrink-0 rounded-full p-1 text-deep-forest transition-colors hover:bg-ash-whisper"
                   onClick={(e) => {
                     e.stopPropagation();
                     setIsExpanded(!isExpanded);
                   }}
                 >
                   {isExpanded ? (
-                    <ChevronUp className="w-5 h-5 text-gray-400" />
+                    <ChevronUp className="h-5 w-5" />
                   ) : (
-                    <ChevronDown className="w-5 h-5 text-gray-400" />
+                    <ChevronDown className="h-5 w-5" />
                   )}
                 </button>
               </div>
 
               {/* Quick Info Preview (when collapsed) */}
               {!isExpanded && (
-                <div className="mt-2 flex items-center gap-3 text-xs text-gray-500">
+                <div className="mt-3 flex items-center gap-3 text-xs font-medium text-deep-forest/60">
                   <div className="flex items-center gap-1">
                     <Phone className="w-3.5 h-3.5" />
                     <span>{formatPhoneNumber(phoneNumber)}</span>
@@ -243,39 +243,39 @@ function UserCard({ data, onBanUser, onUnbanUser, onEdit, onView }) {
 
             {/* Expanded Content */}
             {isExpanded && (
-              <div className="px-4 pb-4 space-y-3 rounded-xl">
+              <div className="space-y-3 rounded-[20px] border-t-2 border-ash-whisper px-4 pb-4 text-deep-forest">
                 {/* Email & Type */}
                 <div className="flex items-start gap-2 text-sm pt-3">
-                  <Mail className="w-4 h-4 text-gray-400 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700 break-words">{email}</span>
+                  <Mail className="mt-0.5 h-4 w-4 flex-shrink-0 text-deep-forest/45" />
+                  <span className="break-words font-medium text-deep-forest/75">{email}</span>
                 </div>
                 <div className="flex items-start gap-2 text-sm">
-                  <User className="w-4 h-4 text-gray-400 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700 break-words capitalize">
+                  <User className="mt-0.5 h-4 w-4 flex-shrink-0 text-deep-forest/45" />
+                  <span className="break-words font-medium capitalize text-deep-forest/75">
                     {type}
                   </span>
                 </div>
 
                 {/* Phone & Date of Birth */}
-                <div className="bg-gray-50 rounded-lg p-3">
+                <div className="rounded-[20px] bg-ash-whisper/55 p-3">
                   <div className="flex items-center justify-between text-sm mb-2">
                     <div className="flex items-center gap-2">
-                      <Phone className="w-4 h-4 text-gray-500" />
-                      <span className="text-gray-600 font-medium">
+                      <Phone className="h-4 w-4 text-deep-forest/60" />
+                      <span className="font-bold text-deep-forest">
                         Contact Info
                       </span>
                     </div>
                   </div>
                   <div className="flex flex-col gap-2 text-sm">
                     <div className="flex items-center gap-2">
-                      <Phone className="w-4 h-4 text-gray-400" />
-                      <span className="text-gray-700">
+                      <Phone className="h-4 w-4 text-deep-forest/45" />
+                      <span className="font-medium text-deep-forest/75">
                         {formatPhoneNumber(phoneNumber)}
                       </span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Calendar className="w-4 h-4 text-gray-400" />
-                      <span className="text-gray-700">
+                      <Calendar className="h-4 w-4 text-deep-forest/45" />
+                      <span className="font-medium text-deep-forest/75">
                         {formatDate(dateOfBirth)}
                       </span>
                     </div>
@@ -290,12 +290,10 @@ function UserCard({ data, onBanUser, onUnbanUser, onEdit, onView }) {
                         e.stopPropagation();
                         BanUser();
                       }}
-                      className="col-span-2 py-2.5 bg-red-500 hover:bg-red-600 rounded-lg transition-colors flex items-center justify-center gap-2"
+                      className="col-span-2 flex items-center justify-center gap-2 rounded-[10px] bg-deep-forest py-3 font-bold text-pale-canvas transition-all hover:-translate-y-0.5 hover:brightness-110"
                     >
-                      <Ban className="w-4 h-4 text-white" />
-                      <span className="text-white text-sm font-medium">
-                        Ban User
-                      </span>
+                      <Ban className="h-4 w-4" />
+                      <span className="text-sm font-bold">Ban User</span>
                     </button>
                   )}
                   {(currentStatus === USER_STATUS.BAN ||
@@ -305,12 +303,10 @@ function UserCard({ data, onBanUser, onUnbanUser, onEdit, onView }) {
                         e.stopPropagation();
                         UnbanUser();
                       }}
-                      className="col-span-2 py-2.5 bg-green-500 hover:bg-green-600 rounded-lg transition-colors flex items-center justify-center gap-2"
+                      className="col-span-2 flex items-center justify-center gap-2 rounded-[10px] bg-deep-forest py-3 font-bold text-pale-canvas transition-all hover:-translate-y-0.5 hover:brightness-110"
                     >
-                      <CircleCheckBig className="w-4 h-4 text-white" />
-                      <span className="text-white text-sm font-medium">
-                        Unban User
-                      </span>
+                      <CircleCheckBig className="h-4 w-4" />
+                      <span className="text-sm font-bold">Unban User</span>
                     </button>
                   )}
                   {currentStatus === USER_STATUS.PENDING && (
@@ -319,12 +315,10 @@ function UserCard({ data, onBanUser, onUnbanUser, onEdit, onView }) {
                         e.stopPropagation();
                         onEdit?.(id);
                       }}
-                      className="col-span-2 py-2.5 bg-green-500 hover:bg-green-600 rounded-lg transition-colors flex items-center justify-center gap-2"
+                      className="col-span-2 flex items-center justify-center gap-2 rounded-[10px] bg-deep-forest py-3 font-bold text-pale-canvas transition-all hover:-translate-y-0.5 hover:brightness-110"
                     >
-                      <CircleCheckBig className="w-4 h-4 text-white" />
-                      <span className="text-white text-sm font-medium">
-                        Approve User
-                      </span>
+                      <CircleCheckBig className="h-4 w-4" />
+                      <span className="text-sm font-bold">Approve User</span>
                     </button>
                   )}
                   <button
@@ -332,10 +326,10 @@ function UserCard({ data, onBanUser, onUnbanUser, onEdit, onView }) {
                       e.stopPropagation();
                       onView?.(id);
                     }}
-                    className="col-span-2 py-2.5 bg-blue-500 hover:bg-blue-600 rounded-lg transition-colors flex items-center justify-center gap-2"
+                    className="col-span-2 flex items-center justify-center gap-2 rounded-[10px] border-2 border-deep-forest bg-transparent py-3 font-bold text-deep-forest transition-all hover:-translate-y-0.5 hover:bg-deep-forest hover:text-pale-canvas"
                   >
-                    <Eye className="w-4 h-4 text-white" />
-                    <span className="text-white text-sm font-medium">View</span>
+                    <Eye className="h-4 w-4" />
+                    <span className="text-sm font-bold">View</span>
                   </button>
                 </div>
               </div>

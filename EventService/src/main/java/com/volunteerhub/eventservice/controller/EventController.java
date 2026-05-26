@@ -22,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/events")
@@ -53,11 +54,6 @@ public class EventController {
         return ResponseEntity.ok(eventService.findByIds(eventIds));
     }
 
-    @GetMapping("/{eventId}")
-    public ResponseEntity<EventResponse> getEventById(@PathVariable Long eventId) {
-        return ResponseEntity.ok(eventService.findById(eventId));
-    }
-
     @GetMapping("/owned")
     public ResponseEntity<Page<EventResponse>> getAllOwnedEvents(@RequestParam(required = false) Integer pageNum,
                                                                  @RequestParam(required = false) Integer pageSize,
@@ -73,6 +69,11 @@ public class EventController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         return ResponseEntity.ok(eventService.findAllOwnedEvent(auth.getName(), pageNum, pageSize, status, category,
                 startAfter, endBefore, province, district, street, sortedBy, order));
+    }
+
+    @GetMapping("/{eventId}")
+    public ResponseEntity<EventResponse> getEventById(@PathVariable Long eventId) {
+        return ResponseEntity.ok(eventService.findById(eventId));
     }
 
     @PostMapping
@@ -111,11 +112,13 @@ public class EventController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<Page<EventResponse>> searchEvents(@RequestParam("keyword") String keyword,
-                                                            @RequestParam(required = false) EventStatus status,
-                                                            @RequestParam(required = false) Integer pageNum,
-                                                            @RequestParam(required = false) Integer pageSize) {
-        return ResponseEntity.ok(eventService.searchByKeyword(keyword, null, status, pageNum, pageSize));
+    public ResponseEntity<Page<EventResponse>> searchEvents(
+            @RequestParam("keyword") String keyword,
+            @RequestParam(required = false) EventStatus status,
+            @RequestParam(required = false) Integer pageNum,
+            @RequestParam(required = false) Integer pageSize) {
+
+            return ResponseEntity.ok(eventService.searchByKeyword(keyword, null, status, pageNum, pageSize));
     }
 
     @GetMapping("/owned/search")
@@ -124,8 +127,7 @@ public class EventController {
                                                                  @RequestParam(required = false) Integer pageNum,
                                                                  @RequestParam(required = false) Integer pageSize) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return ResponseEntity.ok(eventService.searchByKeyword(keyword, authentication.getName(), status, pageNum,
-                pageSize));
+        return ResponseEntity.ok(eventService.searchByKeyword(keyword, authentication.getName(), status, pageNum, pageSize));
     }
 
     @GetMapping("/stats/count")
@@ -150,5 +152,18 @@ public class EventController {
     public ResponseEntity<Long> countActiveEventsByOwnerId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return ResponseEntity.ok(eventService.countActiveEventsByOwnerId(authentication.getName()));
+    }
+
+    @GetMapping("/stats/by-status")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Map<String, Long>> countEventsByStatus() {
+        return ResponseEntity.ok(eventService.countEventsByStatus());
+    }
+
+    @GetMapping("/stats/by-status/manager")
+    @PreAuthorize("hasRole('MANAGER')")
+    public ResponseEntity<Map<String, Long>> countEventsByStatusByOwnerId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return ResponseEntity.ok(eventService.countEventsByStatusByOwnerId(authentication.getName()));
     }
 }

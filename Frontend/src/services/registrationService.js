@@ -179,6 +179,58 @@ export const registerForEvent = async (eventId) => {
         throw error;
     }
 };
+
+export const createJoinQrCode = async (eventId, payload = {}) => {
+    try {
+        return await axiosClient.post(
+            `${REGISTRATION_BASE_URL}/events/${eventId}/qr-codes`,
+            payload
+        );
+    } catch (error) {
+        console.error("Error creating join QR code:", error);
+        throw error;
+    }
+};
+
+export const listJoinQrCodes = async (eventId) => {
+    try {
+        return await axiosClient.get(`${REGISTRATION_BASE_URL}/events/${eventId}/qr-codes`);
+    } catch (error) {
+        console.error("Error fetching join QR codes:", error);
+        throw error;
+    }
+};
+
+export const revokeJoinQrCode = async (eventId, qrCodeId) => {
+    try {
+        return await axiosClient.delete(
+            `${REGISTRATION_BASE_URL}/events/${eventId}/qr-codes/${qrCodeId}`
+        );
+    } catch (error) {
+        console.error("Error revoking join QR code:", error);
+        throw error;
+    }
+};
+
+export const previewJoinQrCode = async (token) => {
+    try {
+        return await axiosClient.get(`${REGISTRATION_BASE_URL}/qr/preview`, {
+            params: { token },
+        });
+    } catch (error) {
+        console.error("Error previewing join QR code:", error);
+        throw error;
+    }
+};
+
+export const joinRegistrationByQrCode = async (token) => {
+    try {
+        return await axiosClient.post(`${REGISTRATION_BASE_URL}/qr/join`, { token });
+    } catch (error) {
+        console.error("Error joining registration by QR code:", error);
+        throw error;
+    }
+};
 export const unregisterFromEvent = async (eventId) => {
     try {
         const response = await axiosClient.delete(`${REGISTRATION_BASE_URL}/events/${eventId}`);
@@ -240,6 +292,58 @@ export const UserApprovedList = async (eventId) => {
         return response;
     } catch (error) {
         console.error("Error fetching approved users for event:", error);
+        throw error;
+    }
+};
+
+export const createCompletionQrCode = async (eventId, payload = {}) => {
+    try {
+        return await axiosClient.post(
+            `${REGISTRATION_BASE_URL}/events/${eventId}/completion-qr-codes`,
+            payload
+        );
+    } catch (error) {
+        console.error("Error creating completion QR code:", error);
+        throw error;
+    }
+};
+
+export const listCompletionQrCodes = async (eventId) => {
+    try {
+        return await axiosClient.get(`${REGISTRATION_BASE_URL}/events/${eventId}/completion-qr-codes`);
+    } catch (error) {
+        console.error("Error fetching completion QR codes:", error);
+        throw error;
+    }
+};
+
+export const revokeCompletionQrCode = async (eventId, qrCodeId) => {
+    try {
+        return await axiosClient.delete(
+            `${REGISTRATION_BASE_URL}/events/${eventId}/completion-qr-codes/${qrCodeId}`
+        );
+    } catch (error) {
+        console.error("Error revoking completion QR code:", error);
+        throw error;
+    }
+};
+
+export const previewCompletionQrCode = async (token) => {
+    try {
+        return await axiosClient.get(`${REGISTRATION_BASE_URL}/qr/completion/preview`, {
+            params: { token },
+        });
+    } catch (error) {
+        console.error("Error previewing completion QR code:", error);
+        throw error;
+    }
+};
+
+export const completeRegistrationByQrCode = async (token) => {
+    try {
+        return await axiosClient.post(`${REGISTRATION_BASE_URL}/qr/complete`, { token });
+    } catch (error) {
+        console.error("Error completing registration by QR code:", error);
         throw error;
     }
 };

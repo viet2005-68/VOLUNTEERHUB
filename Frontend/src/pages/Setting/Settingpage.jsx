@@ -18,6 +18,7 @@ import {
   Plus,
   X,
   Bell,
+  Upload,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useProfile, useUpdateUserProfile } from "../../hook/useUser";
@@ -30,6 +31,28 @@ import {
 import profileSchema from "../../validation/profileSchema";
 import { ValidationError } from "yup";
 import { LazyLoadImage } from "react-lazy-load-image-component";
+
+const MINIMUM_PROFILE_AGE = 16;
+const AVATAR_MAX_SIZE = 5 * 1024 * 1024;
+const AVATAR_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+
+const validateAvatarFile = (file) => {
+  if (!file) return "";
+  if (!AVATAR_TYPES.includes(file.type)) {
+    return "Only JPEG, PNG, WebP, and GIF images are allowed.";
+  }
+  if (file.size > AVATAR_MAX_SIZE) {
+    return "Profile photo must be 5MB or smaller.";
+  }
+  return "";
+};
+
+const getAgeByYear = (dateString) => {
+  const birthYear = Number(String(dateString || "").slice(0, 4));
+  if (!Number.isInteger(birthYear)) return null;
+
+  return new Date().getFullYear() - birthYear;
+};
 
 const composeAddress = ({ street, districtName, provinceName }) =>
   [street, districtName, provinceName]
@@ -98,8 +121,11 @@ export default function Settingpage() {
   const [formData, setFormData] = useState(null);
   const [skillInput, setSkillInput] = useState("");
   const [errors, setErrors] = useState({});
+  const [avatarFile, setAvatarFile] = useState(null);
+  const [avatarPreview, setAvatarPreview] = useState("");
   const { data: profile, isLoading } = useProfile();
   const { mutate: updateProfile } = useUpdateUserProfile();
+  const maxAllowedBirthDate = `${new Date().getFullYear() - MINIMUM_PROFILE_AGE}-12-31`;
 
   // Callback khi provinces được fetch xong
   const handleProvincesLoaded = useCallback((provincesData) => {
@@ -232,6 +258,8 @@ export default function Settingpage() {
       setFormData(mappedData);
       setSkillInput("");
       setErrors({});
+      setAvatarFile(null);
+      setAvatarPreview("");
     }
   }, [profile]);
 
@@ -298,7 +326,20 @@ export default function Settingpage() {
       return;
     }
 
-    clearFieldError(name);
+    if (name === "dateOfBirth") {
+      const ageByYear = getAgeByYear(value);
+      if (value && (ageByYear === null || ageByYear < MINIMUM_PROFILE_AGE)) {
+        setErrors((prev) => ({
+          ...prev,
+          dateOfBirth: "You must be at least 16 years old.",
+        }));
+      } else {
+        clearFieldError(name);
+      }
+    } else {
+      clearFieldError(name);
+    }
+
     setFormData((prev) => {
       if (!prev) return prev;
       if (prev[name] === value) return prev;
@@ -307,6 +348,34 @@ export default function Settingpage() {
         [name]: value,
       };
     });
+  };
+
+  const handleAvatarSelect = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const validationMessage = validateAvatarFile(file);
+    if (validationMessage) {
+      setErrors((prev) => ({ ...prev, avatarFile: validationMessage }));
+      setAvatarFile(null);
+      setAvatarPreview("");
+      e.target.value = "";
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setAvatarPreview(String(reader.result || ""));
+    };
+    reader.readAsDataURL(file);
+    setAvatarFile(file);
+    clearFieldError("avatarUrl", "avatarFile");
+  };
+
+  const handleRemoveAvatarFile = () => {
+    setAvatarFile(null);
+    setAvatarPreview("");
+    clearFieldError("avatarFile");
   };
 
   const handleProvinceChange = (event) => {
@@ -429,7 +498,19 @@ export default function Settingpage() {
 
   const handleSaveChanges = async () => {
     try {
-      const validated = await profileSchema.validate(formData, {
+      const avatarValidationMessage = validateAvatarFile(avatarFile);
+      if (avatarValidationMessage) {
+        setErrors((prev) => ({ ...prev, avatarFile: avatarValidationMessage }));
+        return;
+      }
+
+      const validationData = {
+        ...formData,
+        avatarUrl:
+          formData.avatarUrl ||
+          (avatarFile ? "https://volunteerhub.local/avatar-upload" : ""),
+      };
+      const validated = await profileSchema.validate(validationData, {
         abortEarly: false,
       });
 
@@ -462,12 +543,18 @@ export default function Settingpage() {
         address: addressPayload,
         dateOfBirth: validated.dateOfBirth,
         bio: validated.bio,
-        avatarUrl: validated.avatarUrl,
+        avatarUrl: avatarFile ? undefined : validated.avatarUrl,
+        avatarFile,
         skills: validated.skills?.length ? validated.skills : null,
         preferences: preferencesPayload,
       };
       console.log("Updating profile with payload:", payload);
-      updateProfile(payload);
+      updateProfile(payload, {
+        onSuccess: () => {
+          setAvatarFile(null);
+          setAvatarPreview("");
+        },
+      });
     } catch (error) {
       if (error instanceof ValidationError) {
         const nextErrors = error.inner.reduce((acc, curr) => {
@@ -490,6 +577,8 @@ export default function Settingpage() {
       setFormData(resetState);
       setSkillInput("");
       setErrors({});
+      setAvatarFile(null);
+      setAvatarPreview("");
     }
   };
 
@@ -506,7 +595,7 @@ export default function Settingpage() {
     {
       id: "avatar",
       label: "Add a profile photo",
-      complete: Boolean(formData.avatarUrl),
+      complete: Boolean(formData.avatarUrl || avatarPreview),
     },
     { id: "bio", label: "Write a short bio", complete: Boolean(formData.bio) },
     {
@@ -617,9 +706,9 @@ export default function Settingpage() {
             <div className="relative flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
               <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
                 <div className="relative mx-auto h-28 w-28 overflow-hidden rounded-3xl border border-blue-200 bg-gradient-to-br from-blue-500 to-blue-600 shadow-xl shadow-blue-500/30 sm:mx-0">
-                  {formData.avatarUrl ? (
+                  {avatarPreview || formData.avatarUrl ? (
                     <LazyLoadImage
-                      src={formData.avatarUrl}
+                      src={avatarPreview || formData.avatarUrl}
                       alt={formData.name}
                       className="h-full w-full object-cover"
                     />
@@ -731,20 +820,64 @@ export default function Settingpage() {
                 <div className="flex flex-col gap-2 md:col-span-2">
                   <label className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
                     <User className="h-4 w-4" />
-                    Profile Photo URL
+                    Profile Photo
                     <span className="ml-1 text-red-500">*</span>
                   </label>
-                  <input
-                    type="url"
-                    name="avatarUrl"
-                    value={formData.avatarUrl || ""}
-                    onChange={handleInputChange}
-                    disabled={!isEditing}
-                    placeholder="https://..."
-                    className={getInputClasses("avatarUrl")}
-                  />
-                  {isEditing && errors.avatarUrl && (
-                    <p className="text-xs text-red-500">{errors.avatarUrl}</p>
+                  <div className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4 sm:flex-row sm:items-center">
+                    <div className="h-20 w-20 overflow-hidden rounded-xl border border-slate-200 bg-white">
+                      {avatarPreview || formData.avatarUrl ? (
+                        <img
+                          src={avatarPreview || formData.avatarUrl}
+                          alt="Profile preview"
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center">
+                          <User className="h-8 w-8 text-slate-400" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex flex-1 flex-wrap gap-2">
+                      <input
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp,image/gif"
+                        onChange={handleAvatarSelect}
+                        disabled={!isEditing}
+                        className="hidden"
+                        id="avatarUpload"
+                      />
+                      <label
+                        htmlFor="avatarUpload"
+                        className={`inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition ${
+                          isEditing
+                            ? "cursor-pointer hover:border-blue-300 hover:bg-blue-50"
+                            : "cursor-not-allowed opacity-60"
+                        }`}
+                      >
+                        <Upload className="h-4 w-4" />
+                        {avatarFile ? "Change photo" : "Upload photo"}
+                      </label>
+                      {avatarFile && isEditing && (
+                        <button
+                          type="button"
+                          onClick={handleRemoveAvatarFile}
+                          className="inline-flex items-center gap-2 rounded-lg border border-red-200 bg-white px-4 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-50"
+                        >
+                          <X className="h-4 w-4" />
+                          Remove
+                        </button>
+                      )}
+                      {avatarFile && (
+                        <span className="flex min-w-0 items-center text-sm text-slate-500">
+                          {avatarFile.name}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  {isEditing && (errors.avatarUrl || errors.avatarFile) && (
+                    <p className="text-xs text-red-500">
+                      {errors.avatarUrl || errors.avatarFile}
+                    </p>
                   )}
                 </div>
 
@@ -825,6 +958,7 @@ export default function Settingpage() {
                     value={formData.dateOfBirth}
                     onChange={handleInputChange}
                     disabled={!isEditing}
+                    max={maxAllowedBirthDate}
                     className={getInputClasses("dateOfBirth")}
                   />
                   {isEditing && errors.dateOfBirth && (

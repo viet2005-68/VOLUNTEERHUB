@@ -1,6 +1,16 @@
 import axiosClient from "./axiosClient";
 
 const AnalysisService = {
+    getDashboardAnalytics: async () => {
+        try {
+            const response = await axiosClient.get("/v1/analytics/dashboard");
+            return response;
+        } catch (error) {
+            console.error("Error fetching dashboard analytics:", error);
+            throw error;
+        }
+    },
+
     // ==================== MANAGER ANALYTICS ====================
 
     // Analytic tỉ lệ apply (manager)
@@ -36,10 +46,20 @@ const AnalysisService = {
         }
     },
 
+    getMyCommunityServiceHours: async () => {
+        try {
+            const response = await axiosClient.get("/v1/analytics/my-stats/community-service-hours");
+            return response;
+        } catch (error) {
+            console.error("Error fetching community service hours:", error);
+            throw error;
+        }
+    },
+
     // Lấy thống kê status events của user (approved, completed, pending)
     getMyStatusEvents: async () => {
         try {
-            const response = await axiosClient.get("/v1/registrations/my-stats/status-events");
+            const response = await axiosClient.get("/v1/analytics/my-stats/count-reqs");
             return response;
         } catch (error) {
             console.error("Error fetching my status events:", error);

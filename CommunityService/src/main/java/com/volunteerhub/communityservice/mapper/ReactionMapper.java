@@ -39,8 +39,10 @@ public class ReactionMapper {
 
     public ReactionCreatedMessage toReactionCreatedMessage(Reaction reaction) {
         return ReactionCreatedMessage.builder()
+                .reactionId(reaction.getId())
                 .ownerId(reaction.getOwnerId())
                 .postId(reaction.getPostId())
+                .eventId(reaction.getPost().getEventId())
                 .type(reaction.getType())
                 .userId(reaction.getPost().getOwnerId())
                 .build();

@@ -18,7 +18,8 @@ export const useUpdateUserProfile = () => {
         onSuccess: (data) => {
             console.log("Profile updated successfully:", data);
             toast.success("Profile updated successfully!");
-            queryClient.invalidateQueries(["userProfile"]);
+            queryClient.invalidateQueries({ queryKey: ["userProfile"] });
+            queryClient.invalidateQueries({ queryKey: ["profileCompleteness"] });
         },
         onError: (error) => {
             console.error("Failed to update profile:", error);

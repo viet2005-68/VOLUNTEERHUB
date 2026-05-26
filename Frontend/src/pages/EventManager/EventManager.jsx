@@ -299,9 +299,11 @@ function EventManager() {
 
   if (showFullLoading) {
     return (
-      <div className="bg-white p-6 rounded-xl shadow-sm">
-        <div className="flex items-center justify-center h-64">
-          <div className="text-gray-500">Loading events...</div>
+      <div className="rounded-[25px] border-2 border-ash-whisper bg-pale-canvas p-8">
+        <div className="flex h-64 items-center justify-center">
+          <div className="text-sm font-bold leading-[1.2] text-deep-forest/70">
+            Loading events...
+          </div>
         </div>
       </div>
     );
@@ -309,9 +311,9 @@ function EventManager() {
 
   if (isError) {
     return (
-      <div className="bg-white p-6 rounded-xl shadow-sm">
-        <div className="flex items-center justify-center h-64">
-          <div className="text-red-500">
+      <div className="rounded-[25px] border-2 border-ash-whisper bg-pale-canvas p-8">
+        <div className="flex h-64 items-center justify-center">
+          <div className="rounded-[10px] bg-ash-whisper px-5 py-3 text-sm font-bold leading-[1.2] text-foudre-pink">
             Error loading events: {error.message}
           </div>
         </div>
@@ -320,13 +322,13 @@ function EventManager() {
   }
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow-sm gap-6 flex flex-col ">
+    <div className="flex flex-col gap-8 rounded-[25px] border-2 border-ash-whisper bg-pale-canvas p-6 text-deep-forest md:p-8">
       {/* Header */}
-      <div className="flex flex-col gap-2">
-        <h2 className="text-2xl font-semibold text-gray-900">
+      <div className="flex flex-col gap-3">
+        <h2 className="font-beni text-[56px] font-black uppercase leading-[0.75] text-deep-forest md:text-[80px]">
           {isSearchMode ? `Search: "${searchTerm}"` : "Your Events"}
         </h2>
-        <p className="text-gray-500">
+        <p className="text-base font-medium leading-[1.2] text-deep-forest/70">
           {isSearchMode
             ? `Found ${data?.meta?.totalElements || 0} events`
             : "Manage all your volunteer opportunities"}
@@ -334,27 +336,27 @@ function EventManager() {
       </div>
 
       {/* Toolbar */}
-      <div className="flex flex-col sm:flex-row gap-4 sm:justify-between sm:items-center">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         {/* Search */}
-        <div className="relative w-full sm:flex-1 sm:max-w-md">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+        <div className="relative w-full sm:max-w-md sm:flex-1">
+          <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-deep-forest/45" />
           <input
             type="text"
             placeholder="Search events by name..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full rounded-[10px] border-2 border-ash-whisper bg-white px-4 py-4 pl-12 pr-10 text-sm font-medium leading-[1.2] text-deep-forest placeholder:text-deep-forest/55 focus:border-foudre-pink focus:outline-none"
           />
           {/* Loading indicator for search */}
           {isSearchMode && isFetching && (
             <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-              <div className="w-4 h-4 border-2 border-red-400 border-t-transparent rounded-full animate-spin" />
+              <div className="h-4 w-4 animate-spin rounded-full border-2 border-foudre-pink border-t-transparent" />
             </div>
           )}
         </div>
 
         {/* Filter & Create */}
-        <div className="flex justify-between sm:justify-start items-center gap-3">
+        <div className="flex items-center justify-between gap-3 sm:justify-start">
           <DropdownSelect
             value={filterStatus}
             onChange={setFilterStatus}
@@ -369,35 +371,35 @@ function EventManager() {
 
           <button
             onClick={() => setOpenCreateForm(true)}
-            className="flex items-center gap-2 px-4 py-2 max-sm:text-sm bg-black text-white rounded-lg hover:bg-gray-600 transition-colors font-medium"
+            className="flex items-center gap-2 rounded-[10px] bg-deep-forest px-5 py-4 text-sm font-bold leading-[0.85] text-pale-canvas transition-colors hover:bg-foudre-pink max-sm:text-xs"
           >
-            <Plus className="w-5 h-5" />
+            <Plus className="h-5 w-5" />
             <span>New Event</span>
           </button>
         </div>
       </div>
 
       {/* Table */}
-      <div className="overflow-x-auto relative max-lg:hidden">
+      <div className="relative max-lg:hidden overflow-x-auto rounded-[20px] border-2 border-ash-whisper bg-white">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-gray-200 bg-gray-50">
-              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+            <tr className="bg-ash-whisper/70">
+              <th className="px-6 py-4 text-left text-sm font-bold leading-[1.2] text-deep-forest">
                 Event
               </th>
-              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+              <th className="px-6 py-4 text-left text-sm font-bold leading-[1.2] text-deep-forest">
                 Date & Time
               </th>
-              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+              <th className="px-6 py-4 text-left text-sm font-bold leading-[1.2] text-deep-forest">
                 Location
               </th>
-              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+              <th className="px-6 py-4 text-left text-sm font-bold leading-[1.2] text-deep-forest">
                 Volunteers
               </th>
-              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+              <th className="px-6 py-4 text-left text-sm font-bold leading-[1.2] text-deep-forest">
                 Status
               </th>
-              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+              <th className="px-6 py-4 text-left text-sm font-bold leading-[1.2] text-deep-forest">
                 Actions
               </th>
             </tr>
@@ -421,12 +423,14 @@ function EventManager() {
               ))
             ) : (
               <tr>
-                <td colSpan="6" className="px-6 py-12 text-center">
-                  <div className="flex flex-col items-center gap-2">
-                    <p className="text-gray-500">No events found</p>
+                <td colSpan="6" className="px-6 py-16 text-center">
+                  <div className="flex flex-col items-center gap-3">
+                    <p className="text-sm font-medium leading-[1.2] text-deep-forest/65">
+                      No events found
+                    </p>
                     <button
                       onClick={handleCreateNew}
-                      className="text-blue-600 hover:underline"
+                      className="rounded-[10px] bg-bubblegum-blush px-5 py-3 text-sm font-bold leading-[0.85] text-deep-forest hover:bg-foudre-pink hover:text-pale-canvas"
                     >
                       Create your first event
                     </button>
@@ -451,11 +455,13 @@ function EventManager() {
             />
           ))
         ) : (
-          <div className="px-6 py-12 text-center">
-            <p className="text-gray-500">No events found</p>
+          <div className="rounded-[20px] border-2 border-ash-whisper bg-white px-6 py-12 text-center">
+            <p className="text-sm font-medium leading-[1.2] text-deep-forest/65">
+              No events found
+            </p>
             <button
               onClick={handleCreateNew}
-              className="text-blue-600 hover:underline"
+              className="mt-3 rounded-[10px] bg-bubblegum-blush px-5 py-3 text-sm font-bold leading-[0.85] text-deep-forest hover:bg-foudre-pink hover:text-pale-canvas"
             >
               Create your first event
             </button>
@@ -465,8 +471,8 @@ function EventManager() {
 
       {/* Pagination & Stats Footer */}
       {data?.data && data.data.length > 0 && (
-        <div className="flex flex-col sm:flex-row items-center justify-between pt-4 border-t border-gray-200 gap-4">
-          <p className="text-sm text-gray-500">
+        <div className="flex flex-col items-center justify-between gap-4 border-t-2 border-ash-whisper pt-5 sm:flex-row">
+          <p className="text-sm font-medium leading-[1.2] text-deep-forest/70">
             Showing {data.data.length} of {data.meta?.totalElements || 0} events
           </p>
           <Pagination
@@ -476,9 +482,9 @@ function EventManager() {
             sx={{
               "& .MuiPaginationItem-root": {
                 "&.Mui-selected": {
-                  backgroundColor: "#f87171",
-                  color: "white",
-                  "&:hover": { backgroundColor: "#ef4444" },
+                  backgroundColor: "#00522d",
+                  color: "#fff8f6",
+                  "&:hover": { backgroundColor: "#db3c8a" },
                 },
               },
             }}
@@ -492,10 +498,10 @@ function EventManager() {
             ref={modalRef}
             className="w-full max-w-3xl max-h-[calc(100vh-2rem)] flex flex-col"
           >
-            <div className="relative bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-full">
+            <div className="relative flex max-h-full flex-col overflow-hidden rounded-[25px] border-2 border-ash-whisper bg-pale-canvas">
               <button
                 onClick={() => setOpenCreateForm(false)}
-                className="absolute top-4 right-4 z-10 rounded-full bg-gray-100 p-2 text-gray-600 transition hover:text-white hover:bg-red-500"
+                className="absolute right-4 top-4 z-10 rounded-full bg-ash-whisper p-2 text-deep-forest transition hover:bg-foudre-pink hover:text-pale-canvas"
                 aria-label="Close"
               >
                 <span className="text-xl font-bold leading-none">
@@ -520,13 +526,13 @@ function EventManager() {
             ref={editModalRef}
             className="w-full max-w-3xl max-h-[calc(100vh-2rem)] flex flex-col"
           >
-            <div className="relative bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-full">
+            <div className="relative flex max-h-full flex-col overflow-hidden rounded-[25px] border-2 border-ash-whisper bg-pale-canvas">
               <button
                 onClick={() => {
                   setOpenEditForm(false);
                   setIsInitialLoad(true);
                 }}
-                className="absolute top-4 right-4 z-10 rounded-full bg-gray-100 p-2 text-gray-600 transition hover:text-white hover:bg-red-500"
+                className="absolute right-4 top-4 z-10 rounded-full bg-ash-whisper p-2 text-deep-forest transition hover:bg-foudre-pink hover:text-pale-canvas"
                 aria-label="Close edit form"
               >
                 <span className="text-xl font-bold leading-none">
@@ -534,27 +540,29 @@ function EventManager() {
                 </span>
               </button>
 
-              <div className="p-6 overflow-y-auto">
-                <div className="flex justify-between items-center mb-4">
+              <div className="overflow-y-auto p-6 text-deep-forest">
+                <div className="mb-6 flex items-center justify-between">
                   <div>
-                    <p className="text-xl font-semibold text-gray-900">
+                    <p className="font-beni text-[46px] font-black uppercase leading-[0.75] text-deep-forest">
                       Edit Event
                     </p>
-                    <p className="text-gray-500 text-sm">
+                    <p className="text-sm font-medium leading-[1.2] text-deep-forest/70">
                       Update details of your event
                     </p>
                   </div>
                 </div>
 
                 {isLoadingEdit && (
-                  <div className="flex items-center justify-center h-32">
-                    <p className="text-gray-500">Loading event details...</p>
+                  <div className="flex h-32 items-center justify-center">
+                    <p className="text-sm font-medium leading-[1.2] text-deep-forest/70">
+                      Loading event details...
+                    </p>
                   </div>
                 )}
 
                 {editError && (
-                  <div className="flex items-center justify-center h-32">
-                    <p className="text-red-500">
+                  <div className="flex h-32 items-center justify-center">
+                    <p className="rounded-[10px] bg-ash-whisper px-5 py-3 text-sm font-bold leading-[1.2] text-foudre-pink">
                       Error loading event: {editError.message}
                     </p>
                   </div>

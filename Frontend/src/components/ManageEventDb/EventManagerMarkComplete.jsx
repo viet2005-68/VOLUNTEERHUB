@@ -7,9 +7,10 @@ import {
   useListUserOfAnEvent,
   useReviewRegistration,
 } from "../../hook/useRegistration";
+import CompletionQrPanel from "./CompletionQrPanel";
 
 function EventManagerMarkComplete() {
-  const { eventId } = useOutletContext();
+  const { eventId, eventData } = useOutletContext();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [filter, setFilter] = useState("attended"); // Default: Approved users
@@ -235,6 +236,8 @@ function EventManagerMarkComplete() {
           chứng nhận.
         </p>
       </div>
+
+      <CompletionQrPanel eventId={eventId} eventStatus={eventData?.status} />
 
       {/* Volunteer List */}
       <div className="space-y-3 sm:space-y-4">

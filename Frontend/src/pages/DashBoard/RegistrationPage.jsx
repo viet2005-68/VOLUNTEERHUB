@@ -71,22 +71,22 @@ export default function RegistrationPage() {
 
   if (showFullLoading) {
     return (
-      <div className="bg-white p-6 rounded-xl shadow-sm">
-        <div className="flex items-center justify-center h-64">
-          <div className="text-gray-500">Loading registrations...</div>
+      <div className="rounded-2xl border border-deep-forest/15 bg-pale-canvas p-6">
+        <div className="flex h-64 items-center justify-center">
+          <div className="text-deep-forest/65">Loading registrations...</div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow-sm ">
+    <div className="rounded-2xl border border-deep-forest/15 bg-pale-canvas p-6 text-deep-forest">
       <div className={`${selectedReg ? "blur" : ""} flex flex-col gap-5`}>
         <div className="flex flex-col gap-2">
-          <h3 className="text-2xl font-semibold text-gray-900">
+          <h3 className="text-2xl font-bold text-deep-forest">
             Register manager
           </h3>
-          <p className="text-gray-500">
+          <p className="text-deep-forest/65">
             Manage all your volunteer registration
           </p>
         </div>
@@ -115,7 +115,7 @@ export default function RegistrationPage() {
               return (
                 <div
                   key={reg.registrationId}
-                  className="border border-gray-200 rounded-xl p-4 bg-white shadow-sm hover:shadow-md transition-shadow"
+                  className="rounded-2xl border border-deep-forest/15 bg-pale-canvas p-4 transition-colors hover:bg-ash-whisper"
                 >
                   {/* Header: Avatar, Name and Status */}
                   <div className="flex items-start gap-3 mb-3">
@@ -125,7 +125,7 @@ export default function RegistrationPage() {
                         <img
                           src={reg.avatarUrl}
                           alt={reg.fullName || "Volunteer"}
-                          className="h-12 w-12 rounded-full object-cover border-2 border-gray-200"
+                          className="h-12 w-12 rounded-full object-cover border-2 border-bubblegum-blush"
                         />
                       ) : (
                         <img
@@ -133,17 +133,17 @@ export default function RegistrationPage() {
                             reg.fullName || "volunteer"
                           }`}
                           alt="avatar"
-                          className="h-12 w-12 rounded-full object-cover border-2 border-gray-200"
+                          className="h-12 w-12 rounded-full object-cover border-2 border-bubblegum-blush"
                         />
                       )}
                     </div>
 
                     {/* Name and Event */}
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-semibold text-gray-900 text-base truncate">
+                      <h4 className="font-bold text-deep-forest text-base truncate">
                         {reg.fullName || "Unknown"}
                       </h4>
-                      <p className="text-sm text-gray-600 truncate mt-0.5">
+                      <p className="text-sm text-deep-forest/65 truncate mt-0.5">
                         {reg.eventName || "No event"}
                       </p>
                     </div>
@@ -159,7 +159,7 @@ export default function RegistrationPage() {
                   {/* Info Grid */}
                   <div className="space-y-2 mb-3">
                     {/* Registration Date */}
-                    <div className="flex items-center gap-2 text-sm text-gray-500">
+                    <div className="flex items-center gap-2 text-sm text-deep-forest/65">
                       <svg
                         className="w-4 h-4 flex-shrink-0"
                         fill="none"
@@ -180,7 +180,7 @@ export default function RegistrationPage() {
 
                     {/* Phone Number */}
                     {reg.phoneNumber && (
-                      <div className="flex items-center gap-2 text-sm text-gray-500">
+                      <div className="flex items-center gap-2 text-sm text-deep-forest/65">
                         <svg
                           className="w-4 h-4 flex-shrink-0"
                           fill="none"
@@ -202,7 +202,7 @@ export default function RegistrationPage() {
                   {/* View Details Button */}
                   <button
                     onClick={() => setSelectedReg(reg)}
-                    className="w-full px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition-colors"
+                    className="w-full px-4 py-2 rounded-lg bg-foudre-pink hover:bg-deep-forest text-pale-canvas text-sm font-bold transition-colors"
                   >
                     View details
                   </button>
@@ -210,7 +210,7 @@ export default function RegistrationPage() {
               );
             })
           ) : (
-            <div className="text-center py-8 text-gray-500 text-sm">
+            <div className="text-center py-8 text-deep-forest/65 text-sm">
               No registrations found
             </div>
           )}
@@ -218,8 +218,8 @@ export default function RegistrationPage() {
 
         {/* Pagination */}
         {data?.items && data.items.length > 0 && (
-          <div className="flex flex-col sm:flex-row items-center justify-between pt-4 border-t border-gray-200 gap-4">
-            <p className="text-sm text-gray-500">
+          <div className="flex flex-col sm:flex-row items-center justify-between pt-4 border-t border-deep-forest/15 gap-4">
+            <p className="text-sm text-deep-forest/65">
               Showing {data.items.length} of {data.totalItems} registrations
             </p>
             {data.totalPages > 0 && (
@@ -229,11 +229,13 @@ export default function RegistrationPage() {
                 onChange={handlePageChange}
                 sx={{
                   "& .MuiPaginationItem-root": {
+                    color: "#00522d",
+                    fontFamily: "Clash Grotesk, sans-serif",
                     "&.Mui-selected": {
-                      backgroundColor: "#f87171",
-                      color: "white",
+                      backgroundColor: "#db3c8a",
+                      color: "#fff8f6",
                       "&:hover": {
-                        backgroundColor: "#ef4444",
+                        backgroundColor: "#00522d",
                       },
                     },
                   },

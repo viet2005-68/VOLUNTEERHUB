@@ -41,6 +41,7 @@ public class CommentMapper {
         return CommentCreatedMessage.builder()
                 .commentId(comment.getId())
                 .postId(comment.getPostId())
+                .eventId(comment.getPost().getEventId())
                 .ownerId(comment.getOwnerId())
                 .content(comment.getContent())
                 .userId(comment.getPost().getOwnerId())

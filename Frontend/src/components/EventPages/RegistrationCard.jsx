@@ -122,24 +122,22 @@ function RegistrationCard({
   const buttonConfig = getButtonConfig();
 
   return (
-    <Card>
-      <div className="flex flex-col text-sm/6 text-black gap-1">
-        <div className="flex gap-1 flex-col">
-          <p>Register for Event</p>
+    <Card className="rounded-[20px] border-2 border-ash-whisper bg-pale-canvas">
+      <div className="flex flex-col gap-4 text-sm font-medium leading-[1.2] text-deep-forest">
+        <div className="flex flex-col gap-3">
+          <p className="text-base font-bold leading-[1.2]">Register for Event</p>
           <div className="flex flex-row items-center gap-5">
-            <div className="bg-gray-600/20 h-2 w-full relative rounded-full">
+            <div className="relative h-2 w-full rounded-full bg-ash-whisper">
               <div
-                className="bg-red-400 h-2 absolute top-0 left-0 rounded-full transition-all duration-300"
+                className="absolute left-0 top-0 h-2 rounded-full bg-deep-forest transition-all duration-300"
                 style={{ width: `${width}%` }}
               ></div>
             </div>
-            <p className="inline-flex items-center text-sm text-center gap-1">
+            <p className="inline-flex items-center gap-1 text-center text-sm font-bold text-deep-forest">
               <span>
                 <BsFillPeopleFill />
               </span>
-              <span className="text-gray-600">
-                {registedVolunteer}/{totalSpots}
-              </span>
+              <span>{registedVolunteer}/{totalSpots}</span>
             </p>
           </div>
         </div>
@@ -160,14 +158,14 @@ function RegistrationCard({
             {formatDateTime(registrationDeadline, { withTime: false })}
           </p>
         </div>
-        <div className="text-gray-600 text-sm/3">
+        <div className="text-sm font-medium leading-[1.2] text-deep-forest/70">
           Cancellations must be made at least {durationCancel} hours in advance.
         </div>
         {hasRole("USER") && user && (
           <button
             onClick={handleRegister}
             disabled={buttonConfig.disabled}
-            className={`border-none rounded-xl md:mt-8 text-white px-4 mt-1 py-1 text-center font-lobster tracking-widest hover:scale-105 transition-all duration-300 ease-in-out active:scale-95 disabled:hover:scale-100 ${buttonConfig.className}`}
+            className={`mt-1 rounded-[10px] px-4 py-3 text-center text-sm font-bold leading-[0.85] text-pale-canvas transition-colors disabled:hover:scale-100 md:mt-6 ${buttonConfig.className}`}
           >
             {buttonConfig.text}
           </button>

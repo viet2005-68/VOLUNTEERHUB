@@ -147,10 +147,10 @@ export default function Opportunities() {
   const showingCount = totalElements > 0 ? itemsOnCurrentPage : 0;
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow-sm gap-4 flex flex-col">
+    <div className="rounded-2xl border border-deep-forest/15 bg-pale-canvas p-6 gap-4 flex flex-col text-deep-forest">
       <div>
-        <h4 className="text-2xl font-semibold mb-1">Opportunities</h4>
-        <p className="text-gray-500">
+        <h4 className="text-2xl font-bold mb-1">Opportunities</h4>
+        <p className="text-deep-forest/65">
           Manage your event registrations and participation
         </p>
       </div>
@@ -167,7 +167,7 @@ export default function Opportunities() {
         <div className="mt-6 p-2 flex gap-5 flex-col">
           {isLoading ? (
             <div className="flex justify-center items-center py-10">
-              <div className="text-gray-500">Loading...</div>
+              <div className="text-deep-forest/65">Loading...</div>
             </div>
           ) : data?.data && data.data.length > 0 ? (
             <>
@@ -192,8 +192,8 @@ export default function Opportunities() {
                   );
                 })}
               </div>
-              <div className="flex items-center justify-between pt-4 border-t border-gray-200 mt-4">
-                <p className="text-sm text-gray-500">
+              <div className="flex items-center justify-between pt-4 border-t border-deep-forest/15 mt-4">
+                <p className="text-sm text-deep-forest/65">
                   Showing {showingCount} of {totalElements} events
                 </p>
                 <Pagination
@@ -202,11 +202,13 @@ export default function Opportunities() {
                   onChange={handlePageChange}
                   sx={{
                     "& .MuiPaginationItem-root": {
+                      color: "#00522d",
+                      fontFamily: "Clash Grotesk, sans-serif",
                       "&.Mui-selected": {
-                        backgroundColor: "#000",
-                        color: "white",
+                        backgroundColor: "#db3c8a",
+                        color: "#fff8f6",
                         "&:hover": {
-                          backgroundColor: "#888",
+                          backgroundColor: "#00522d",
                         },
                       },
                     },
@@ -215,9 +217,9 @@ export default function Opportunities() {
               </div>
             </>
           ) : (
-            <div className="flex flex-col items-center justify-center py-16 text-gray-500">
+            <div className="flex flex-col items-center justify-center py-16 text-deep-forest/65">
               <svg
-                className="w-16 h-16 mb-4 text-gray-300"
+                className="w-16 h-16 mb-4 text-ash-whisper"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"

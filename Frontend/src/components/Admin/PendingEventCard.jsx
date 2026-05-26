@@ -73,15 +73,14 @@ function PendingEventCard({
 
   return (
     <>
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
-        <div className="flex items-center gap-3 p-3">
-          {/* Image - Small thumbnail centered vertically */}
+      <div className="overflow-hidden rounded-[20px] border-2 border-ash-whisper bg-pale-canvas transition-colors hover:border-bubblegum-blush">
+        <div className="flex flex-col gap-4 p-4 sm:flex-row sm:items-stretch">
           {urlImg && (
-            <div className="relative w-24 h-24 bg-gray-100 rounded-lg overflow-hidden shrink-0">
+            <div className="relative h-28 w-full shrink-0 overflow-hidden rounded-[20px] bg-ash-whisper sm:w-32">
               <img
                 src={urlImg}
                 alt={title}
-                className="w-full h-full object-cover"
+                className="h-full w-full object-cover"
                 onError={(e) => {
                   e.target.style.display = "none";
                 }}
@@ -89,80 +88,69 @@ function PendingEventCard({
             </div>
           )}
 
-          {/* Content */}
-          <div className="flex-1 min-w-0">
-            {/* Title & Category */}
-            <div className="mb-1">
-              <p className="font-semibold text-gray-900 text-sm line-clamp-1">
-                {title}
-              </p>
-              {category && (
-                <span className="text-xs text-gray-500">{category}</span>
-              )}
+          <div className="min-w-0 flex-1">
+            <div className="mb-3 flex flex-wrap items-start gap-2">
+              <div className="min-w-0 flex-1">
+                <p className="line-clamp-1 text-base font-bold leading-[1.2] text-deep-forest">
+                  {title}
+                </p>
+                {category && (
+                  <span className="mt-1 inline-flex rounded-[10px] bg-ash-whisper px-3 py-1 text-xs font-bold leading-[0.85] text-foudre-pink">
+                    {category}
+                  </span>
+                )}
+              </div>
             </div>
 
-            {/* Date, Time & Location - Compact */}
-            <div className="space-y-0.5">
-              <div className="flex items-center gap-1.5 text-xs text-gray-600">
-                <Calendar className="w-3 h-3 text-gray-400" />
-                <span>{formatDate(starttime || date)}</span>
-                <Clock className="w-3 h-3 text-gray-400 ml-1" />
-                <span>
+            <div className="space-y-2 text-xs font-medium leading-[1.2] text-deep-forest/70">
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                <span className="inline-flex items-center gap-1.5">
+                  <Calendar className="h-3.5 w-3.5 text-foudre-pink" />
+                  {formatDate(starttime || date)}
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <Clock className="h-3.5 w-3.5 text-foudre-pink" />
                   {formatTime(starttime)} - {formatTime(endtime)}
                 </span>
               </div>
               {location && (
-                <div className="flex items-start gap-1.5 text-xs text-gray-600">
-                  <MapPin className="w-3 h-3 text-gray-400 mt-0.5 shrink-0" />
+                <div className="flex items-start gap-1.5">
+                  <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-foudre-pink" />
                   <span className="line-clamp-1">{location}</span>
                 </div>
               )}
             </div>
 
-            {/* Volunteers - Inline */}
-            <div className="flex items-center gap-2 mt-1.5">
-              <div className="flex items-center gap-1">
-                <Users className="w-3 h-3 text-gray-500" />
-                <span className="text-xs font-medium text-gray-900">
-                  {joined}/{capacity}
-                </span>
+            <div className="mt-3 flex items-center gap-3">
+              <div className="flex items-center gap-1.5 text-xs font-bold leading-[1.2] text-deep-forest">
+                <Users className="h-3.5 w-3.5 text-foudre-pink" />
+                {joined}/{capacity}
               </div>
-              <div className="flex-1 bg-gray-200 rounded-full h-1 max-w-[80px]">
+              <div className="h-2 w-24 rounded-full bg-ash-whisper">
                 <div
-                  className={`h-1 rounded-full transition-all ${
-                    joined === capacity
-                      ? "bg-red-500"
-                      : joined >= capacity * 0.8
-                      ? "bg-orange-500"
-                      : "bg-blue-500"
-                  }`}
+                  className="h-2 rounded-full bg-deep-forest transition-all"
                   style={{ width: `${getProgressPercentage()}%` }}
                 ></div>
               </div>
             </div>
           </div>
 
-          {/* Action Buttons - Vertical on the right, centered */}
-          <div className="flex flex-col gap-1.5 shrink-0">
+          <div className="flex shrink-0 flex-row gap-2 sm:w-28 sm:flex-col sm:justify-center">
             <button
               onClick={handleApprove}
               disabled={approveEventMutation.isPending}
-              className="flex items-center justify-center gap-1 px-3 py-1.5 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+              className="flex flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-[10px] bg-deep-forest px-4 py-3 text-xs font-bold leading-[0.85] text-pale-canvas transition-colors hover:bg-foudre-pink disabled:cursor-not-allowed disabled:opacity-50"
             >
-              <UserPlus className="w-3.5 h-3.5" />
-              <span className="text-xs font-medium">
-                {approveEventMutation.isPending ? "..." : "Approve"}
-              </span>
+              <UserPlus className="h-3.5 w-3.5" />
+              <span>{approveEventMutation.isPending ? "..." : "Approve"}</span>
             </button>
             <button
               onClick={handleReject}
               disabled={rejectEventMutation.isPending}
-              className="flex items-center justify-center gap-1 px-3 py-1.5 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+              className="flex flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-[10px] border-2 border-foudre-pink bg-transparent px-4 py-3 text-xs font-bold leading-[0.85] text-foudre-pink transition-colors hover:bg-foudre-pink hover:text-pale-canvas disabled:cursor-not-allowed disabled:opacity-50"
             >
-              <Ban className="w-3.5 h-3.5" />
-              <span className="text-xs font-medium">
-                {rejectEventMutation.isPending ? "..." : "Reject"}
-              </span>
+              <Ban className="h-3.5 w-3.5" />
+              <span>{rejectEventMutation.isPending ? "..." : "Reject"}</span>
             </button>
           </div>
         </div>

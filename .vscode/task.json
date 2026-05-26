@@ -1,0 +1,74 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Run ALL Services",
+      "dependsOn": [
+        "ServiceDiscovery",
+        "ApiGateway",
+        "AuthorizationServer",
+        "UserService",
+        "CommunityService",
+        "EventService",
+        "NotificationService",
+        "RegistrationService",
+        "AggregationService"
+      ]
+    },
+
+    {
+      "label": "ServiceDiscovery",
+      "type": "shell",
+      "command": "./mvnw spring-boot:run",
+      "options": { "cwd": "${workspaceFolder}/ServiceDiscovery" }
+    },
+    {
+      "label": "ApiGateway",
+      "type": "shell",
+      "command": "./mvnw spring-boot:run",
+      "options": { "cwd": "${workspaceFolder}/ApiGateway" }
+    },
+    {
+      "label": "AuthorizationServer",
+      "type": "shell",
+      "command": "./mvnw spring-boot:run",
+      "options": { "cwd": "${workspaceFolder}/AuthorizationServer" }
+    },
+    {
+      "label": "UserService",
+      "type": "shell",
+      "command": "./mvnw spring-boot:run",
+      "options": { "cwd": "${workspaceFolder}/UserService" }
+    },
+    {
+      "label": "CommunityService",
+      "type": "shell",
+      "command": "./mvnw spring-boot:run",
+      "options": { "cwd": "${workspaceFolder}/CommunityService" }
+    },
+    {
+      "label": "EventService",
+      "type": "shell",
+      "command": "./mvnw spring-boot:run",
+      "options": { "cwd": "${workspaceFolder}/EventService" }
+    },
+    {
+      "label": "NotificationService",
+      "type": "shell",
+      "command": "./mvnw spring-boot:run",
+      "options": { "cwd": "${workspaceFolder}/NotificationService" }
+    },
+    {
+      "label": "RegistrationService",
+      "type": "shell",
+      "command": "./mvnw spring-boot:run",
+      "options": { "cwd": "${workspaceFolder}/RegistrationService" }
+    },
+    {
+      "label": "AggregationService",
+      "type": "shell",
+      "command": "./mvnw spring-boot:run",
+      "options": { "cwd": "${workspaceFolder}/AggregationService" }
+    }
+  ]
+}

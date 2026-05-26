@@ -80,6 +80,21 @@ public class RouteConfig {
     }
 
     @Bean
+    public RouterFunction<ServerResponse> chatServiceRoute() {
+        return route("chatservice")
+                .nest(RequestPredicates.path("/api/v1/chats/**"), builder ->
+                        builder
+                                .GET(http())
+                                .POST(http())
+                                .PUT(http())
+                                .DELETE(http())
+                                .filter(lb("CHATSERVICE"))
+                                .before(authenticationHeaderFilter.addAuthenticationHeader())
+                )
+                .build();
+    }
+
+    @Bean
     public RouterFunction<ServerResponse> registrationServiceRoute() {
         return route("registrationservice")
                 .nest(RequestPredicates.path("/api/v1/registrations/**"), builder ->

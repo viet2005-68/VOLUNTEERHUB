@@ -121,9 +121,9 @@ function UserManager() {
 
   if (showFullLoading) {
     return (
-      <div className="bg-white p-6 rounded-xl shadow-sm">
-        <div className="flex items-center justify-center h-64">
-          <div className="text-gray-500">Loading users...</div>
+      <div className="rounded-[25px] border-2 border-ash-whisper bg-pale-canvas p-6 text-deep-forest md:p-8">
+        <div className="flex h-64 items-center justify-center rounded-[20px] bg-white">
+          <div className="font-bold text-deep-forest/70">Loading users...</div>
         </div>
       </div>
     );
@@ -131,9 +131,9 @@ function UserManager() {
 
   if (isError) {
     return (
-      <div className="bg-white p-6 rounded-xl shadow-sm">
-        <div className="flex items-center justify-center h-64">
-          <div className="text-red-500">
+      <div className="rounded-[25px] border-2 border-ash-whisper bg-pale-canvas p-6 text-deep-forest md:p-8">
+        <div className="flex h-64 items-center justify-center rounded-[20px] bg-white">
+          <div className="font-bold text-red-700">
             Error loading users: {error.message}
           </div>
         </div>
@@ -141,26 +141,35 @@ function UserManager() {
     );
   }
   return (
-    <div className="bg-white p-6 rounded-xl shadow-sm gap-6 flex flex-col">
+    <div className="flex flex-col gap-6 rounded-[25px] border-2 border-ash-whisper bg-pale-canvas p-6 text-deep-forest md:p-8">
       {/* Header */}
-      <div className="flex flex-col gap-2">
-        <h2 className="text-2xl font-semibold text-gray-900">User Manager</h2>
-        <p className="text-gray-500">Manage all users</p>
+      <div className="flex flex-col gap-3">
+        <p className="text-xs font-bold uppercase tracking-[0.35em] text-foudre-pink">
+          Admin Control
+        </p>
+        <h2 className="font-beni text-[56px] font-black uppercase leading-[0.75] text-deep-forest md:text-[82px]">
+          User Manager
+        </h2>
+        <p className="max-w-xl text-sm font-medium text-deep-forest/70">
+          Search, filter, export, and manage every volunteer account from one clean view.
+        </p>
       </div>
       {/* Toolbar */}
-      <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center relative">
-        {/* Search */}
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-        <input
-          type="text"
-          placeholder="Search users..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
+      <div className="rounded-[20px] border-2 border-ash-whisper bg-white p-4">
+        <div className="relative">
+          {/* Search */}
+          <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-deep-forest/45" />
+          <input
+            type="text"
+            placeholder="Search users..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full rounded-[10px] border-2 border-ash-whisper bg-pale-canvas py-4 pl-12 pr-4 text-sm font-bold text-deep-forest outline-none transition-colors placeholder:text-deep-forest/40 focus:border-deep-forest"
+          />
+        </div>
       </div>
       {/* Filter & Export */}
-      <div className="flex flex-row gap-3 items-center justify-end flex-wrap">
+      <div className="flex flex-row flex-wrap items-center justify-end gap-3 rounded-[20px] border-2 border-ash-whisper bg-white p-4">
         <DropdownSelect
           value={filterStatus}
           onChange={setFilterStatus}
@@ -177,7 +186,7 @@ function UserManager() {
           <button
             onClick={() => setShowExportMenu(!showExportMenu)}
             disabled={isExporting}
-            className="flex items-center justify-center gap-2 px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+            className="flex items-center justify-center gap-2 whitespace-nowrap rounded-[10px] bg-deep-forest px-4 py-3 font-bold text-pale-canvas transition-all hover:brightness-110 hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Download className="w-5 h-5" />
             <span className="max-sm:hidden">
@@ -191,17 +200,17 @@ function UserManager() {
 
           {/* Dropdown Menu */}
           {showExportMenu && !isExporting && (
-            <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+            <div className="absolute right-0 z-50 mt-2 w-48 overflow-hidden rounded-[10px] border-2 border-ash-whisper bg-pale-canvas">
               <button
                 onClick={() => handleExport("csv")}
-                className="w-full px-4 py-2 text-left hover:bg-gray-100 transition-colors flex items-center gap-2 rounded-t-lg"
+                className="flex w-full items-center gap-2 px-4 py-3 text-left font-bold text-deep-forest transition-colors hover:bg-ash-whisper"
               >
                 <Download className="w-4 h-4" />
                 <span>Export as CSV</span>
               </button>
               <button
                 onClick={() => handleExport("json")}
-                className="w-full px-4 py-2 text-left hover:bg-gray-100 transition-colors flex items-center gap-2 rounded-b-lg"
+                className="flex w-full items-center gap-2 px-4 py-3 text-left font-bold text-deep-forest transition-colors hover:bg-ash-whisper"
               >
                 <Download className="w-4 h-4" />
                 <span>Export as JSON</span>
@@ -210,32 +219,33 @@ function UserManager() {
           )}
         </div>
       </div>
-      <div className="overflow-x-auto">
+      <div className="overflow-hidden rounded-[20px] border-2 border-ash-whisper bg-white">
+        <div className="overflow-x-auto">
         <table className="w-full">
           <thead className="max-lg:hidden">
-            <tr className="border-b border-gray-200 bg-gray-50">
-              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+            <tr className="border-b-2 border-ash-whisper bg-ash-whisper/65">
+              <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-[0.18em] text-deep-forest">
                 ID
               </th>
-              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+              <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-[0.18em] text-deep-forest">
                 Avatar
               </th>
-              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+              <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-[0.18em] text-deep-forest">
                 Name
               </th>
-              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+              <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-[0.18em] text-deep-forest">
                 Role
               </th>
-              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+              <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-[0.18em] text-deep-forest">
                 Status
               </th>
-              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+              <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-[0.18em] text-deep-forest">
                 Phone Number
               </th>
-              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+              <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-[0.18em] text-deep-forest">
                 Date of Birth
               </th>
-              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+              <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-[0.18em] text-deep-forest">
                 Actions
               </th>
             </tr>
@@ -260,20 +270,21 @@ function UserManager() {
             ) : (
               <tr>
                 <td colSpan="8" className="px-6 py-12 text-center">
-                  <div className="flex flex-col items-center gap-2">
-                    <p className="text-gray-500">No users found</p>
+                  <div className="flex flex-col items-center gap-2 rounded-[20px] bg-pale-canvas py-8">
+                    <p className="font-bold text-deep-forest/65">No users found</p>
                   </div>
                 </td>
               </tr>
             )}
           </tbody>
         </table>
+        </div>
       </div>
 
       {/* Pagination */}
       {data?.items && data.items.length > 0 && (
-        <div className="flex flex-col sm:flex-row items-center justify-between pt-4 border-t border-gray-200 gap-4">
-          <p className="text-sm text-gray-500">
+        <div className="flex flex-col items-center justify-between gap-4 rounded-[20px] border-2 border-ash-whisper bg-white p-4 sm:flex-row">
+          <p className="text-sm font-bold text-deep-forest/65">
             Showing {data.items.length} of {data.totalItems} users
           </p>
           <Pagination
@@ -283,10 +294,10 @@ function UserManager() {
             sx={{
               "& .MuiPaginationItem-root": {
                 "&.Mui-selected": {
-                  backgroundColor: "#f87171",
-                  color: "white",
+                  backgroundColor: "#00522d",
+                  color: "#fff8f6",
                   "&:hover": {
-                    backgroundColor: "#ef4444",
+                    backgroundColor: "#006b3b",
                   },
                 },
               },

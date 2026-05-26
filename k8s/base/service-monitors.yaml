@@ -1,0 +1,20 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: volunteerhub-services
+  labels:
+    app.kubernetes.io/name: volunteerhub
+    app.kubernetes.io/part-of: volunteerhub
+    release: volunteerhub
+spec:
+  namespaceSelector:
+    matchNames:
+      - volunteerhub
+  selector:
+    matchLabels:
+      metrics.volunteerhub.io/scrape: "true"
+  endpoints:
+    - port: http
+      path: /actuator/prometheus
+      interval: 30s
+      scrapeTimeout: 10s

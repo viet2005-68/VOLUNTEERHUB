@@ -1,4 +1,4 @@
 package com.volunteerhub.userservice.validation;
 
-public class OnUpdate {
+public interface OnUpdate {
 }

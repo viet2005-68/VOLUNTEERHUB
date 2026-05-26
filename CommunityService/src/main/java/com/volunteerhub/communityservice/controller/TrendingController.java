@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/events/trending-calculation")
+@RequestMapping("/api/v1/events/trending_calculation")
 @RequiredArgsConstructor
 public class TrendingController {
 

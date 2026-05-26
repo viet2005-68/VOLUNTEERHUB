@@ -20,8 +20,32 @@ import {
   FileText,
   Loader2,
   Home,
+  Upload,
+  X,
 } from "lucide-react";
 import toast from "react-hot-toast";
+
+const MINIMUM_PROFILE_AGE = 16;
+const AVATAR_MAX_SIZE = 5 * 1024 * 1024;
+const AVATAR_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+
+const validateAvatarFile = (file) => {
+  if (!file) return "";
+  if (!AVATAR_TYPES.includes(file.type)) {
+    return "Only JPEG, PNG, WebP, and GIF images are allowed.";
+  }
+  if (file.size > AVATAR_MAX_SIZE) {
+    return "Profile photo must be 5MB or smaller.";
+  }
+  return "";
+};
+
+const getAgeByYear = (dateString) => {
+  const birthYear = Number(String(dateString || "").slice(0, 4));
+  if (!Number.isInteger(birthYear)) return null;
+
+  return new Date().getFullYear() - birthYear;
+};
 
 function CompleteProfile() {
   const navigate = useNavigate();
@@ -29,6 +53,7 @@ function CompleteProfile() {
   const { data: validation, isLoading: isValidating } =
     useProfileCompleteness();
   const updateProfileMutation = useUpdateUserProfile();
+  const maxAllowedBirthDate = `${new Date().getFullYear() - MINIMUM_PROFILE_AGE}-12-31`;
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -41,11 +66,14 @@ function CompleteProfile() {
       street: "",
     },
     bio: "",
+    avatarUrl: "",
     provinceCode: "",
     districtCode: "",
     provinceName: "",
     districtName: "",
   });
+  const [avatarFile, setAvatarFile] = useState(null);
+  const [avatarPreview, setAvatarPreview] = useState("");
 
   // Callback khi provinces được fetch xong
   const handleProvincesLoaded = useCallback((provincesData) => {
@@ -178,11 +206,14 @@ function CompleteProfile() {
           street: street,
         },
         bio: profileData.bio || "",
+        avatarUrl: profileData.avatarUrl || "",
         provinceCode: "",
         districtCode: "",
         provinceName: provinceName,
         districtName: districtName,
       });
+      setAvatarFile(null);
+      setAvatarPreview("");
     }
   }, [profileData]);
 
@@ -247,6 +278,32 @@ function CompleteProfile() {
     }));
   };
 
+  const handleAvatarSelect = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const validationMessage = validateAvatarFile(file);
+    if (validationMessage) {
+      toast.error(validationMessage);
+      setAvatarFile(null);
+      setAvatarPreview("");
+      e.target.value = "";
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setAvatarPreview(String(reader.result || ""));
+    };
+    reader.readAsDataURL(file);
+    setAvatarFile(file);
+  };
+
+  const handleRemoveAvatarFile = () => {
+    setAvatarFile(null);
+    setAvatarPreview("");
+  };
+
   const handleProvinceChange = (event) => {
     const selectedCode = event.target.value;
     const matchedProvince = getProvinceByCode(selectedCode);
@@ -303,6 +360,18 @@ function CompleteProfile() {
       return;
     }
 
+    const ageByYear = getAgeByYear(formData.dateOfBirth);
+    if (formData.dateOfBirth && (ageByYear === null || ageByYear < MINIMUM_PROFILE_AGE)) {
+      toast.error("You must be at least 16 years old to complete your profile");
+      return;
+    }
+
+    const avatarValidationMessage = validateAvatarFile(avatarFile);
+    if (avatarValidationMessage) {
+      toast.error(avatarValidationMessage);
+      return;
+    }
+
     // Prepare payload with address object
     const addressPayload = {
       province: formData.provinceName || formData.address?.province || "",
@@ -317,6 +386,8 @@ function CompleteProfile() {
       dateOfBirth: formData.dateOfBirth,
       address: addressPayload,
       bio: formData.bio,
+      avatarUrl: avatarFile ? undefined : formData.avatarUrl,
+      avatarFile,
       preferences: {
         fullName: formData.fullName,
         phoneNumber: formData.phoneNumber,
@@ -330,6 +401,8 @@ function CompleteProfile() {
     updateProfileMutation.mutate(payload, {
       onSuccess: () => {
         toast.success("Profile completed successfully!");
+        setAvatarFile(null);
+        setAvatarPreview("");
         // Clear skip/dismiss flags
         localStorage.removeItem("profileSkipped");
         localStorage.removeItem("profileBannerDismissed");
@@ -357,10 +430,10 @@ function CompleteProfile() {
 
   if (isLoadingProfile || isValidating) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
-        <div className="flex items-center gap-3">
-          <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
-          <span className="text-gray-600">Loading profile...</span>
+      <div className="flex min-h-screen items-center justify-center bg-[#fff8f6] font-['Clash_Grotesk',Inter,ui-sans-serif,system-ui]">
+        <div className="flex items-center gap-3 text-[#00522d]">
+          <Loader2 className="h-8 w-8 animate-spin text-[#db3c8a]" />
+          <span className="text-sm font-medium leading-[1.2]">Loading profile...</span>
         </div>
       </div>
     );
@@ -370,23 +443,23 @@ function CompleteProfile() {
   const isFieldRequired = (fieldName) => missingFields.includes(fieldName);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
-      <div className="bg-white rounded-2xl shadow-xl max-w-2xl w-full p-8">
+    <div className="min-h-screen flex items-center justify-center bg-[#fff8f6] px-4 py-10 font-['Clash_Grotesk',Inter,ui-sans-serif,system-ui] text-[#00522d]">
+      <div className="w-full max-w-3xl rounded-[25px] border-2 border-[#db3c8a] bg-[#fff8f6] p-6 md:p-10">
         {/* Header */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
-            <User className="w-8 h-8 text-blue-600" />
+        <div className="mb-10 text-center">
+          <div className="mb-5 inline-flex h-16 w-16 items-center justify-center rounded-full bg-[#f29ebd] text-[#00522d]">
+            <User className="h-8 w-8" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="mx-auto mb-3 max-w-2xl font-['Beni','Bebas_Neue',Impact,ui-sans-serif] text-[64px] font-black uppercase leading-[0.7] text-[#db3c8a] md:text-[94px]">
             Complete Your Profile
           </h1>
-          <p className="text-gray-600">
+          <p className="text-base font-medium leading-[1.2] text-[#00522d]">
             Help us personalize your experience by completing your profile
           </p>
           {missingFields.length > 0 && (
-            <div className="mt-4 bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-              <p className="text-sm text-yellow-800">
-                <span className="font-semibold">Required fields:</span>{" "}
+            <div className="mt-5 rounded-[10px] bg-[#fce5df] px-5 py-3">
+              <p className="text-sm font-medium leading-[1.2] text-[#db3c8a]">
+                <span className="font-bold">Required fields:</span>{" "}
                 {missingFields.join(", ")}
               </p>
             </div>
@@ -394,24 +467,77 @@ function CompleteProfile() {
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <form onSubmit={handleSubmit} className="space-y-8">
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+            {/* Profile Photo */}
+            <div className="md:col-span-2">
+              <label className="mb-2 block text-sm font-bold leading-[1.2] text-[#00522d]">
+                Profile Photo
+              </label>
+              <div className="flex flex-col gap-4 rounded-[10px] border-2 border-[#fce5df] bg-white p-4 sm:flex-row sm:items-center">
+                <div className="h-24 w-24 overflow-hidden rounded-[10px] border-2 border-[#fce5df] bg-[#fce5df]/55">
+                  {avatarPreview || formData.avatarUrl ? (
+                    <img
+                      src={avatarPreview || formData.avatarUrl}
+                      alt="Profile preview"
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center">
+                      <User className="h-9 w-9 text-[#db3c8a]" />
+                    </div>
+                  )}
+                </div>
+                <div className="flex flex-1 flex-wrap gap-2">
+                  <input
+                    id="completeProfileAvatar"
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,image/gif"
+                    onChange={handleAvatarSelect}
+                    className="hidden"
+                  />
+                  <label
+                    htmlFor="completeProfileAvatar"
+                    className="inline-flex cursor-pointer items-center gap-2 rounded-[10px] border-2 border-[#00522d] bg-[#fff8f6] px-4 py-3 text-sm font-bold leading-[0.85] text-[#00522d] transition-colors hover:bg-[#00522d] hover:text-[#fff8f6]"
+                  >
+                    <Upload className="h-4 w-4" />
+                    {avatarFile ? "Change photo" : "Upload photo"}
+                  </label>
+                  {avatarFile && (
+                    <button
+                      type="button"
+                      onClick={handleRemoveAvatarFile}
+                      className="inline-flex items-center gap-2 rounded-[10px] border-2 border-[#db3c8a] bg-transparent px-4 py-3 text-sm font-bold leading-[0.85] text-[#db3c8a] transition-colors hover:bg-[#db3c8a] hover:text-[#fff8f6]"
+                    >
+                      <X className="h-4 w-4" />
+                      Remove
+                    </button>
+                  )}
+                  {avatarFile && (
+                    <span className="flex min-w-0 items-center text-sm font-medium leading-[1.2] text-[#00522d]/70">
+                      {avatarFile.name}
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+
             {/* Full Name */}
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="mb-2 block text-sm font-bold leading-[1.2] text-[#00522d]">
                 Full Name{" "}
                 {isFieldRequired("fullName") && (
-                  <span className="text-red-500">*</span>
+                  <span className="text-[#db3c8a]">*</span>
                 )}
               </label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#db3c8a]" />
                 <input
                   type="text"
                   name="fullName"
                   value={formData.fullName}
                   onChange={handleChange}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full rounded-[10px] border-2 border-[#fce5df] bg-white px-4 py-4 pl-11 text-sm font-medium leading-[1.2] text-[#00522d] placeholder:text-[#00522d]/55 focus:border-[#db3c8a] focus:outline-none"
                   placeholder="Enter your full name"
                   required={isFieldRequired("fullName")}
                 />
@@ -420,20 +546,20 @@ function CompleteProfile() {
 
             {/* Email */}
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="mb-2 block text-sm font-bold leading-[1.2] text-[#00522d]">
                 Email{" "}
                 {isFieldRequired("email") && (
-                  <span className="text-red-500">*</span>
+                  <span className="text-[#db3c8a]">*</span>
                 )}
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#db3c8a]" />
                 <input
                   type="email"
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50"
+                  className="w-full rounded-[10px] border-2 border-[#fce5df] bg-[#fce5df]/55 px-4 py-4 pl-11 text-sm font-medium leading-[1.2] text-[#00522d] placeholder:text-[#00522d]/55 focus:border-[#db3c8a] focus:outline-none disabled:cursor-not-allowed"
                   placeholder="Enter your email"
                   disabled
                 />
@@ -442,20 +568,20 @@ function CompleteProfile() {
 
             {/* Phone Number */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="mb-2 block text-sm font-bold leading-[1.2] text-[#00522d]">
                 Phone Number{" "}
                 {isFieldRequired("phoneNumber") && (
-                  <span className="text-red-500">*</span>
+                  <span className="text-[#db3c8a]">*</span>
                 )}
               </label>
               <div className="relative">
-                <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#db3c8a]" />
                 <input
                   type="tel"
                   name="phoneNumber"
                   value={formData.phoneNumber}
                   onChange={handleChange}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full rounded-[10px] border-2 border-[#fce5df] bg-white px-4 py-4 pl-11 text-sm font-medium leading-[1.2] text-[#00522d] placeholder:text-[#00522d]/55 focus:border-[#db3c8a] focus:outline-none"
                   placeholder="Enter your phone number"
                   required={isFieldRequired("phoneNumber")}
                 />
@@ -464,20 +590,21 @@ function CompleteProfile() {
 
             {/* Date of Birth */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="mb-2 block text-sm font-bold leading-[1.2] text-[#00522d]">
                 Date of Birth{" "}
                 {isFieldRequired("dateOfBirth") && (
-                  <span className="text-red-500">*</span>
+                  <span className="text-[#db3c8a]">*</span>
                 )}
               </label>
               <div className="relative">
-                <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#db3c8a]" />
                 <input
                   type="date"
                   name="dateOfBirth"
                   value={formData.dateOfBirth}
                   onChange={handleChange}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  max={maxAllowedBirthDate}
+                  className="w-full rounded-[10px] border-2 border-[#fce5df] bg-white px-4 py-4 pl-11 text-sm font-medium leading-[1.2] text-[#00522d] placeholder:text-[#00522d]/55 focus:border-[#db3c8a] focus:outline-none"
                   required={isFieldRequired("dateOfBirth")}
                 />
               </div>
@@ -485,17 +612,17 @@ function CompleteProfile() {
 
             {/* Address */}
             <div className="md:col-span-2">
-              <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+              <label className="mb-2 flex items-center gap-2 text-sm font-bold leading-[1.2] text-[#00522d]">
                 <Home className="w-4 h-4" />
                 Location{" "}
                 {isFieldRequired("address") && (
-                  <span className="text-red-500">*</span>
+                  <span className="text-[#db3c8a]">*</span>
                 )}
               </label>
 
               {/* Province/City */}
               <div className="mb-3">
-                <label className="block text-xs font-medium text-gray-600 mb-1">
+                <label className="mb-1 block text-xs font-medium leading-[1.2] text-[#00522d]/75">
                   Province / City
                 </label>
                 <select
@@ -503,7 +630,7 @@ function CompleteProfile() {
                   value={provinceCode || ""}
                   onChange={handleProvinceChange}
                   disabled={isProvincesLoading || isProvincesFetching}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                  className="w-full rounded-[10px] border-2 border-[#fce5df] bg-white px-4 py-4 text-sm font-bold leading-[1.2] text-[#00522d] focus:border-[#db3c8a] focus:outline-none"
                   required={isFieldRequired("address")}
                 >
                   <option value="">
@@ -521,7 +648,7 @@ function CompleteProfile() {
 
               {/* District */}
               <div className="mb-3">
-                <label className="block text-xs font-medium text-gray-600 mb-1">
+                <label className="mb-1 block text-xs font-medium leading-[1.2] text-[#00522d]/75">
                   District
                 </label>
                 <select
@@ -531,7 +658,7 @@ function CompleteProfile() {
                   disabled={
                     !provinceCode || isDistrictsLoading || isDistrictsFetching
                   }
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white disabled:bg-gray-100 disabled:cursor-not-allowed"
+                  className="w-full rounded-[10px] border-2 border-[#fce5df] bg-white px-4 py-4 text-sm font-bold leading-[1.2] text-[#00522d] focus:border-[#db3c8a] focus:outline-none disabled:cursor-not-allowed disabled:bg-[#fce5df]/55"
                 >
                   <option value="">
                     {isDistrictsLoading || isDistrictsFetching
@@ -548,17 +675,17 @@ function CompleteProfile() {
 
               {/* Street */}
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">
+                <label className="mb-1 block text-xs font-medium leading-[1.2] text-[#00522d]/75">
                   Street / Address Line
                 </label>
                 <div className="relative">
-                  <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#db3c8a]" />
                   <input
                     type="text"
                     name="street"
                     value={formData.address?.street || ""}
                     onChange={handleChange}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full rounded-[10px] border-2 border-[#fce5df] bg-white px-4 py-4 pl-11 text-sm font-medium leading-[1.2] text-[#00522d] placeholder:text-[#00522d]/55 focus:border-[#db3c8a] focus:outline-none"
                     placeholder="House number, street, ward"
                   />
                 </div>
@@ -567,20 +694,20 @@ function CompleteProfile() {
 
             {/* Bio */}
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="mb-2 block text-sm font-bold leading-[1.2] text-[#00522d]">
                 Bio{" "}
                 {isFieldRequired("bio") && (
-                  <span className="text-red-500">*</span>
+                  <span className="text-[#db3c8a]">*</span>
                 )}
               </label>
               <div className="relative">
-                <FileText className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+                <FileText className="absolute left-3 top-3 w-5 h-5 text-[#db3c8a]" />
                 <textarea
                   name="bio"
                   value={formData.bio}
                   onChange={handleChange}
                   rows={4}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full rounded-[10px] border-2 border-[#fce5df] bg-white px-4 py-4 pl-11 text-sm font-medium leading-[1.2] text-[#00522d] placeholder:text-[#00522d]/55 focus:border-[#db3c8a] focus:outline-none"
                   placeholder="Tell us about yourself..."
                   required={isFieldRequired("bio")}
                 />
@@ -589,11 +716,11 @@ function CompleteProfile() {
           </div>
 
           {/* Buttons */}
-          <div className="flex flex-col sm:flex-row gap-3 pt-4">
+          <div className="flex flex-col gap-4 pt-2 sm:flex-row">
             <button
               type="submit"
               disabled={updateProfileMutation.isPending}
-              className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex flex-1 items-center justify-center gap-2 rounded-[10px] border-2 border-[#00522d] bg-[#db3c8a] px-6 py-5 text-base font-bold leading-[0.85] text-[#fff8f6] transition-transform duration-200 hover:-translate-y-0.5 hover:bg-[#00522d] focus:outline-none focus:ring-4 focus:ring-[#f29ebd] disabled:cursor-not-allowed disabled:border-[#f29ebd] disabled:bg-[#f29ebd] disabled:opacity-70"
             >
               {updateProfileMutation.isPending ? (
                 <>
@@ -607,7 +734,7 @@ function CompleteProfile() {
             <button
               type="button"
               onClick={handleSkip}
-              className="flex-1 px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium"
+              className="flex-1 rounded-[10px] border-2 border-[#00522d] bg-transparent px-6 py-5 text-base font-bold leading-[0.85] text-[#00522d] transition-colors hover:bg-[#00522d] hover:text-[#fff8f6]"
             >
               Skip for Now
             </button>
@@ -616,7 +743,7 @@ function CompleteProfile() {
 
         {/* Info */}
         <div className="mt-6 text-center">
-          <p className="text-sm text-gray-500">
+          <p className="text-sm font-medium leading-[1.2] text-[#00522d]/70">
             You can update your profile anytime from the settings page
           </p>
         </div>

@@ -28,6 +28,7 @@ public interface UserRepository extends JpaRepository<User, String> {
     """)
     List<User> findAllByIds(@Param("userIds") List<String> userIds);
 
+
     @Query("SELECT u FROM User u LEFT JOIN FETCH u.badges WHERE u.id IN :ids")
     List<User> findAllByIdsWithBadges(@Param("ids") List<String> ids);
 

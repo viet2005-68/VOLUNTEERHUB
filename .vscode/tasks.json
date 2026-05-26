@@ -1,0 +1,84 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Run ALL Services",
+      "dependsOn": [
+        "ServiceDiscovery",
+        "ApiGateway",
+        "AuthorizationServer",
+        "UserService",
+        "CommunityService",
+        "EventService",
+        "NotificationService",
+        "RegistrationService",
+        "AggregationService"
+      ],
+      "dependsOrder": "parallel"
+    },
+
+    {
+      "label": "ServiceDiscovery",
+      "type": "shell",
+      "command": "./mvnw spring-boot:run",
+      "options": { "cwd": "${workspaceFolder}/ServiceDiscovery" },
+      "problemMatcher": []
+    },
+    {
+      "label": "ApiGateway",
+      "type": "shell",
+      "command": "./mvnw spring-boot:run",
+      "options": { "cwd": "${workspaceFolder}/ApiGateway" },
+      "problemMatcher": []
+    },
+    {
+      "label": "AuthorizationServer",
+      "type": "shell",
+      "command": "./mvnw spring-boot:run",
+      "options": { "cwd": "${workspaceFolder}/AuthorizationServer" },
+      "problemMatcher": []
+    },
+    {
+      "label": "UserService",
+      "type": "shell",
+      "command": "./mvnw spring-boot:run",
+      "options": { "cwd": "${workspaceFolder}/UserService" },
+      "problemMatcher": []
+    },
+    {
+      "label": "CommunityService",
+      "type": "shell",
+      "command": "./mvnw spring-boot:run",
+      "options": { "cwd": "${workspaceFolder}/CommunityService" },
+      "problemMatcher": []
+    },
+    {
+      "label": "EventService",
+      "type": "shell",
+      "command": "./mvnw spring-boot:run",
+      "options": { "cwd": "${workspaceFolder}/EventService" },
+      "problemMatcher": []
+    },
+    {
+      "label": "NotificationService",
+      "type": "shell",
+      "command": "./mvnw spring-boot:run",
+      "options": { "cwd": "${workspaceFolder}/NotificationService" },
+      "problemMatcher": []
+    },
+    {
+      "label": "RegistrationService",
+      "type": "shell",
+      "command": "./mvnw spring-boot:run",
+      "options": { "cwd": "${workspaceFolder}/RegistrationService" },
+      "problemMatcher": []
+    },
+    {
+      "label": "AggregationService",
+      "type": "shell",
+      "command": "./mvnw spring-boot:run",
+      "options": { "cwd": "${workspaceFolder}/AggregationService" },
+      "problemMatcher": []
+    }
+  ]
+}

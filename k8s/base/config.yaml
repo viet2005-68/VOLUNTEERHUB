@@ -1,0 +1,62 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: volunteerhub-config
+data:
+  PUBLIC_BASE_URL: "http://localhost:30080"
+  APP_CORS_ALLOWED_ORIGINS: "http://localhost:30080"
+  CLIENT_APP_URI: "http://localhost:30080"
+  REDIRECT_URI: "http://localhost:30080/login/oauth2/code/volunteerhub"
+  SERVER_FORWARD_HEADERS_STRATEGY: "framework"
+
+  EUREKA_SERVER_URL: "http://service-discovery:8761/eureka/"
+  EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
+  REDIS_HOST: "redis"
+  REDIS_PORT: "6379"
+  RABBITMQ_HOST: "rabbitmq"
+  RABBITMQ_PORT: "5672"
+  RABBITMQ_DEFAULT_USER: "guest"
+  POSTGRES_USER: "postgres"
+  POSTGRES_PORT: "5432"
+
+  VOLUNTEER_HUB_AS_URI: "http://localhost:7070"
+  VOLUNTEER_HUB_AS_JWK_URI: "http://authorization-server:7070/oauth2/jwks"
+  GOOGLE_AS_URI: "https://accounts.google.com"
+  GOOGLE_AS_JWK_URI: "https://www.googleapis.com/oauth2/v3/certs"
+
+  MANAGEMENT_OTLP_TRACING_ENDPOINT: "http://otel-collector.observability.svc.cluster.local:4318/v1/traces"
+  MANAGEMENT_TRACING_SAMPLING_PROBABILITY: "1.0"
+  MANAGEMENT_TRACING_ENABLED: "true"
+  MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,prometheus"
+  MANAGEMENT_ENDPOINT_HEALTH_PROBES_ENABLED: "true"
+
+  NOTIFICATION_EXCHANGE: "notification-exchange"
+  EVENT_EXCHANGE: "event-exchange"
+  COMMENT_ROUTING_KEY: "notification.comment"
+  REACTION_ROUTING_KEY: "notification.reaction"
+  POST_ROUTING_KEY: "notification.post"
+  NOTIFICATION_ROUTING_KEY: "notification.event"
+  CHAT_NOTIFICATION_ROUTING_KEY: "notification.chat"
+  EVENT_ROUTING_KEY: "event.event"
+
+  FIREBASE_PROJECT_ID: "voluteer-hub"
+  FIREBASE_STORAGE_BUCKET: "voluteer-hub.firebasestorage.app"
+  VAPID_SUBJECT: "mailto:admin@yourcompany.com"
+
+  USER_SERVICE_URL: "http://user-service:8081/api/v1/users/users"
+  EVENT_SERVICE_URL: "http://event-service:8082/api/v1/events"
+  REGISTRATION_SERVICE_URL: "http://registration-service:8084/api/v1/registrations"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: volunteerhub-secrets
+type: Opaque
+stringData:
+  POSTGRES_PASSWORD: "admin"
+  REDIS_PASSWORD: "secret_password"
+  RABBITMQ_DEFAULT_PASS: "guest"
+  CLIENT_ID: "7fcdbb6c-fc1d-4921-a52d-0466557b6132"
+  CLIENT_SECRET: "f584278e-be8a-4f55-9c64-8e7be8f9e846"
+  VAPID_PUBLIC_KEY: "BOnrlujfRMG5ucNlTsPasMCckJERQRA6S3E9TudLdpEQK8-FhboumN9H10OibSHJ7aP8xrEwnrjz3doeiUZXrfE"
+  VAPID_PRIVATE_KEY: "IUu6njmriPi39MHg2uzyGSso1HruCnGdS7ITNEeGrlw"

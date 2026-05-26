@@ -1,7 +1,17 @@
 import { useQuery } from "@tanstack/react-query";
 import AnalysisService from "../services/analysisService";
+import { useAuth } from "./useAuth";
 
 const ANALYTICS_QUERY_KEY = ["analytics"];
+
+export const useDashboardAnalytics = () => {
+    const { user } = useAuth();
+    return useQuery({
+        queryKey: [...ANALYTICS_QUERY_KEY, "dashboard", user?.id, user?.role],
+        queryFn: AnalysisService.getDashboardAnalytics,
+        staleTime: 2 * 60 * 1000,
+    });
+};
 
 // ==================== MANAGER ANALYTICS HOOKS ====================
 
@@ -131,6 +141,14 @@ export const useMyParticipatedEvents = () => {
     return useQuery({
         queryKey: [...ANALYTICS_QUERY_KEY, "participatedEvents"],
         queryFn: AnalysisService.getMyParticipatedEvents,
+        staleTime: 5 * 60 * 1000,
+    });
+};
+
+export const useMyCommunityServiceHours = () => {
+    return useQuery({
+        queryKey: [...ANALYTICS_QUERY_KEY, "communityServiceHours"],
+        queryFn: AnalysisService.getMyCommunityServiceHours,
         staleTime: 5 * 60 * 1000,
     });
 };

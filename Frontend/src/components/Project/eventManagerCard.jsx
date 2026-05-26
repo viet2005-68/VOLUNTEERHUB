@@ -116,25 +116,27 @@ function EventManagerCard({ data, onCancelEvent, onEdit, onView }) {
   };
 
   return (
-    <tr className="border-b border-gray-200 hover:bg-gray-50 transition-colors">
+    <tr className="border-b-2 border-ash-whisper transition-colors hover:bg-ash-whisper/30">
       {/* Event Name & Category */}
-      <td className="px-6 py-4">
-        <div className="flex flex-col">
-          <span className="font-semibold text-gray-900">{title}</span>
-          <span className="text-sm text-gray-500">
+      <td className="px-6 py-5">
+        <div className="flex flex-col gap-1">
+          <span className="text-base font-bold leading-[1.2] text-deep-forest">
+            {title}
+          </span>
+          <span className="text-sm font-medium leading-[1.2] text-deep-forest/60">
             {category?.name || "N/A"}
           </span>
         </div>
       </td>
 
       {/* Date & Time */}
-      <td className="px-6 py-4">
-        <div className="flex flex-col text-sm">
-          <div className="flex items-center gap-1 text-gray-700">
+      <td className="px-6 py-5">
+        <div className="flex flex-col gap-1 text-sm font-medium leading-[1.2]">
+          <div className="flex items-center gap-1.5 text-deep-forest">
             <i className="ri-calendar-line"></i>
             <span>{formatDate(startTime)}</span>
           </div>
-          <div className="flex items-center gap-1 text-gray-500">
+          <div className="flex items-center gap-1.5 text-deep-forest/65">
             <i className="ri-time-line"></i>
             <span>
               {formatTime(startTime)} - {formatTime(endTime)}
@@ -144,9 +146,9 @@ function EventManagerCard({ data, onCancelEvent, onEdit, onView }) {
       </td>
 
       {/* Location */}
-      <td className="px-6 py-4">
-        <div className="flex items-center gap-2 text-sm text-gray-700">
-          <i className="ri-map-pin-fill text-gray-400"></i>
+      <td className="px-6 py-5">
+        <div className="flex items-center gap-2 text-sm font-medium leading-[1.2] text-deep-forest/75">
+          <i className="ri-map-pin-fill text-foudre-pink"></i>
           <span className="max-w-[150px] truncate">
             {address
               ? `${address.street}, ${address.district}, ${address.province}`
@@ -156,22 +158,16 @@ function EventManagerCard({ data, onCancelEvent, onEdit, onView }) {
       </td>
 
       {/* Volunteers */}
-      <td className="px-6 py-4">
+      <td className="px-6 py-5">
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between text-sm">
-            <span className="font-semibold text-gray-700">
+            <span className="font-bold leading-[1.2] text-deep-forest">
               {participantCount}/{capacity}
             </span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
+          <div className="h-2 w-full rounded-full bg-ash-whisper">
             <div
-              className={`h-2 rounded-full transition-all ${
-                participantCount === capacity
-                  ? "bg-red-500"
-                  : participantCount >= capacity * 0.8
-                  ? "bg-orange-500"
-                  : "bg-blue-500"
-              }`}
+              className="h-2 rounded-full bg-deep-forest transition-all"
               style={{ width: `${getProgressPercentage()}%` }}
             ></div>
           </div>
@@ -179,11 +175,11 @@ function EventManagerCard({ data, onCancelEvent, onEdit, onView }) {
       </td>
 
       {/* Status */}
-      <td className="px-6 py-4">
+      <td className="px-6 py-5">
         <div className="flex items-center gap-2">
           {/* Status Badge */}
           <span
-            className={`px-3 py-1.5 rounded-lg text-sm font-medium capitalize ${getStatusColor(
+            className={`rounded-[10px] px-3 py-2 text-sm font-bold capitalize leading-[0.85] ${getStatusColor(
               currentStatus
             )}`}
             title={STATUS_CONFIG[currentStatus]?.description}
@@ -196,12 +192,12 @@ function EventManagerCard({ data, onCancelEvent, onEdit, onView }) {
             <button
               onClick={handleCancelEvent}
               disabled={isCancelling}
-              className="p-1.5 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed group relative"
+              className="group relative rounded-[10px] p-2 text-foudre-pink transition-colors hover:bg-ash-whisper disabled:cursor-not-allowed disabled:opacity-50"
               title="Cancel this event"
             >
               {isCancelling ? (
                 <svg
-                  className="animate-spin h-4 w-4 text-red-600"
+                  className="h-4 w-4 animate-spin text-foudre-pink"
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
@@ -221,13 +217,13 @@ function EventManagerCard({ data, onCancelEvent, onEdit, onView }) {
                   ></path>
                 </svg>
               ) : (
-                <X className="w-4 h-4 text-red-600 group-hover:text-red-700" />
+                <X className="h-4 w-4" />
               )}
             </button>
           ) : (
             currentStatus === EVENT_STATUS.PENDING && (
               <span
-                className="text-xs text-gray-400 italic"
+                className="text-xs font-medium italic leading-[1.2] text-deep-forest/45"
                 title="Event must be approved before it can be cancelled"
               >
                 (Waiting approval)
@@ -238,31 +234,31 @@ function EventManagerCard({ data, onCancelEvent, onEdit, onView }) {
       </td>
 
       {/* Actions */}
-      <td className="px-6 py-4">
+      <td className="px-6 py-5">
         <div className="flex items-center gap-2">
           <button
             onClick={() => onEdit?.(id)}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="rounded-[10px] p-2 text-deep-forest transition-colors hover:bg-ash-whisper"
             title="Edit"
           >
-            <Edit className="w-4 h-4 text-gray-600" />
+            <Edit className="h-4 w-4" />
           </button>
           <button
             onClick={() => onView?.(id)}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="rounded-[10px] p-2 text-deep-forest transition-colors hover:bg-ash-whisper"
             title="View"
           >
-            <Eye className="w-4 h-4 text-gray-600" />
+            <Eye className="h-4 w-4" />
           </button>
           <button
             onClick={handleDeleteEvent}
-            className="p-2 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="rounded-[10px] p-2 text-foudre-pink transition-colors hover:bg-ash-whisper disabled:cursor-not-allowed disabled:opacity-50"
             title="Delete"
             disabled={deleteEventMutation.isPending}
           >
             {deleteEventMutation.isPending ? (
               <svg
-                className="animate-spin h-4 w-4 text-red-500"
+                className="h-4 w-4 animate-spin text-foudre-pink"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
@@ -282,7 +278,7 @@ function EventManagerCard({ data, onCancelEvent, onEdit, onView }) {
                 ></path>
               </svg>
             ) : (
-              <Trash2 className="w-4 h-4 text-red-500" />
+              <Trash2 className="h-4 w-4" />
             )}
           </button>
         </div>

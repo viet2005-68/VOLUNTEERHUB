@@ -1,6 +1,7 @@
     package com.volunteerhub.eventservice.dto.request;
 
     import com.fasterxml.jackson.annotation.JsonFormat;
+    import com.volunteerhub.common.enums.QrJoinPolicy;
     import com.volunteerhub.eventservice.validation.OnCreate;
     import jakarta.validation.Valid;
     import jakarta.validation.constraints.Min;
@@ -42,6 +43,8 @@
         private AddressRequest address;
 
         private String optional;
+
+        private QrJoinPolicy qrJoinPolicy;
 
         @Min(value = 1, message = "Capacity must be at least 1", groups = OnCreate.class)
         private int capacity;

@@ -1,14 +1,24 @@
 import {
     approveRegistration,
     checkUserParticipation,
+    completeRegistrationByQrCode,
+    createJoinQrCode,
+    createCompletionQrCode,
     getAggregatedRegistrations,
+    joinRegistrationByQrCode,
+    listJoinQrCodes,
+    listCompletionQrCodes,
     listUserAllEventManagement,
     listUserOfAnEvent,
     listUserOfAnEventAprovedAndCompleted,
     numberOfEventRegistrations,
+    previewJoinQrCode,
+    previewCompletionQrCode,
     registerEventList,
     registerForEvent,
     removeParticipant,
+    revokeJoinQrCode,
+    revokeCompletionQrCode,
     reviewRegistration,
     unregisterFromEvent,
     UserApprovedList,
@@ -284,6 +294,145 @@ export const useConstUserApprovedList = (eventId) => {
         queryFn: () => UserApprovedList(eventId),
         staleTime: 5 * 60 * 1000,
         enabled: !!eventId,
+    });
+};
+
+export const useJoinQrCodes = (eventId) => {
+    return useQuery({
+        queryKey: [...REGISTRAION_QUERY_KEY, "joinQrCodes", eventId],
+        queryFn: () => listJoinQrCodes(eventId),
+        enabled: !!eventId,
+        staleTime: 30 * 1000,
+    });
+};
+
+export const useCreateJoinQrCode = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ eventId, payload }) => createJoinQrCode(eventId, payload || {}),
+        onSuccess: (_, variables) => {
+            toast.success("Join QR code generated.");
+            queryClient.invalidateQueries({
+                queryKey: [...REGISTRAION_QUERY_KEY, "joinQrCodes", variables.eventId],
+            });
+        },
+        onError: (error) => {
+            const message = error?.response?.data?.message || error.message || "Failed to generate QR code";
+            toast.error(message);
+        },
+    });
+};
+
+export const useRevokeJoinQrCode = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ eventId, qrCodeId }) => revokeJoinQrCode(eventId, qrCodeId),
+        onSuccess: (_, variables) => {
+            toast.success("Join QR code revoked.");
+            queryClient.invalidateQueries({
+                queryKey: [...REGISTRAION_QUERY_KEY, "joinQrCodes", variables.eventId],
+            });
+        },
+        onError: (error) => {
+            const message = error?.response?.data?.message || error.message || "Failed to revoke QR code";
+            toast.error(message);
+        },
+    });
+};
+
+export const usePreviewJoinQrCode = (token, options = {}) => {
+    return useQuery({
+        queryKey: [...REGISTRAION_QUERY_KEY, "joinQrPreview", token],
+        queryFn: () => previewJoinQrCode(token),
+        enabled: !!token && (options.enabled ?? true),
+        retry: false,
+        ...options,
+    });
+};
+
+export const useJoinRegistrationByQrCode = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (token) => joinRegistrationByQrCode(token),
+        onSuccess: () => {
+            toast.success("Event joined successfully.");
+            queryClient.invalidateQueries({ queryKey: REGISTRAION_QUERY_KEY });
+        },
+        onError: (error) => {
+            const message = error?.response?.data?.message || error.message || "Failed to join event";
+            toast.error(message);
+        },
+    });
+};
+
+export const useCompletionQrCodes = (eventId) => {
+    return useQuery({
+        queryKey: [...REGISTRAION_QUERY_KEY, "completionQrCodes", eventId],
+        queryFn: () => listCompletionQrCodes(eventId),
+        enabled: !!eventId,
+        staleTime: 30 * 1000,
+    });
+};
+
+export const useCreateCompletionQrCode = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ eventId, payload }) => createCompletionQrCode(eventId, payload || {}),
+        onSuccess: (_, variables) => {
+            toast.success("Completion QR code generated.");
+            queryClient.invalidateQueries({
+                queryKey: [...REGISTRAION_QUERY_KEY, "completionQrCodes", variables.eventId],
+            });
+        },
+        onError: (error) => {
+            const message = error?.response?.data?.message || error.message || "Failed to generate QR code";
+            toast.error(message);
+        },
+    });
+};
+
+export const useRevokeCompletionQrCode = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ eventId, qrCodeId }) => revokeCompletionQrCode(eventId, qrCodeId),
+        onSuccess: (_, variables) => {
+            toast.success("Completion QR code revoked.");
+            queryClient.invalidateQueries({
+                queryKey: [...REGISTRAION_QUERY_KEY, "completionQrCodes", variables.eventId],
+            });
+        },
+        onError: (error) => {
+            const message = error?.response?.data?.message || error.message || "Failed to revoke QR code";
+            toast.error(message);
+        },
+    });
+};
+
+export const usePreviewCompletionQrCode = (token, options = {}) => {
+    return useQuery({
+        queryKey: [...REGISTRAION_QUERY_KEY, "completionQrPreview", token],
+        queryFn: () => previewCompletionQrCode(token),
+        enabled: !!token && (options.enabled ?? true),
+        retry: false,
+        ...options,
+    });
+};
+
+export const useCompleteRegistrationByQrCode = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (token) => completeRegistrationByQrCode(token),
+        onSuccess: (data) => {
+            const message = data?.alreadyCompleted
+                ? "This event was already completed."
+                : "Event completed successfully.";
+            toast.success(message);
+            queryClient.invalidateQueries({ queryKey: REGISTRAION_QUERY_KEY });
+        },
+        onError: (error) => {
+            const message = error?.response?.data?.message || error.message || "Failed to complete event";
+            toast.error(message);
+        },
     });
 };
 

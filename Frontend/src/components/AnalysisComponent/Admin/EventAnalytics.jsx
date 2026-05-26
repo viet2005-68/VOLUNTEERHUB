@@ -1,35 +1,30 @@
 import React from "react";
-import { Calendar, Play, Users, CheckCircle, Loader2 } from "lucide-react";
-import { useEventStatsCount } from "../../../hook/useAnalysis";
+import { Calendar, CheckCircle, Clock, Loader2, Play } from "lucide-react";
+import { useDashboardAnalytics } from "../../../hook/useAnalysis";
 
 function EventAnalytics() {
-  const { data: eventStatsCount, isLoading: isLoadingStats } =
-    useEventStatsCount();
+  const { data, isLoading } = useDashboardAnalytics();
 
   const stats = [
     {
       label: "Total Events",
-      value: eventStatsCount ?? 0,
+      value: data?.totalEvents || 0,
       icon: Calendar,
-      isLoading: isLoadingStats,
     },
     {
       label: "Active Events",
-      value: eventStatsCount ?? 0,
+      value: data?.activeEvents || 0,
       icon: Play,
-      isLoading: isLoadingStats,
     },
     {
-      label: "Avg. Participants",
-      value: "5.7",
-      icon: Users,
-      isLoading: false, // Hardcoded
+      label: "Pending Review",
+      value: data?.pendingEvents || 0,
+      icon: Clock,
     },
     {
       label: "Completion Rate",
-      value: "94.2%",
+      value: `${Math.round(data?.completionRate || 0)}%`,
       icon: CheckCircle,
-      isLoading: false, // Hardcoded
     },
   ];
 
@@ -40,20 +35,21 @@ function EventAnalytics() {
       </h4>
 
       <div className="space-y-5">
-        {stats.map((stat, index) => {
+        {stats.map((stat) => {
           const Icon = stat.icon;
           return (
-            <div key={index} className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">{stat.label}</span>
-              <div className="flex items-center gap-2">
-                {stat.isLoading ? (
-                  <Loader2 className="w-5 h-5 animate-spin text-gray-400" />
-                ) : (
-                  <span className="text-lg font-bold text-gray-900">
-                    {stat.value}
-                  </span>
-                )}
+            <div key={stat.label} className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-2 text-sm text-gray-600">
+                <Icon className="h-4 w-4 text-blue-600" />
+                {stat.label}
               </div>
+              {isLoading ? (
+                <Loader2 className="w-5 h-5 animate-spin text-gray-400" />
+              ) : (
+                <span className="text-lg font-bold text-gray-900">
+                  {stat.value}
+                </span>
+              )}
             </div>
           );
         })}

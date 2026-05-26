@@ -14,6 +14,7 @@ import toast from "react-hot-toast";
 import { useOutletContext } from "react-router-dom";
 import eventSchema from "../../validation/eventSchema";
 import { useProvinces, useDistricts } from "../../hook/useVietnamLocations";
+import JoinQrPanel from "./JoinQrPanel";
 
 const categoryOptions = [
   { value: "health", label: "Health" },
@@ -320,6 +321,8 @@ function OverviewEventManager() {
   }
   return (
     <div className="flex flex-col gap-6 font-jost">
+      <JoinQrPanel eventId={eventId} eventStatus={eventData?.status} />
+
       <div className="rounded-xl grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
           <Card>
@@ -844,7 +847,7 @@ function OverviewEventManager() {
         <div className="flex flex-col gap-6">
           {/* Quick Actions Card */}
           <Card>
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-4 mx-4">
               <h4 className="text-lg font-bold text-gray-900 mb-2">
                 Quick Actions
               </h4>

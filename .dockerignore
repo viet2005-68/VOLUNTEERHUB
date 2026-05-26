@@ -1,0 +1,11 @@
+**/target/
+**/node_modules/
+**/dist/
+logs/
+.git/
+.vscode/
+.service-pids
+*.log
+RegistrationService/docs/
+**/src/main/resources/*firebase-adminsdk*.json
+**/src/main/resources/firebase-service-account*.json

@@ -21,7 +21,7 @@ public class UserRequest {
     @JsonProperty("fullName")
     private String fullName;
 
-    //    @NotNull(message = "Username cannot be null", groups = OnCreate.class)
+//    @NotNull(message = "Username cannot be null", groups = OnCreate.class)
     @JsonProperty("username")
     private String username;
 

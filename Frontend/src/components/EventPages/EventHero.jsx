@@ -22,33 +22,41 @@ function EventHero({ id, imgURL, organizerName, eventName }) {
   };
 
   return (
-    <div className="flex flex-col w-full ">
-      <div className="w-full aspect-[16/5] max-h-[380px] overflow-hidden rounded-xl bg-gray-100 mb-4 relative">
-        <img
-          src={imgURL}
-          alt="Event Hero"
-          className="w-full h-full object-cover object-center"
-        />
+    <div className="flex w-full flex-col">
+      <div className="relative mb-6 flex min-h-[300px] w-full items-center justify-center overflow-hidden rounded-[25px] bg-ash-whisper md:min-h-[360px]">
+        {imgURL ? (
+          <img
+            src={imgURL}
+            alt="Event Hero"
+            className="h-full max-h-[360px] w-full object-cover object-center"
+          />
+        ) : (
+          <div className="font-beni text-[80px] font-black uppercase leading-[0.75] text-foudre-pink/35">
+            Event
+          </div>
+        )}
         {/* Back Button */}
         <button
           onClick={() => navigate("/opportunities")}
-          className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm text-gray-800 p-3 rounded-full shadow-lg hover:bg-white transition-all flex items-center gap-2"
+          className="absolute left-4 top-4 flex items-center gap-2 rounded-full bg-pale-canvas p-3 text-deep-forest transition-colors hover:bg-bubblegum-blush"
           title="Back to Opportunities"
         >
           <ArrowLeft size={20} />
         </button>
       </div>
-      <div className="text-black mb-4">
-        <p className="text-2xl font-bold mb-1 max-sm:px-3">{eventName}</p>
+      <div className="mb-6 text-deep-forest">
+        <p className="mb-2 text-3xl font-bold leading-[1.2] max-sm:px-3">
+          {eventName}
+        </p>
 
-        <p className="max-md:text-sm max-sm:px-3 inline-flex items-center gap-2 text-gray-600/80 mb-3">
+        <p className="mb-4 inline-flex items-center gap-2 text-base font-medium leading-[1.2] text-deep-forest/70 max-md:text-sm max-sm:px-3">
           <span>
             <FaEarthAfrica />
           </span>
           <span>{organizerName}</span>
         </p>
         {isLoading ? (
-          <div className="text-sm text-gray-500">Loading volunteers...</div>
+          <div className="text-sm font-medium leading-[1.2] text-deep-forest/65">Loading volunteers...</div>
         ) : userList.length > 0 ? (
           <div className="max-sm:px-3">
             <VolunteerHero
@@ -59,7 +67,7 @@ function EventHero({ id, imgURL, organizerName, eventName }) {
             />
           </div>
         ) : (
-          <div className="text-sm text-gray-500">No volunteers yet</div>
+          <div className="text-sm font-medium leading-[1.2] text-deep-forest/65">No volunteers yet</div>
         )}
       </div>
     </div>

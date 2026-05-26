@@ -1,4 +1,4 @@
-import { Search, Download, MessageSquare, User, Plus, FileText, Users, BarChart3, Settings, Calendar } from "lucide-react";
+import { Search, MessageSquare, User, Plus, FileText, Users, BarChart3, Calendar, QrCode } from "lucide-react";
 import { ROLES } from "./role";
 
 export const quickActionsConfig = {
@@ -18,10 +18,24 @@ export const quickActionsConfig = {
       active: false,
     },
     {
+      id: "scan-qr",
+      label: "Scan checkout",
+      icon: QrCode,
+      navigate: "/qr/complete",
+      active: false,
+    },
+    {
+      id: "join-qr",
+      label: "Join by QR",
+      icon: QrCode,
+      navigate: "/qr/join",
+      active: false,
+    },
+    {
       id: "messages",
       label: "Messages",
       icon: MessageSquare,
-      navigate: "/dashboard/notifications",
+      navigate: "/dashboard/messages",
       active: false,
     },
     {
@@ -61,6 +75,13 @@ export const quickActionsConfig = {
       navigate: "/dashboard/manager-analytics",
       active: false,
     },
+    {
+      id: "messages",
+      label: "Messages",
+      icon: MessageSquare,
+      navigate: "/dashboard/messages",
+      active: false,
+    },
   ],
   [ROLES.ADMIN]: [
     {
@@ -93,4 +114,3 @@ export const quickActionsConfig = {
     },
   ],
 };
-

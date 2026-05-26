@@ -1,0 +1,9 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: volunteerhub
+resources:
+  - namespace.yaml
+  - config.yaml
+  - datastores.yaml
+  - apps.yaml
+  - service-monitors.yaml

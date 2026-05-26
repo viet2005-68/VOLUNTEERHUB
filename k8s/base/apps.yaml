@@ -1,0 +1,849 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-discovery
+  labels:
+    app.kubernetes.io/name: service-discovery
+    app.kubernetes.io/part-of: volunteerhub
+    metrics.volunteerhub.io/scrape: "true"
+spec:
+  type: NodePort
+  ports:
+    - name: http
+      port: 8761
+      targetPort: 8761
+      nodePort: 30876
+  selector:
+    app.kubernetes.io/name: service-discovery
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: service-discovery
+  labels:
+    app.kubernetes.io/name: service-discovery
+    app.kubernetes.io/part-of: volunteerhub
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: service-discovery
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: service-discovery
+        app.kubernetes.io/part-of: volunteerhub
+    spec:
+      containers:
+        - name: service-discovery
+          image: localhost:5000/volunteerhub/service-discovery:local
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 8761
+          envFrom:
+            - configMapRef:
+                name: volunteerhub-config
+            - secretRef:
+                name: volunteerhub-secrets
+          env:
+            - name: PORT
+              value: "8761"
+            - name: SPRING_APPLICATION_NAME
+              value: ServiceDiscovery
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+            initialDelaySeconds: 60
+            periodSeconds: 20
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-gateway
+  labels:
+    app.kubernetes.io/name: api-gateway
+    app.kubernetes.io/part-of: volunteerhub
+    metrics.volunteerhub.io/scrape: "true"
+spec:
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+  selector:
+    app.kubernetes.io/name: api-gateway
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-gateway
+  labels:
+    app.kubernetes.io/name: api-gateway
+    app.kubernetes.io/part-of: volunteerhub
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: api-gateway
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: api-gateway
+        app.kubernetes.io/part-of: volunteerhub
+    spec:
+      containers:
+        - name: api-gateway
+          image: localhost:5000/volunteerhub/api-gateway:local
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: volunteerhub-config
+            - secretRef:
+                name: volunteerhub-secrets
+          env:
+            - name: PORT
+              value: "8080"
+            - name: SPRING_APPLICATION_NAME
+              value: ApiGateway
+            - name: HOST
+              value: redis
+            - name: SPRING_DATA_REDIS_HOST
+              value: redis
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+            initialDelaySeconds: 60
+            periodSeconds: 20
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: authorization-server
+  labels:
+    app.kubernetes.io/name: authorization-server
+    app.kubernetes.io/part-of: volunteerhub
+    metrics.volunteerhub.io/scrape: "true"
+spec:
+  ports:
+    - name: http
+      port: 7070
+      targetPort: 7070
+  selector:
+    app.kubernetes.io/name: authorization-server
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: authorization-server
+  labels:
+    app.kubernetes.io/name: authorization-server
+    app.kubernetes.io/part-of: volunteerhub
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: authorization-server
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: authorization-server
+        app.kubernetes.io/part-of: volunteerhub
+    spec:
+      containers:
+        - name: authorization-server
+          image: localhost:5000/volunteerhub/authorization-server:local
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 7070
+          envFrom:
+            - configMapRef:
+                name: volunteerhub-config
+            - secretRef:
+                name: volunteerhub-secrets
+          env:
+            - name: PORT
+              value: "7070"
+            - name: SPRING_APPLICATION_NAME
+              value: AuthorizationServer
+            - name: POSTGRES_HOST
+              value: authorization-postgres
+            - name: POSTGRES_DB
+              value: users
+            - name: HOST
+              value: authorization-postgres
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://authorization-postgres:5432/users
+            - name: SPRING_SECURITY_OAUTH2_AUTHORIZATIONSERVER_ISSUER_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: volunteerhub-config
+                  key: VOLUNTEER_HUB_AS_URI
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: http
+            initialDelaySeconds: 35
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+            initialDelaySeconds: 70
+            periodSeconds: 20
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-service
+  labels:
+    app.kubernetes.io/name: user-service
+    app.kubernetes.io/part-of: volunteerhub
+    metrics.volunteerhub.io/scrape: "true"
+spec:
+  ports:
+    - name: http
+      port: 8081
+      targetPort: 8081
+  selector:
+    app.kubernetes.io/name: user-service
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-service
+  labels:
+    app.kubernetes.io/name: user-service
+    app.kubernetes.io/part-of: volunteerhub
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: user-service
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: user-service
+        app.kubernetes.io/part-of: volunteerhub
+    spec:
+      containers:
+        - name: user-service
+          image: localhost:5000/volunteerhub/user-service:local
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 8081
+          envFrom:
+            - configMapRef:
+                name: volunteerhub-config
+            - secretRef:
+                name: volunteerhub-secrets
+          env:
+            - name: PORT
+              value: "8081"
+            - name: SPRING_APPLICATION_NAME
+              value: UserService
+            - name: POSTGRES_HOST
+              value: user-service-postgres
+            - name: POSTGRES_DB
+              value: users
+            - name: HOST
+              value: user-service-postgres
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://user-service-postgres:5432/users
+            - name: SPRING_DATA_REDIS_HOST
+              value: redis
+            - name: SPRING_RABBITMQ_HOST
+              value: rabbitmq
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: http
+            initialDelaySeconds: 35
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+            initialDelaySeconds: 70
+            periodSeconds: 20
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: event-service
+  labels:
+    app.kubernetes.io/name: event-service
+    app.kubernetes.io/part-of: volunteerhub
+    metrics.volunteerhub.io/scrape: "true"
+spec:
+  ports:
+    - name: http
+      port: 8082
+      targetPort: 8082
+  selector:
+    app.kubernetes.io/name: event-service
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: event-service
+  labels:
+    app.kubernetes.io/name: event-service
+    app.kubernetes.io/part-of: volunteerhub
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: event-service
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: event-service
+        app.kubernetes.io/part-of: volunteerhub
+    spec:
+      containers:
+        - name: event-service
+          image: localhost:5000/volunteerhub/event-service:local
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 8082
+          envFrom:
+            - configMapRef:
+                name: volunteerhub-config
+            - secretRef:
+                name: volunteerhub-secrets
+          env:
+            - name: PORT
+              value: "8082"
+            - name: SPRING_APPLICATION_NAME
+              value: EventService
+            - name: POSTGRES_HOST
+              value: event-service-postgres
+            - name: POSTGRES_DB
+              value: events
+            - name: HOST
+              value: event-service-postgres
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://event-service-postgres:5432/events
+            - name: SPRING_DATA_REDIS_HOST
+              value: redis
+            - name: SPRING_RABBITMQ_HOST
+              value: rabbitmq
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: http
+            initialDelaySeconds: 35
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+            initialDelaySeconds: 70
+            periodSeconds: 20
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: community-service
+  labels:
+    app.kubernetes.io/name: community-service
+    app.kubernetes.io/part-of: volunteerhub
+    metrics.volunteerhub.io/scrape: "true"
+spec:
+  ports:
+    - name: http
+      port: 8083
+      targetPort: 8083
+  selector:
+    app.kubernetes.io/name: community-service
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: community-service
+  labels:
+    app.kubernetes.io/name: community-service
+    app.kubernetes.io/part-of: volunteerhub
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: community-service
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: community-service
+        app.kubernetes.io/part-of: volunteerhub
+    spec:
+      containers:
+        - name: community-service
+          image: localhost:5000/volunteerhub/community-service:local
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 8083
+          envFrom:
+            - configMapRef:
+                name: volunteerhub-config
+            - secretRef:
+                name: volunteerhub-secrets
+          env:
+            - name: PORT
+              value: "8083"
+            - name: SPRING_APPLICATION_NAME
+              value: CommunityService
+            - name: POSTGRES_HOST
+              value: community-service-postgres
+            - name: POSTGRES_DB
+              value: community
+            - name: HOST
+              value: community-service-postgres
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://community-service-postgres:5432/community
+            - name: SPRING_DATA_REDIS_HOST
+              value: redis
+            - name: SPRING_RABBITMQ_HOST
+              value: rabbitmq
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: http
+            initialDelaySeconds: 35
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+            initialDelaySeconds: 70
+            periodSeconds: 20
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: registration-service
+  labels:
+    app.kubernetes.io/name: registration-service
+    app.kubernetes.io/part-of: volunteerhub
+    metrics.volunteerhub.io/scrape: "true"
+spec:
+  ports:
+    - name: http
+      port: 8084
+      targetPort: 8084
+  selector:
+    app.kubernetes.io/name: registration-service
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: registration-service
+  labels:
+    app.kubernetes.io/name: registration-service
+    app.kubernetes.io/part-of: volunteerhub
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: registration-service
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: registration-service
+        app.kubernetes.io/part-of: volunteerhub
+    spec:
+      containers:
+        - name: registration-service
+          image: localhost:5000/volunteerhub/registration-service:local
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 8084
+          envFrom:
+            - configMapRef:
+                name: volunteerhub-config
+            - secretRef:
+                name: volunteerhub-secrets
+          env:
+            - name: PORT
+              value: "8084"
+            - name: SPRING_APPLICATION_NAME
+              value: RegistrationService
+            - name: POSTGRES_HOST
+              value: registration-service-postgres
+            - name: POSTGRES_DB
+              value: registrations
+            - name: HOST
+              value: registration-service-postgres
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://registration-service-postgres:5432/registrations
+            - name: SPRING_DATA_REDIS_HOST
+              value: redis
+            - name: SPRING_RABBITMQ_HOST
+              value: rabbitmq
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: http
+            initialDelaySeconds: 35
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+            initialDelaySeconds: 70
+            periodSeconds: 20
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: notification-service
+  labels:
+    app.kubernetes.io/name: notification-service
+    app.kubernetes.io/part-of: volunteerhub
+    metrics.volunteerhub.io/scrape: "true"
+spec:
+  ports:
+    - name: http
+      port: 8085
+      targetPort: 8085
+  selector:
+    app.kubernetes.io/name: notification-service
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notification-service
+  labels:
+    app.kubernetes.io/name: notification-service
+    app.kubernetes.io/part-of: volunteerhub
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: notification-service
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: notification-service
+        app.kubernetes.io/part-of: volunteerhub
+    spec:
+      containers:
+        - name: notification-service
+          image: localhost:5000/volunteerhub/notification-service:local
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 8085
+          envFrom:
+            - configMapRef:
+                name: volunteerhub-config
+            - secretRef:
+                name: volunteerhub-secrets
+          env:
+            - name: PORT
+              value: "8085"
+            - name: SPRING_APPLICATION_NAME
+              value: NotificationService
+            - name: POSTGRES_HOST
+              value: notification-service-postgres
+            - name: POSTGRES_DB
+              value: notifications
+            - name: HOST
+              value: notification-service-postgres
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://notification-service-postgres:5432/notifications
+            - name: SPRING_RABBITMQ_HOST
+              value: rabbitmq
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: http
+            initialDelaySeconds: 35
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+            initialDelaySeconds: 70
+            periodSeconds: 20
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: chat-service
+  labels:
+    app.kubernetes.io/name: chat-service
+    app.kubernetes.io/part-of: volunteerhub
+    metrics.volunteerhub.io/scrape: "true"
+spec:
+  ports:
+    - name: http
+      port: 8086
+      targetPort: 8086
+  selector:
+    app.kubernetes.io/name: chat-service
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chat-service
+  labels:
+    app.kubernetes.io/name: chat-service
+    app.kubernetes.io/part-of: volunteerhub
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: chat-service
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: chat-service
+        app.kubernetes.io/part-of: volunteerhub
+    spec:
+      containers:
+        - name: chat-service
+          image: localhost:5000/volunteerhub/chat-service:local
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 8086
+          envFrom:
+            - configMapRef:
+                name: volunteerhub-config
+            - secretRef:
+                name: volunteerhub-secrets
+          env:
+            - name: PORT
+              value: "8086"
+            - name: SPRING_APPLICATION_NAME
+              value: ChatService
+            - name: POSTGRES_HOST
+              value: chat-service-postgres
+            - name: POSTGRES_DB
+              value: chats
+            - name: HOST
+              value: chat-service-postgres
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://chat-service-postgres:5432/chats
+            - name: SPRING_RABBITMQ_HOST
+              value: rabbitmq
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: http
+            initialDelaySeconds: 35
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+            initialDelaySeconds: 70
+            periodSeconds: 20
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: aggregation-service
+  labels:
+    app.kubernetes.io/name: aggregation-service
+    app.kubernetes.io/part-of: volunteerhub
+    metrics.volunteerhub.io/scrape: "true"
+spec:
+  ports:
+    - name: http
+      port: 8087
+      targetPort: 8087
+  selector:
+    app.kubernetes.io/name: aggregation-service
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aggregation-service
+  labels:
+    app.kubernetes.io/name: aggregation-service
+    app.kubernetes.io/part-of: volunteerhub
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: aggregation-service
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: aggregation-service
+        app.kubernetes.io/part-of: volunteerhub
+    spec:
+      containers:
+        - name: aggregation-service
+          image: localhost:5000/volunteerhub/aggregation-service:local
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 8087
+          envFrom:
+            - configMapRef:
+                name: volunteerhub-config
+            - secretRef:
+                name: volunteerhub-secrets
+          env:
+            - name: PORT
+              value: "8087"
+            - name: SPRING_APPLICATION_NAME
+              value: AggregationService
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: http
+            initialDelaySeconds: 35
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+            initialDelaySeconds: 70
+            periodSeconds: 20
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: analytic-service
+  labels:
+    app.kubernetes.io/name: analytic-service
+    app.kubernetes.io/part-of: volunteerhub
+    metrics.volunteerhub.io/scrape: "true"
+spec:
+  ports:
+    - name: http
+      port: 8089
+      targetPort: 8089
+  selector:
+    app.kubernetes.io/name: analytic-service
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: analytic-service
+  labels:
+    app.kubernetes.io/name: analytic-service
+    app.kubernetes.io/part-of: volunteerhub
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: analytic-service
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: analytic-service
+        app.kubernetes.io/part-of: volunteerhub
+    spec:
+      containers:
+        - name: analytic-service
+          image: localhost:5000/volunteerhub/analytic-service:local
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 8089
+          envFrom:
+            - configMapRef:
+                name: volunteerhub-config
+            - secretRef:
+                name: volunteerhub-secrets
+          env:
+            - name: PORT
+              value: "8089"
+            - name: SPRING_APPLICATION_NAME
+              value: AnalyticService
+            - name: HOST
+              value: redis
+            - name: SPRING_DATA_REDIS_HOST
+              value: redis
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: http
+            initialDelaySeconds: 35
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+            initialDelaySeconds: 70
+            periodSeconds: 20
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+  labels:
+    app.kubernetes.io/name: frontend
+    app.kubernetes.io/part-of: volunteerhub
+spec:
+  type: NodePort
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+      nodePort: 30080
+  selector:
+    app.kubernetes.io/name: frontend
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  labels:
+    app.kubernetes.io/name: frontend
+    app.kubernetes.io/part-of: volunteerhub
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: frontend
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: frontend
+        app.kubernetes.io/part-of: volunteerhub
+    spec:
+      containers:
+        - name: frontend
+          image: localhost:5000/volunteerhub/frontend:local
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 80
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 20

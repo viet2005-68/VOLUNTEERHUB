@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Navigate, Outlet } from "react-router-dom";
 import { LOGIN_LINK } from "../../constant/constNavigate";
 import { useAuth } from "../../hook/useAuth";
+import { saveRedirectAfterLogin } from "../../utils/authRedirect";
 
 const RequireRole = ({ allowedRoles }) => {
   const { user } = useAuth();
@@ -15,6 +16,7 @@ const RequireRole = ({ allowedRoles }) => {
   useEffect(() => {
     if (!user) {
       console.log("No user found, redirecting to login link");
+      saveRedirectAfterLogin();
       window.location.href = LOGIN_LINK;
     }
   }, [user]);

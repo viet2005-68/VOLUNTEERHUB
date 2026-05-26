@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: AnalyticService
+
+  config:
+    import: optional:file:.env[.properties]
+
+  data:
+    redis:
+      database: 0
+      host: ${HOST}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
+      timeout: 60000
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_SERVER_URL}
+
+server:
+  port: ${PORT}

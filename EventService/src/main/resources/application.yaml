@@ -5,6 +5,7 @@ spring:
   config:
     import: optional:file:.env[.properties]
 
+  # Defaults (1MB file) are easy to exceed on create-event image upload; abort mid-body → gateway sees Broken pipe.
   servlet:
     multipart:
       max-file-size: 25MB
