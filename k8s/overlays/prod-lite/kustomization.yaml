@@ -3,6 +3,7 @@ kind: Kustomization
 namespace: volunteerhub
 resources:
   - ../../base
+  - cluster-issuer.yaml
   - ingress.yaml
 patches:
   - path: config-patch.yaml

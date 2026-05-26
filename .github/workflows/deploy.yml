@@ -192,17 +192,34 @@ jobs:
           if [ -z "$PUBLIC_BASE_URL" ]; then
             PUBLIC_BASE_URL="http://${{ secrets.VM_HOST }}"
           fi
+          APP_HOST="${PUBLIC_BASE_URL#http://}"
+          APP_HOST="${APP_HOST#https://}"
+          APP_HOST="${APP_HOST%%/*}"
           FIREBASE_PROJECT_ID="${{ vars.FIREBASE_PROJECT_ID }}"
           FIREBASE_STORAGE_BUCKET="${{ vars.FIREBASE_STORAGE_BUCKET }}"
           VAPID_SUBJECT="${{ vars.VAPID_SUBJECT }}"
           if [ -z "$VAPID_SUBJECT" ]; then
             VAPID_SUBJECT="mailto:admin@volunteerhub.local"
           fi
+          LETSENCRYPT_EMAIL="${{ vars.LETSENCRYPT_EMAIL }}"
+          if [ -z "$LETSENCRYPT_EMAIL" ]; then
+            LETSENCRYPT_EMAIL="${VAPID_SUBJECT#mailto:}"
+          fi
           sed -i "s|__PUBLIC_BASE_URL__|${PUBLIC_BASE_URL}|g" k8s/overlays/prod-lite/config-patch.yaml
           sed -i "s|__FIREBASE_PROJECT_ID__|${FIREBASE_PROJECT_ID}|g" k8s/overlays/prod-lite/config-patch.yaml
           sed -i "s|__FIREBASE_STORAGE_BUCKET__|${FIREBASE_STORAGE_BUCKET}|g" k8s/overlays/prod-lite/config-patch.yaml
           sed -i "s|__VAPID_SUBJECT__|${VAPID_SUBJECT}|g" k8s/overlays/prod-lite/config-patch.yaml
+          sed -i "s|__APP_HOST__|${APP_HOST}|g" k8s/overlays/prod-lite/ingress.yaml
+          sed -i "s|__LETSENCRYPT_EMAIL__|${LETSENCRYPT_EMAIL}|g" k8s/overlays/prod-lite/cluster-issuer.yaml
           sed -i "s|newTag: latest|newTag: ${DEPLOY_SHA}|g" k8s/overlays/prod-lite/kustomization.yaml
+
+      - name: Install cert-manager
+        shell: bash
+        run: |
+          kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.20.2/cert-manager.yaml
+          kubectl rollout status deployment/cert-manager -n cert-manager --timeout=300s
+          kubectl rollout status deployment/cert-manager-cainjector -n cert-manager --timeout=300s
+          kubectl rollout status deployment/cert-manager-webhook -n cert-manager --timeout=300s
 
       - name: Install observability
         shell: bash
@@ -219,6 +236,23 @@ jobs:
 
       - name: Apply manifests
         run: kubectl apply -k k8s/overlays/prod-lite
+
+      - name: Wait for TLS certificate
+        shell: bash
+        run: |
+          set +e
+          for _ in {1..30}; do
+            kubectl get certificate volunteerhub-tls -n volunteerhub >/dev/null 2>&1 && break
+            sleep 10
+          done
+          kubectl wait certificate/volunteerhub-tls -n volunteerhub --for=condition=Ready --timeout=10m
+          status=$?
+          if [ "$status" -ne 0 ]; then
+            kubectl describe certificate volunteerhub-tls -n volunteerhub || true
+            kubectl describe challenge -n volunteerhub || true
+            kubectl get events -n volunteerhub --sort-by=.lastTimestamp | tail -n 80 || true
+          fi
+          exit "$status"
 
       - name: Apply runtime secrets
         shell: bash
