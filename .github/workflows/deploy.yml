@@ -1,0 +1,197 @@
+name: Deploy VolunteerHub
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  REGISTRY: ghcr.io
+  OWNER: viet2005-68
+
+jobs:
+  build:
+    name: Build and push images
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - image: volunteerhub-service-discovery
+            service_dir: ServiceDiscovery
+            kind: spring
+          - image: volunteerhub-api-gateway
+            service_dir: ApiGateway
+            kind: spring
+          - image: volunteerhub-authorization-server
+            service_dir: AuthorizationServer
+            kind: spring
+          - image: volunteerhub-user-service
+            service_dir: UserService
+            kind: spring
+          - image: volunteerhub-event-service
+            service_dir: EventService
+            kind: spring
+          - image: volunteerhub-community-service
+            service_dir: CommunityService
+            kind: spring
+          - image: volunteerhub-registration-service
+            service_dir: RegistrationService
+            kind: spring
+          - image: volunteerhub-notification-service
+            service_dir: NotificationService
+            kind: spring
+          - image: volunteerhub-chat-service
+            service_dir: ChatService
+            kind: spring
+          - image: volunteerhub-aggregation-service
+            service_dir: AggregationService
+            kind: spring
+          - image: volunteerhub-analytic-service
+            service_dir: AnalyticService
+            kind: spring
+          - image: volunteerhub-frontend
+            service_dir: Frontend
+            kind: frontend
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ env.OWNER }}
+          password: ${{ secrets.GHCR_TOKEN }}
+
+      - name: Resolve public URL
+        id: public-url
+        shell: bash
+        run: |
+          if [ -n "${{ vars.PUBLIC_BASE_URL }}" ]; then
+            echo "value=${{ vars.PUBLIC_BASE_URL }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "value=http://${{ secrets.VM_HOST }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build and push Spring image
+        if: matrix.kind == 'spring'
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/spring-service.Dockerfile
+          platforms: linux/amd64
+          push: true
+          build-args: |
+            SERVICE_DIR=${{ matrix.service_dir }}
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.OWNER }}/${{ matrix.image }}:${{ github.sha }}
+            ${{ env.REGISTRY }}/${{ env.OWNER }}/${{ matrix.image }}:latest
+
+      - name: Build and push frontend image
+        if: matrix.kind == 'frontend'
+        uses: docker/build-push-action@v6
+        with:
+          context: Frontend
+          file: Frontend/Dockerfile
+          platforms: linux/amd64
+          push: true
+          build-args: |
+            VITE_API_URL=/api
+            VITE_API_LOGIN=${{ steps.public-url.outputs.value }}
+            VITE_AUTH_BASE_URL=
+            VITE_PUBLIC_BASE_URL=${{ steps.public-url.outputs.value }}
+            VITE_OAUTH_RESPONSE_TYPE=code
+            VITE_OAUTH_CLIENT_ID=7fcdbb6c-fc1d-4921-a52d-0466557b6132
+            VITE_OAUTH_CLIENT_SECRET=f584278e-be8a-4f55-9c64-8e7be8f9e846
+            VITE_OAUTH_SCOPE=openid
+            VITE_OAUTH_REDIRECT_URI=${{ steps.public-url.outputs.value }}/login/oauth2/code/volunteerhub
+            VITE_GOOGLE_REDIRECT_URI=${{ steps.public-url.outputs.value }}/login/oauth2/code/google
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.OWNER }}/${{ matrix.image }}:${{ github.sha }}
+            ${{ env.REGISTRY }}/${{ env.OWNER }}/${{ matrix.image }}:latest
+
+  deploy:
+    name: Deploy to k3s
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v4
+
+      - name: Install Helm
+        uses: azure/setup-helm@v4
+
+      - name: Prepare kubeconfig and SSH tunnel
+        shell: bash
+        run: |
+          mkdir -p ~/.kube ~/.ssh
+          printf '%s' "${{ secrets.KUBE_CONFIG }}" > ~/.kube/config
+          printf '%s' "${{ secrets.VM_SSH_KEY }}" > ~/.ssh/vm_key
+          chmod 600 ~/.ssh/vm_key
+          ssh-keyscan -H "${{ secrets.VM_HOST }}" >> ~/.ssh/known_hosts
+          ssh -i ~/.ssh/vm_key -fN \
+            -o ExitOnForwardFailure=yes \
+            -o ServerAliveInterval=30 \
+            -L 6443:127.0.0.1:6443 \
+            "${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}"
+          kubectl get nodes
+
+      - name: Patch deployment config
+        shell: bash
+        run: |
+          PUBLIC_BASE_URL="${{ vars.PUBLIC_BASE_URL }}"
+          if [ -z "$PUBLIC_BASE_URL" ]; then
+            PUBLIC_BASE_URL="http://${{ secrets.VM_HOST }}"
+          fi
+          sed -i "s|__PUBLIC_BASE_URL__|${PUBLIC_BASE_URL}|g" k8s/overlays/prod-lite/config-patch.yaml
+          sed -i "s|newTag: latest|newTag: ${{ github.sha }}|g" k8s/overlays/prod-lite/kustomization.yaml
+
+      - name: Install observability
+        shell: bash
+        run: |
+          kubectl apply -k k8s/observability
+          helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+          helm repo update
+          helm upgrade --install volunteerhub-prometheus prometheus-community/kube-prometheus-stack \
+            --namespace observability \
+            --create-namespace \
+            -f k8s/observability/values-prometheus.yaml \
+            --wait \
+            --timeout 10m
+
+      - name: Apply manifests
+        run: kubectl apply -k k8s/overlays/prod-lite
+
+      - name: Wait for rollout
+        shell: bash
+        run: |
+          deployments=(
+            service-discovery
+            authorization-server
+            api-gateway
+            user-service
+            event-service
+            community-service
+            registration-service
+            notification-service
+            chat-service
+            aggregation-service
+            analytic-service
+            frontend
+          )
+
+          for deployment in "${deployments[@]}"; do
+            kubectl rollout status "deployment/${deployment}" -n volunteerhub --timeout=600s
+          done
