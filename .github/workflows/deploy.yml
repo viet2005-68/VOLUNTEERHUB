@@ -186,6 +186,7 @@ jobs:
       - name: Wait for rollout
         shell: bash
         run: |
+          set +e
           deployments=(
             service-discovery
             authorization-server
@@ -201,6 +202,23 @@ jobs:
             frontend
           )
 
+          failed=0
           for deployment in "${deployments[@]}"; do
             kubectl rollout status "deployment/${deployment}" -n volunteerhub --timeout=600s
+            status=$?
+            if [ "$status" -ne 0 ]; then
+              failed=1
+              echo "::group::Diagnostics for ${deployment}"
+              kubectl get pods -n volunteerhub -o wide
+              kubectl describe "deployment/${deployment}" -n volunteerhub || true
+              kubectl get events -n volunteerhub --sort-by=.lastTimestamp | tail -n 80 || true
+              selector="$(kubectl get "deployment/${deployment}" -n volunteerhub -o jsonpath='{.spec.selector.matchLabels.app\.kubernetes\.io/name}' 2>/dev/null)"
+              if [ -n "$selector" ]; then
+                kubectl logs -n volunteerhub -l "app.kubernetes.io/name=${selector}" --all-containers --tail=200 || true
+              fi
+              echo "::endgroup::"
+              break
+            fi
           done
+
+          exit "$failed"
