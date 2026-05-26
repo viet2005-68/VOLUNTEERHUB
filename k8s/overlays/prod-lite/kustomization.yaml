@@ -1,0 +1,156 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: volunteerhub
+resources:
+  - ../../base
+  - ingress.yaml
+patches:
+  - path: config-patch.yaml
+  - target:
+      kind: Deployment
+    patch: |-
+      - op: add
+        path: /spec/template/spec/imagePullSecrets
+        value:
+          - name: ghcr-secret
+      - op: replace
+        path: /spec/template/spec/containers/0/imagePullPolicy
+        value: IfNotPresent
+      - op: add
+        path: /spec/template/spec/containers/0/resources
+        value:
+          requests:
+            cpu: 50m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 768Mi
+  - target:
+      kind: Deployment
+      name: frontend
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/resources
+        value:
+          requests:
+            cpu: 25m
+            memory: 64Mi
+          limits:
+            cpu: 200m
+            memory: 256Mi
+  - target:
+      kind: Deployment
+      name: service-discovery
+    patch: &spring-runtime |-
+      - op: add
+        path: /spec/progressDeadlineSeconds
+        value: 1800
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value:
+          name: JAVA_OPTS
+          value: "-Xms128m -Xmx512m"
+      - op: add
+        path: /spec/template/spec/containers/0/startupProbe
+        value:
+          tcpSocket:
+            port: http
+          initialDelaySeconds: 20
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 120
+      - op: replace
+        path: /spec/template/spec/containers/0/readinessProbe
+        value:
+          tcpSocket:
+            port: http
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 12
+      - op: replace
+        path: /spec/template/spec/containers/0/livenessProbe
+        value:
+          tcpSocket:
+            port: http
+          initialDelaySeconds: 60
+          periodSeconds: 20
+          timeoutSeconds: 5
+          failureThreshold: 6
+  - target:
+      kind: Deployment
+      name: api-gateway
+    patch: *spring-runtime
+  - target:
+      kind: Deployment
+      name: authorization-server
+    patch: *spring-runtime
+  - target:
+      kind: Deployment
+      name: user-service
+    patch: *spring-runtime
+  - target:
+      kind: Deployment
+      name: event-service
+    patch: *spring-runtime
+  - target:
+      kind: Deployment
+      name: community-service
+    patch: *spring-runtime
+  - target:
+      kind: Deployment
+      name: registration-service
+    patch: *spring-runtime
+  - target:
+      kind: Deployment
+      name: notification-service
+    patch: *spring-runtime
+  - target:
+      kind: Deployment
+      name: chat-service
+    patch: *spring-runtime
+  - target:
+      kind: Deployment
+      name: aggregation-service
+    patch: *spring-runtime
+  - target:
+      kind: Deployment
+      name: analytic-service
+    patch: *spring-runtime
+images:
+  - name: localhost:5000/volunteerhub/service-discovery
+    newName: ghcr.io/viet2005-68/volunteerhub-service-discovery
+    newTag: latest
+  - name: localhost:5000/volunteerhub/api-gateway
+    newName: ghcr.io/viet2005-68/volunteerhub-api-gateway
+    newTag: latest
+  - name: localhost:5000/volunteerhub/authorization-server
+    newName: ghcr.io/viet2005-68/volunteerhub-authorization-server
+    newTag: latest
+  - name: localhost:5000/volunteerhub/user-service
+    newName: ghcr.io/viet2005-68/volunteerhub-user-service
+    newTag: latest
+  - name: localhost:5000/volunteerhub/event-service
+    newName: ghcr.io/viet2005-68/volunteerhub-event-service
+    newTag: latest
+  - name: localhost:5000/volunteerhub/community-service
+    newName: ghcr.io/viet2005-68/volunteerhub-community-service
+    newTag: latest
+  - name: localhost:5000/volunteerhub/registration-service
+    newName: ghcr.io/viet2005-68/volunteerhub-registration-service
+    newTag: latest
+  - name: localhost:5000/volunteerhub/notification-service
+    newName: ghcr.io/viet2005-68/volunteerhub-notification-service
+    newTag: latest
+  - name: localhost:5000/volunteerhub/chat-service
+    newName: ghcr.io/viet2005-68/volunteerhub-chat-service
+    newTag: latest
+  - name: localhost:5000/volunteerhub/aggregation-service
+    newName: ghcr.io/viet2005-68/volunteerhub-aggregation-service
+    newTag: latest
+  - name: localhost:5000/volunteerhub/analytic-service
+    newName: ghcr.io/viet2005-68/volunteerhub-analytic-service
+    newTag: latest
+  - name: localhost:5000/volunteerhub/frontend
+    newName: ghcr.io/viet2005-68/volunteerhub-frontend
+    newTag: latest
