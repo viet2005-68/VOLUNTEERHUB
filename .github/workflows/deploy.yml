@@ -3,7 +3,7 @@ name: Deploy VolunteerHub
 on:
   push:
     branches:
-      - main
+      - cicd
   workflow_dispatch:
 
 permissions:
