@@ -13,6 +13,7 @@ permissions:
 env:
   REGISTRY: ghcr.io
   OWNER: viet2005-68
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   build:
