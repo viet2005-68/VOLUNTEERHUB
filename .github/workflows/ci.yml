@@ -38,7 +38,7 @@ jobs:
           java -version
 
       - name: Install common module
-        run: cd Common && ./mvnw -q -DskipTests install
+        run: cd Common && bash ./mvnw -q -DskipTests install
 
       - name: Compile services
         shell: bash
@@ -60,7 +60,7 @@ jobs:
 
           for service in "${services[@]}"; do
             echo "::group::Compile ${service}"
-            (cd "${service}" && ./mvnw -q -DskipTests compile)
+            (cd "${service}" && bash ./mvnw -q -DskipTests compile)
             echo "::endgroup::"
           done
 
