@@ -459,12 +459,12 @@
           <div class="footer-text">
             <p>
               Don't have an account?
-              <a href="http://localhost:30080/signup">Register</a>
+              <a th:href="${signupUrl}">Register</a>
             </p>
           </div>
 
           <div class="back-wrap">
-            <a href="http://localhost:30080/" class="back-home">
+            <a th:href="${clientAppUri}" class="back-home">
               <i class="fas fa-home"></i>
               <span>Back to home</span>
             </a>

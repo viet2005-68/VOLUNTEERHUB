@@ -1,5 +1,7 @@
 import axios from "axios";
 
+const authBaseUrl = (import.meta.env.VITE_API_LOGIN || window.location.origin).replace(/\/+$/, "");
+
 const registerAuthUser = async (data) => {
     try {
         // Convert role to uppercase for backend enum
@@ -13,7 +15,7 @@ const registerAuthUser = async (data) => {
             roles: role,
         }
         console.log(payload)
-        const res = await axios.post("http://localhost:7070/api/v1/users/register", payload);
+        const res = await axios.post(`${authBaseUrl}/api/v1/users/register`, payload);
         return res.data;
     } catch (error) {
         console.error("Error signing up:", error);
@@ -36,7 +38,7 @@ const logout = async () => {
         // Gọi logout endpoint với cookie và token để invalidate session
 
         const res = await axios.post(
-            "http://localhost:7070/logout",
+            `${authBaseUrl}/logout`,
             {},
             {
                 withCredentials: true, // Gửi cookie/session với request
