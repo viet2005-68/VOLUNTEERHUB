@@ -1,0 +1,86 @@
+import { Client } from "@stomp/stompjs";
+import axiosClient from "./axiosClient";
+
+const CHAT_BASE_URL = "/v1/chats";
+
+const resolveWsUrl = () => {
+  const explicit = import.meta.env.VITE_CHAT_WS_URL;
+  if (explicit) return explicit;
+
+  const apiBase = (import.meta.env.VITE_API_URL || "/api").replace(/\/+$/, "");
+  if (apiBase.startsWith("http")) {
+    const url = new URL(apiBase);
+    url.protocol = url.protocol === "https:" ? "wss:" : "ws:";
+    url.pathname = url.pathname.replace(/\/api$/i, "");
+    url.pathname = `${url.pathname.replace(/\/+$/, "")}/ws/chat`;
+    return url.toString();
+  }
+
+  const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+  return `${protocol}//${window.location.host}/ws/chat`;
+};
+
+export const listConversations = async () => {
+  return axiosClient.get(`${CHAT_BASE_URL}/conversations`);
+};
+
+export const openConversation = async ({ eventId, volunteerId }) => {
+  return axiosClient.post(`${CHAT_BASE_URL}/conversations`, {
+    eventId: Number(eventId),
+    volunteerId: volunteerId || undefined,
+  });
+};
+
+export const listMessages = async ({ conversationId, before, limit = 50 }) => {
+  return axiosClient.get(`${CHAT_BASE_URL}/conversations/${conversationId}/messages`, {
+    params: { before, limit },
+  });
+};
+
+export const sendMessage = async ({ conversationId, body, attachments = [] }) => {
+  return axiosClient.post(`${CHAT_BASE_URL}/conversations/${conversationId}/messages`, {
+    body,
+    attachments,
+    clientMessageId:
+      typeof crypto !== "undefined" && crypto.randomUUID
+        ? crypto.randomUUID()
+        : `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+  });
+};
+
+export const markConversationRead = async ({ conversationId, lastReadMessageId }) => {
+  return axiosClient.put(`${CHAT_BASE_URL}/conversations/${conversationId}/read`, {
+    lastReadMessageId,
+  });
+};
+
+export const createChatClient = ({ onConversationMessage, onUserMessage }) => {
+  const token = localStorage.getItem("token");
+  const baseUrl = resolveWsUrl();
+  const brokerURL = token
+    ? `${baseUrl}${baseUrl.includes("?") ? "&" : "?"}access_token=${encodeURIComponent(token)}`
+    : baseUrl;
+
+  const client = new Client({
+    brokerURL,
+    reconnectDelay: 5000,
+    heartbeatIncoming: 10000,
+    heartbeatOutgoing: 10000,
+    onConnect: () => {
+      if (onUserMessage) {
+        client.subscribe("/user/queue/chats", (frame) => {
+          onUserMessage(JSON.parse(frame.body));
+        });
+      }
+    },
+  });
+
+  client.subscribeToConversation = (conversationId) => {
+    if (!client.connected || !conversationId || !onConversationMessage) return null;
+    return client.subscribe(`/topic/chats/${conversationId}`, (frame) => {
+      onConversationMessage(JSON.parse(frame.body));
+    });
+  };
+
+  return client;
+};
