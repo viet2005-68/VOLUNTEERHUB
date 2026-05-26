@@ -66,7 +66,7 @@ jobs:
 
       - name: Log in to GHCR
         shell: bash
-        run: echo "${{ secrets.GHCR_TOKEN }}" | docker login "${{ env.REGISTRY }}" -u "${{ env.OWNER }}" --password-stdin
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login "${{ env.REGISTRY }}" -u "${{ github.actor }}" --password-stdin
 
       - name: Resolve public URL
         id: public-url
