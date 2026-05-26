@@ -61,6 +61,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GHCR_TOKEN }}
 
       - name: Log in to GHCR
         shell: bash
@@ -122,6 +124,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GHCR_TOKEN }}
 
       - name: Install kubectl
         uses: azure/setup-kubectl@v4
