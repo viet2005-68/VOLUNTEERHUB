@@ -107,10 +107,12 @@ jobs:
             --build-arg VITE_AUTH_BASE_URL= \
             --build-arg "VITE_PUBLIC_BASE_URL=${{ steps.public-url.outputs.value }}" \
             --build-arg VITE_OAUTH_RESPONSE_TYPE=code \
-            --build-arg VITE_OAUTH_CLIENT_ID=7fcdbb6c-fc1d-4921-a52d-0466557b6132 \
-            --build-arg VITE_OAUTH_CLIENT_SECRET=f584278e-be8a-4f55-9c64-8e7be8f9e846 \
+            --build-arg "VITE_OAUTH_CLIENT_ID=${{ secrets.CLIENT_ID }}" \
+            --build-arg "VITE_OAUTH_CLIENT_SECRET=${{ secrets.CLIENT_SECRET }}" \
             --build-arg VITE_OAUTH_SCOPE=openid \
             --build-arg "VITE_OAUTH_REDIRECT_URI=${{ steps.public-url.outputs.value }}/login/oauth2/code/volunteerhub" \
+            --build-arg "VITE_GG_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" \
+            --build-arg "VITE_GG_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" \
             --build-arg "VITE_GOOGLE_REDIRECT_URI=${{ steps.public-url.outputs.value }}/login/oauth2/code/google" \
             -t "${IMAGE}:${{ github.sha }}" \
             -t "${IMAGE}:latest" \
@@ -164,8 +166,53 @@ jobs:
           if [ -z "$PUBLIC_BASE_URL" ]; then
             PUBLIC_BASE_URL="http://${{ secrets.VM_HOST }}"
           fi
+          FIREBASE_PROJECT_ID="${{ vars.FIREBASE_PROJECT_ID }}"
+          FIREBASE_STORAGE_BUCKET="${{ vars.FIREBASE_STORAGE_BUCKET }}"
+          VAPID_SUBJECT="${{ vars.VAPID_SUBJECT }}"
+          if [ -z "$VAPID_SUBJECT" ]; then
+            VAPID_SUBJECT="mailto:admin@volunteerhub.local"
+          fi
           sed -i "s|__PUBLIC_BASE_URL__|${PUBLIC_BASE_URL}|g" k8s/overlays/prod-lite/config-patch.yaml
+          sed -i "s|__FIREBASE_PROJECT_ID__|${FIREBASE_PROJECT_ID}|g" k8s/overlays/prod-lite/config-patch.yaml
+          sed -i "s|__FIREBASE_STORAGE_BUCKET__|${FIREBASE_STORAGE_BUCKET}|g" k8s/overlays/prod-lite/config-patch.yaml
+          sed -i "s|__VAPID_SUBJECT__|${VAPID_SUBJECT}|g" k8s/overlays/prod-lite/config-patch.yaml
           sed -i "s|newTag: latest|newTag: ${{ github.sha }}|g" k8s/overlays/prod-lite/kustomization.yaml
+
+      - name: Apply runtime secrets
+        shell: bash
+        env:
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
+          RABBITMQ_DEFAULT_PASS: ${{ secrets.RABBITMQ_DEFAULT_PASS }}
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          VAPID_PUBLIC_KEY: ${{ secrets.VAPID_PUBLIC_KEY }}
+          VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
+          FIREBASE_SERVICE_ACCOUNT_BASE64: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_BASE64 }}
+          FCM_ENABLED: ${{ secrets.FCM_ENABLED }}
+        run: |
+          kubectl create namespace volunteerhub --dry-run=client -o yaml | kubectl apply -f -
+
+          kubectl create secret generic volunteerhub-secrets \
+            -n volunteerhub \
+            --from-literal=POSTGRES_PASSWORD="${POSTGRES_PASSWORD}" \
+            --from-literal=REDIS_PASSWORD="${REDIS_PASSWORD}" \
+            --from-literal=RABBITMQ_DEFAULT_PASS="${RABBITMQ_DEFAULT_PASS}" \
+            --from-literal=CLIENT_ID="${CLIENT_ID}" \
+            --from-literal=CLIENT_SECRET="${CLIENT_SECRET}" \
+            --from-literal=GOOGLE_CLIENT_ID="${GOOGLE_CLIENT_ID}" \
+            --from-literal=GOOGLE_CLIENT_SECRET="${GOOGLE_CLIENT_SECRET}" \
+            --from-literal=VAPID_PUBLIC_KEY="${VAPID_PUBLIC_KEY}" \
+            --from-literal=VAPID_PRIVATE_KEY="${VAPID_PRIVATE_KEY}" \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+          kubectl create secret generic volunteerhub-firebase \
+            -n volunteerhub \
+            --from-literal=FIREBASE_SERVICE_ACCOUNT_BASE64="${FIREBASE_SERVICE_ACCOUNT_BASE64}" \
+            --from-literal=FCM_ENABLED="${FCM_ENABLED:-false}" \
+            --dry-run=client -o yaml | kubectl apply -f -
 
       - name: Install observability
         shell: bash

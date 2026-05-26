@@ -40,6 +40,20 @@ patches:
             memory: 256Mi
   - target:
       kind: Deployment
+      name: event-service
+    patch: &firebase-secret |-
+      - op: add
+        path: /spec/template/spec/containers/0/envFrom/-
+        value:
+          secretRef:
+            name: volunteerhub-firebase
+            optional: true
+  - target:
+      kind: Deployment
+      name: community-service
+    patch: *firebase-secret
+  - target:
+      kind: Deployment
       name: service-discovery
     patch: &spring-runtime |-
       - op: add
