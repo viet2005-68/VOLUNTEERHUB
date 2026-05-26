@@ -1,0 +1,82 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+      - cicd
+  push:
+    branches:
+      - main
+      - cicd
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  backend:
+    name: Backend compile
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GHCR_TOKEN }}
+
+      - name: Install JDK 21
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y openjdk-21-jdk
+          echo "JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64" >> "$GITHUB_ENV"
+          echo "/usr/lib/jvm/java-21-openjdk-amd64/bin" >> "$GITHUB_PATH"
+          java -version
+
+      - name: Install common module
+        run: cd Common && ./mvnw -q -DskipTests install
+
+      - name: Compile services
+        shell: bash
+        run: |
+          set -euo pipefail
+          services=(
+            ServiceDiscovery
+            ApiGateway
+            AuthorizationServer
+            UserService
+            EventService
+            CommunityService
+            RegistrationService
+            NotificationService
+            ChatService
+            AggregationService
+            AnalyticService
+          )
+
+          for service in "${services[@]}"; do
+            echo "::group::Compile ${service}"
+            (cd "${service}" && ./mvnw -q -DskipTests compile)
+            echo "::endgroup::"
+          done
+
+  frontend:
+    name: Frontend build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GHCR_TOKEN }}
+
+      - name: Build frontend
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd Frontend
+          npm ci
+          npm run build
