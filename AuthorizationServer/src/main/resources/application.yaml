@@ -30,6 +30,10 @@ spring:
     driver-class-name: org.postgresql.Driver
 
 app:
+  client-uri: ${CLIENT_APP_URI:http://localhost:30080}
+  google:
+    client-id: ${GOOGLE_CLIENT_ID:485996629423-td2c31e9vppq688o0ucdjtfgb89i6lt1.apps.googleusercontent.com}
+    redirect-path: ${GOOGLE_REDIRECT_PATH:/login/oauth2/code/google}
   cors:
     allowed-origins: ${APP_CORS_ALLOWED_ORIGINS}
 

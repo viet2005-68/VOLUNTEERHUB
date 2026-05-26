@@ -5,6 +5,7 @@ import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import com.volunteerhub.chatservice.dto.ChatMediaUploadResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -24,9 +25,9 @@ public class ChatMediaStorageService {
 
     private static final Set<String> SUPPORTED_IMAGE_TYPES = Set.of("image/jpeg", "image/png", "image/webp", "image/gif");
 
-    private final Storage storage;
+    private final ObjectProvider<Storage> storageProvider;
 
-    @Value("${firebase.storage.bucket}")
+    @Value("${firebase.storage.bucket:}")
     private String bucketName;
 
     @Value("${chat.media.folder:chat}")
@@ -45,6 +46,11 @@ public class ChatMediaStorageService {
         String contentType = file.getContentType() == null ? "" : file.getContentType().toLowerCase(Locale.ROOT);
         if (!SUPPORTED_IMAGE_TYPES.contains(contentType)) {
             throw new IllegalArgumentException("Only JPEG, PNG, WEBP and GIF images are supported.");
+        }
+
+        Storage storage = storageProvider.getIfAvailable();
+        if (storage == null || !StringUtils.hasText(bucketName)) {
+            throw new IllegalStateException("Firebase Storage is not configured.");
         }
 
         String originalName = StringUtils.cleanPath(file.getOriginalFilename() == null ? "image" : file.getOriginalFilename());

@@ -176,6 +176,15 @@ public class UserService {
         if (userRequest.getBio() != null) {
             existedUser.setBio(userRequest.getBio());
         }
+        if (userRequest.getFullName() != null) {
+            existedUser.setFullName(userRequest.getFullName());
+        }
+        if (userRequest.getUsername() != null) {
+            existedUser.setUsername(userRequest.getUsername());
+        }
+        if (userRequest.getEmail() != null) {
+            existedUser.setEmail(userRequest.getEmail());
+        }
         if (userRequest.getAvatarUrl() != null) {
             existedUser.setAvatarUrl(userRequest.getAvatarUrl());
         }

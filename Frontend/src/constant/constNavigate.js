@@ -4,7 +4,7 @@ const OAUTH_CLIENT_ID = import.meta.env.VITE_OAUTH_CLIENT_ID || "volunteerhub-cl
 const OAUTH_SCOPE = import.meta.env.VITE_OAUTH_SCOPE || "openid profile email";
 const OAUTH_REDIRECT_URI =
     import.meta.env.VITE_OAUTH_REDIRECT_URI ||
-    "http://localhost:3000/login/oauth2/code/volunteerhub";
+    `${window.location.origin}/login/oauth2/code/volunteerhub`;
 
 const LOGIN_LINK =
     `${OAUTH_BASE_URL}/oauth2/authorize` +

@@ -281,6 +281,23 @@ Config:
 
 - `volunteerhub-config`: ConfigMap, chua config khong nhay cam.
 - `volunteerhub-secrets`: Secret, chua password/client secret/key.
+- `volunteerhub-firebase`: Secret tuy chon, chua Firebase service account de upload avatar/chat image va FCM.
+
+Neu can upload avatar/chat image tren k8s, tao secret Firebase tu file JSON local da bi gitignore:
+
+```bash
+kubectl create secret generic volunteerhub-firebase \
+  -n volunteerhub \
+  --from-literal=FIREBASE_SERVICE_ACCOUNT_BASE64="$(base64 -w0 UserService/src/main/resources/storageServiceAccountKey.json)" \
+  --from-literal=FCM_ENABLED=true \
+  --dry-run=client -o yaml | kubectl apply -f -
+```
+
+Sau do restart cac service dung Firebase:
+
+```bash
+kubectl rollout restart deployment/user-service deployment/chat-service deployment/notification-service -n volunteerhub
+```
 
 ## 7. Luong request chinh
 

@@ -37,7 +37,7 @@ vapid:
   subject: ${VAPID_SUBJECT:mailto:admin@yourcompany.com}
 
 firebase:
-  enabled: ${FCM_ENABLED:true}
+  enabled: ${FCM_ENABLED:false}
   credentials:
-    location: ${FIREBASE_CREDENTIALS_LOCATION:classpath:firebase-admin.json}
+    location: ${FIREBASE_CREDENTIALS_LOCATION:}
     base64: ${FIREBASE_SERVICE_ACCOUNT_BASE64:}

@@ -46,9 +46,12 @@ rabbitmq:
     chat: ${CHAT_NOTIFICATION_ROUTING_KEY:notification.chat}
 
 firebase:
-  projectId: ${FIREBASE_PROJECT_ID}
+  projectId: ${FIREBASE_PROJECT_ID:}
+  credentials:
+    location: ${FIREBASE_CREDENTIALS_LOCATION:}
+    base64: ${FIREBASE_SERVICE_ACCOUNT_BASE64:}
   storage:
-    bucket: ${FIREBASE_STORAGE_BUCKET}
+    bucket: ${FIREBASE_STORAGE_BUCKET:}
 
 chat:
   media:

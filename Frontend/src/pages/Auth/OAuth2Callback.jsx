@@ -32,7 +32,7 @@ function exchangeCodeForToken(code, isGoogleOAuth) {
       const googleClientSecret = import.meta.env.VITE_GG_CLIENT_SECRET || "";
       const googleRedirectUri =
         import.meta.env.VITE_GOOGLE_REDIRECT_URI ||
-        "http://localhost:30080/login/oauth2/code/google";
+        `${window.location.origin}/login/oauth2/code/google`;
       const googleTokenBody = new URLSearchParams({
         grant_type: "authorization_code",
         code: code,
@@ -63,7 +63,7 @@ function exchangeCodeForToken(code, isGoogleOAuth) {
       "f584278e-be8a-4f55-9c64-8e7be8f9e846";
     const oauthRedirectUri =
       import.meta.env.VITE_OAUTH_REDIRECT_URI ||
-      "http://localhost:3000/login/oauth2/code/volunteerhub";
+      `${window.location.origin}/login/oauth2/code/volunteerhub`;
     const authServerBaseUrl =
       import.meta.env.VITE_API_LOGIN || "http://localhost:7070";
 

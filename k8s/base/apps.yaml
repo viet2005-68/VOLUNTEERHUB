@@ -255,6 +255,9 @@ spec:
                 name: volunteerhub-config
             - secretRef:
                 name: volunteerhub-secrets
+            - secretRef:
+                name: volunteerhub-firebase
+                optional: true
           env:
             - name: PORT
               value: "8081"
@@ -559,6 +562,9 @@ spec:
                 name: volunteerhub-config
             - secretRef:
                 name: volunteerhub-secrets
+            - secretRef:
+                name: volunteerhub-firebase
+                optional: true
           env:
             - name: PORT
               value: "8085"
@@ -633,6 +639,9 @@ spec:
                 name: volunteerhub-config
             - secretRef:
                 name: volunteerhub-secrets
+            - secretRef:
+                name: volunteerhub-firebase
+                optional: true
           env:
             - name: PORT
               value: "8086"

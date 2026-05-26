@@ -47,9 +47,10 @@ public class User {
     @Column(nullable = false)
     private UserRole role;
 
+    @Column(columnDefinition = "text")
     private String bio;
 
-    @Column(name = "avatar_url")
+    @Column(name = "avatar_url", columnDefinition = "text")
     private String avatarUrl;
 
     @Builder.Default
