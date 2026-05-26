@@ -224,15 +224,26 @@ jobs:
       - name: Install observability
         shell: bash
         run: |
+          set -euo pipefail
           kubectl apply -k k8s/observability
           helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
           helm repo update
-          helm upgrade --install volunteerhub-prometheus prometheus-community/kube-prometheus-stack \
-            --namespace observability \
-            --create-namespace \
-            -f k8s/observability/values-prometheus.yaml \
-            --wait \
-            --timeout 10m
+
+          install_prometheus() {
+            helm upgrade --install volunteerhub-prometheus prometheus-community/kube-prometheus-stack \
+              --namespace observability \
+              --create-namespace \
+              -f k8s/observability/values-prometheus.yaml \
+              --wait \
+              --timeout 10m
+          }
+
+          if ! install_prometheus; then
+            echo "Prometheus Helm release may be locked by an interrupted operation. Cleaning pending release metadata and retrying once."
+            kubectl get secret -n observability -l owner=helm,name=volunteerhub-prometheus -o name \
+              | xargs -r kubectl delete -n observability
+            install_prometheus
+          fi
 
       - name: Apply manifests
         run: kubectl apply -k k8s/overlays/prod-lite
