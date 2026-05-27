@@ -12,19 +12,19 @@ function ProjectCard({
   startTime,
   endTime,
   capacity,
-  registrationCount,
+  participantCount,
   status,
   ...restProps // Get all other props
 }) {
   const navigate = useNavigate();
-
+  
   // Map API data to component variables
   const title = name;
   const date = startTime;
   const location = address
     ? `${address.street}, ${address.district}, ${address.province}`
     : "N/A";
-  const registered = registrationCount || 0;
+  const registered = participantCountt || 0;
   const availableSlots = capacity - registered;
   const categoryName = category?.name || "N/A";
 
