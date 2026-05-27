@@ -379,9 +379,9 @@ export default function ChatPage() {
   const activeOtherName = conversationLabel(activeConversation, user?.id);
 
   return (
-    <div className="grid h-[min(720px,calc(100vh-190px))] min-h-[620px] overflow-hidden rounded-[20px] bg-white text-deep-forest lg:grid-cols-[330px_minmax(0,1fr)]">
-      <aside className="flex min-h-0 flex-col bg-pale-canvas lg:border-r lg:border-deep-forest/10">
-        <div className="flex items-center gap-3 px-4 pb-5 pt-4">
+    <div className="grid h-[calc(100dvh-136px)] min-h-0 grid-rows-[auto_minmax(0,1fr)] overflow-hidden bg-white text-deep-forest md:h-[min(720px,calc(100vh-190px))] md:min-h-[620px] md:rounded-[20px] lg:grid-cols-[330px_minmax(0,1fr)] lg:grid-rows-none">
+      <aside className="flex max-h-[180px] min-h-0 flex-col bg-pale-canvas lg:max-h-none lg:border-r lg:border-deep-forest/10">
+        <div className="flex items-center gap-3 px-4 py-3 md:pb-5 md:pt-4">
           <div className="flex h-[40px] w-[40px] shrink-0 items-center justify-center rounded-[10px] bg-deep-forest text-pale-canvas">
             <MessageSquare className="h-[20px] w-[20px]" />
           </div>
@@ -402,7 +402,7 @@ export default function ChatPage() {
           </div>
         )}
 
-        <div className="min-h-0 flex-1 space-y-1 overflow-y-auto pl-3">
+        <div className="min-h-0 flex-1 space-y-1 overflow-y-auto overscroll-contain pl-3">
           {isLoading ? (
             <div className="flex items-center gap-2 text-sm text-deep-forest/65">
               <Loader2 className="h-[16px] w-[16px] animate-spin" />
@@ -464,7 +464,7 @@ export default function ChatPage() {
         </div>
       </aside>
 
-      <section className="flex min-h-0 flex-col">
+      <section className="flex min-h-0 min-w-0 flex-col overflow-x-hidden">
         {activeConversation ? (
           <>
             <header className="flex items-center justify-between gap-4 bg-white px-5 py-4">
@@ -490,7 +490,7 @@ export default function ChatPage() {
 
             <div
               ref={messagePaneRef}
-              className="min-h-0 flex-1 overflow-y-auto overscroll-contain bg-pale-canvas/35 px-4 py-5"
+              className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden overscroll-contain bg-pale-canvas/35 px-4 py-5"
             >
               {isLoadingMessages ? (
                 <div className="flex items-center justify-center gap-2 text-sm text-deep-forest/65">
@@ -583,85 +583,87 @@ export default function ChatPage() {
               )}
             </div>
 
-            <form onSubmit={handleSend} className="border-t border-deep-forest/10 bg-white p-4">
-              {isReadOnly && (
-                <p className="mb-3 rounded-[10px] bg-deep-forest/5 px-3 py-2 text-sm font-bold text-deep-forest">
-                  This conversation is read-only for the current registration state.
-                </p>
-              )}
-
-              {selectedImages.length > 0 && (
-                <div className="mb-3 flex flex-wrap gap-2">
-                  {selectedImages.map((image) => (
-                    <div
-                      key={image.id}
-                      className="relative h-[80px] w-[80px] overflow-hidden rounded-[10px]"
-                    >
-                      <img
-                        src={image.previewUrl}
-                        alt={image.file.name}
-                        className="h-full w-full object-cover"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => removeSelectedImage(image.id)}
-                        className="absolute right-1 top-1 inline-flex h-[24px] w-[24px] items-center justify-center rounded-full bg-deep-forest text-pale-canvas"
-                        aria-label="Remove image"
-                      >
-                        <X className="h-[14px] w-[14px]" />
-                      </button>
-                    </div>
-                  ))}
+            {isReadOnly ? (
+              <div className="border-t border-deep-forest/10 bg-white p-4">
+                <div className="rounded-[10px] bg-deep-forest/5 px-4 py-3 text-sm font-bold text-deep-forest">
+                  Cuộc trò chuyện hiện chỉ cho phép xem.
                 </div>
-              )}
-
-              <div className="flex gap-3">
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept={IMAGE_TYPES.join(",")}
-                  multiple
-                  className="hidden"
-                  onChange={handleSelectImages}
-                />
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={isReadOnly || isSending || selectedImages.length >= MAX_IMAGES}
-                  className="inline-flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-[10px] bg-deep-forest/5 text-deep-forest transition hover:bg-deep-forest hover:text-pale-canvas disabled:opacity-50"
-                  aria-label="Attach image"
-                  title="Attach image"
-                >
-                  <ImagePlus className="h-[20px] w-[20px]" />
-                </button>
-                <textarea
-                  value={draft}
-                  onChange={(event) => setDraft(event.target.value)}
-                  onKeyDown={(event) => {
-                    if (event.key === "Enter" && !event.shiftKey) {
-                      event.preventDefault();
-                      handleSend(event);
-                    }
-                  }}
-                  disabled={isReadOnly || isSending}
-                  placeholder="Write a message..."
-                  rows={2}
-                  className="min-h-[52px] flex-1 resize-none rounded-[10px] border border-deep-forest/15 px-3 py-2 text-sm leading-[1.25] outline-none focus:border-deep-forest disabled:bg-deep-forest/5"
-                />
-                <button
-                  type="submit"
-                  disabled={!canSend || isSending}
-                  className="inline-flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-[10px] bg-deep-forest text-pale-canvas transition hover:bg-foudre-pink disabled:opacity-50"
-                  aria-label="Send message"
-                >
-                  {isSending ? (
-                    <Loader2 className="h-[20px] w-[20px] animate-spin" />
-                  ) : (
-                    <Send className="h-[20px] w-[20px]" />
-                  )}
-                </button>
               </div>
-            </form>
+            ) : (
+              <form onSubmit={handleSend} className="border-t border-deep-forest/10 bg-white p-4">
+                {selectedImages.length > 0 && (
+                  <div className="mb-3 flex flex-wrap gap-2">
+                    {selectedImages.map((image) => (
+                      <div
+                        key={image.id}
+                        className="relative h-[80px] w-[80px] overflow-hidden rounded-[10px]"
+                      >
+                        <img
+                          src={image.previewUrl}
+                          alt={image.file.name}
+                          className="h-full w-full object-cover"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removeSelectedImage(image.id)}
+                          className="absolute right-1 top-1 inline-flex h-[24px] w-[24px] items-center justify-center rounded-full bg-deep-forest text-pale-canvas"
+                          aria-label="Remove image"
+                        >
+                          <X className="h-[14px] w-[14px]" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <div className="flex min-w-0 gap-3">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept={IMAGE_TYPES.join(",")}
+                    multiple
+                    className="hidden"
+                    onChange={handleSelectImages}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isSending || selectedImages.length >= MAX_IMAGES}
+                    className="inline-flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-[10px] bg-deep-forest/5 text-deep-forest transition hover:bg-deep-forest hover:text-pale-canvas disabled:opacity-50"
+                    aria-label="Attach image"
+                    title="Attach image"
+                  >
+                    <ImagePlus className="h-[20px] w-[20px]" />
+                  </button>
+                  <textarea
+                    value={draft}
+                    onChange={(event) => setDraft(event.target.value)}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" && !event.shiftKey) {
+                        event.preventDefault();
+                        handleSend(event);
+                      }
+                    }}
+                    disabled={isSending}
+                    placeholder="Write a message..."
+                    rows={2}
+                    className="min-h-[52px] min-w-0 flex-1 resize-none rounded-[10px] border border-deep-forest/15 px-3 py-2 text-sm leading-[1.25] outline-none focus:border-deep-forest disabled:bg-deep-forest/5"
+                  />
+                  <button
+                    type="submit"
+                    disabled={!canSend || isSending}
+                    className="inline-flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-[10px] bg-deep-forest text-pale-canvas transition hover:bg-foudre-pink disabled:opacity-50"
+                    aria-label="Send message"
+                  >
+                    {isSending ? (
+                      <Loader2 className="h-[20px] w-[20px] animate-spin" />
+                    ) : (
+                      <Send className="h-[20px] w-[20px]" />
+                    )}
+                  </button>
+                </div>
+              </form>
+            )}
           </>
         ) : (
           <div className="flex flex-1 items-center justify-center p-8 text-center">

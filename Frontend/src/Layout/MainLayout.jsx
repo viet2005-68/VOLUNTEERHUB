@@ -20,6 +20,7 @@ export default function MainLayout() {
   const [isCheckingBan, setIsCheckingBan] = useState(true);
   const [showBanner, setShowBanner] = useState(true);
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const isMessagesPage = location.pathname === "/dashboard/messages";
 
   // Check profile completeness (only fetch once user is loaded and not banned)
   const { data: profileValidation, isLoading: isLoadingProfile } =
@@ -100,6 +101,7 @@ export default function MainLayout() {
   // Also don't show while still loading profile data
   const shouldShowBanner =
     showBanner &&
+    !isMessagesPage &&
     !isLoadingProfile &&
     profileValidation &&
     !profileValidation.isComplete &&
@@ -140,12 +142,22 @@ export default function MainLayout() {
 
       {/* Nội dung chính */}
       <main
-        className={`flex-1 px-4 sm:px-6 lg:px-8 pb-30 ${
-          shouldShowBanner ? "pt-36" : "pt-22"
+        className={`flex-1 ${
+          isMessagesPage
+            ? "px-0 pb-[72px] pt-16 md:px-6 md:pb-30 md:pt-22 lg:px-8"
+            : `px-4 pb-30 sm:px-6 lg:px-8 ${
+                shouldShowBanner ? "pt-36" : "pt-22"
+              }`
         }`}
       >
         {/* thêm pb-20 để tránh bị che bởi BottomNav */}
-        <div className="max-w-7xl mx-auto relative">
+        <div
+          className={
+            isMessagesPage
+              ? "mx-auto w-full max-w-none md:max-w-7xl"
+              : "max-w-7xl mx-auto relative"
+          }
+        >
           <Outlet />
         </div>
       </main>
@@ -154,7 +166,7 @@ export default function MainLayout() {
       {showNavbar && <BottomNav />}
 
       {/* Scroll to Top Button */}
-      {showScrollTop && (
+      {showScrollTop && !isMessagesPage && (
         <button
           onClick={scrollToTop}
           className="fixed bottom-24 right-6 z-40 w-12 h-12 rounded-full bg-foudre-pink text-pale-canvas flex items-center justify-center border border-pale-canvas/60 hover:bg-deep-forest hover:scale-105 transition-all duration-300 animate-bounce"
