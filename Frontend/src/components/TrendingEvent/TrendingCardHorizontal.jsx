@@ -31,14 +31,14 @@ function TrendingCardHorizontal({
   return (
     <div
       onClick={handleClick}
-      className="flex min-w-[280px] cursor-pointer snap-start flex-col rounded-[20px] border border-bubblegum-blush/70 bg-ash-whisper p-4 text-deep-forest transition-colors duration-300 hover:border-bubblegum-blush sm:min-w-[420px] sm:max-w-[520px] sm:flex-row sm:space-x-4 sm:space-y-0"
+      className="group flex min-w-[280px] cursor-pointer snap-start flex-col rounded-[20px] border border-deep-forest/18 bg-pale-canvas p-4 text-deep-forest shadow-[0_14px_34px_rgba(0,82,45,0.16)] ring-1 ring-pale-canvas/80 transition-all duration-300 hover:-translate-y-0.5 hover:border-bubblegum-blush hover:shadow-[0_18px_42px_rgba(0,82,45,0.24)] sm:min-w-[420px] sm:max-w-[520px] sm:flex-row sm:space-x-4 sm:space-y-0"
       ref={ref}
     >
-      <div className="flex h-44 w-full flex-shrink-0 items-center justify-center self-center overflow-hidden rounded-[10px] sm:h-[118px] sm:w-[118px]">
+      <div className="flex h-44 w-full flex-shrink-0 items-center justify-center self-center overflow-hidden rounded-[12px] border border-deep-forest/12 bg-ash-whisper sm:h-[118px] sm:w-[118px]">
         <img
           src={thumbnail || futureVolunteer}
           alt={name}
-          className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
         />
       </div>
       <div className="flex flex-col justify-between flex-1 py-1">
@@ -62,7 +62,7 @@ function TrendingCardHorizontal({
           </div>
         </div>
         <div className="mt-3 grid grid-cols-2 gap-2">
-          <div className="flex min-w-0 basis-1/2 items-center gap-2 rounded-[10px] border border-deep-forest/10 bg-pale-canvas/75 px-3 py-2">
+          <div className="flex min-w-0 basis-1/2 items-center gap-2 rounded-[10px] border border-deep-forest/12 bg-ash-whisper/55 px-3 py-2 shadow-[inset_0_1px_0_rgba(255,248,246,0.9)]">
             <TrendingUp className="h-[18px] w-[18px] text-foudre-pink" />
             <div className="flex flex-col">
               <span className="text-center text-xs text-deep-forest/60">Posts</span>
@@ -71,7 +71,7 @@ function TrendingCardHorizontal({
               </span>
             </div>
           </div>
-          <div className="flex min-w-0 basis-1/2 items-center gap-2 rounded-[10px] border border-deep-forest/10 bg-pale-canvas/75 px-3 py-2">
+          <div className="flex min-w-0 basis-1/2 items-center gap-2 rounded-[10px] border border-deep-forest/12 bg-ash-whisper/55 px-3 py-2 shadow-[inset_0_1px_0_rgba(255,248,246,0.9)]">
             <span className="text-foudre-pink">
               <MessageCircle className="h-[18px] w-[18px]" />
             </span>
