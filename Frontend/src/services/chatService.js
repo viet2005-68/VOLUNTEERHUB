@@ -2,6 +2,7 @@ import { Client } from "@stomp/stompjs";
 import axiosClient from "./axiosClient";
 
 const CHAT_BASE_URL = "/v1/chats";
+const AGGREGATED_CHAT_BASE_URL = "/v1/aggregated/chats";
 
 const resolveWsUrl = () => {
   const explicit = import.meta.env.VITE_CHAT_WS_URL;
@@ -21,7 +22,7 @@ const resolveWsUrl = () => {
 };
 
 export const listConversations = async () => {
-  return axiosClient.get(`${CHAT_BASE_URL}/conversations`);
+  return axiosClient.get(`${AGGREGATED_CHAT_BASE_URL}/conversations`);
 };
 
 export const openConversation = async ({ eventId, volunteerId }) => {
@@ -32,7 +33,7 @@ export const openConversation = async ({ eventId, volunteerId }) => {
 };
 
 export const listMessages = async ({ conversationId, before, limit = 50 }) => {
-  return axiosClient.get(`${CHAT_BASE_URL}/conversations/${conversationId}/messages`, {
+  return axiosClient.get(`${AGGREGATED_CHAT_BASE_URL}/conversations/${conversationId}/messages`, {
     params: { before, limit },
   });
 };

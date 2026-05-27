@@ -15,7 +15,9 @@ export const mergeChatMessages = (old = [], incoming = []) => {
   const next = new Map();
   [...old, ...incoming].forEach((message) => {
     if (!message) return;
-    next.set(message.id || message.clientMessageId, message);
+    const key = message.id || message.clientMessageId;
+    const existing = next.get(key);
+    next.set(key, existing ? { ...existing, ...message, sender: message.sender || existing.sender } : message);
   });
   return Array.from(next.values()).sort(
     (a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0)

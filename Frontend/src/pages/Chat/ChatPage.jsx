@@ -4,7 +4,6 @@ import {
   Loader2,
   MessageSquare,
   Send,
-  Users,
   X,
 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -44,8 +43,14 @@ const shortId = (value) => {
   return text.length > 12 ? `${text.slice(0, 8)}...${text.slice(-4)}` : text;
 };
 
+const displayUserName = (user, fallback) =>
+  user?.fullName || user?.username || user?.email || fallback || "Unknown user";
+
 const conversationLabel = (conversation, userId) => {
   if (!conversation) return "Select a conversation";
+  if (conversation.otherUser) {
+    return displayUserName(conversation.otherUser);
+  }
   const other = conversation.otherUserId || conversation.volunteerId || conversation.managerId;
   const role =
     userId === conversation.managerId
@@ -54,6 +59,17 @@ const conversationLabel = (conversation, userId) => {
       ? "Manager"
       : "Member";
   return `${role} ${shortId(other)}`;
+};
+
+const eventTitle = (conversation) =>
+  conversation?.eventName || conversation?.event?.name || `Event #${conversation?.eventId || ""}`;
+
+const senderForMessage = (message, conversation) => {
+  if (message.sender) return message.sender;
+  if (!conversation) return null;
+  if (message.senderId === conversation.managerId) return conversation.manager;
+  if (message.senderId === conversation.volunteerId) return conversation.volunteer;
+  return null;
 };
 
 const getImageAttachments = (message) =>
@@ -302,6 +318,7 @@ export default function ChatPage() {
   const isReadOnly = activeConversation?.status === "READ_ONLY";
   const isSending = sendMessage.isPending || uploadMedia.isPending;
   const canSend = !!selectedId && !isReadOnly && (draft.trim() || selectedImages.length > 0);
+  const activeOtherName = conversationLabel(activeConversation, user?.id);
 
   return (
     <div className="grid h-[min(720px,calc(100vh-190px))] min-h-[620px] overflow-hidden rounded-[20px] border border-deep-forest/15 bg-white text-deep-forest lg:grid-cols-[330px_minmax(0,1fr)]">
@@ -351,7 +368,7 @@ export default function ChatPage() {
               >
                 <div className="flex items-center justify-between gap-2">
                   <span className="truncate text-sm font-black">
-                    Event #{conversation.eventId}
+                    {eventTitle(conversation)}
                   </span>
                   {conversation.unreadCount > 0 && (
                     <span
@@ -392,15 +409,24 @@ export default function ChatPage() {
       <section className="flex min-h-0 flex-col">
         {activeConversation ? (
           <>
-            <header className="flex items-center justify-between border-b border-deep-forest/10 bg-white px-5 py-4">
-              <div className="min-w-0">
+            <header className="flex items-center justify-between gap-4 border-b border-deep-forest/10 bg-white px-5 py-4">
+              <div className="flex min-w-0 items-center gap-3">
+                <img
+                  src={
+                    activeConversation.otherUser?.avatarUrl ||
+                    `https://api.dicebear.com/7.x/avataaars/svg?seed=${activeOtherName}`
+                  }
+                  alt={activeOtherName}
+                  className="h-11 w-11 shrink-0 rounded-full border border-deep-forest/10 object-cover"
+                />
+                <div className="min-w-0">
                 <div className="truncate text-xl font-black leading-[1.1] text-deep-forest">
-                  Event #{activeConversation.eventId}
+                  {activeOtherName}
                 </div>
-                <p className="mt-1 flex items-center gap-2 text-xs font-bold text-deep-forest/65">
-                  <Users className="h-3.5 w-3.5" />
-                  {conversationLabel(activeConversation, user?.id)}
+                <p className="mt-1 truncate text-xs font-bold text-deep-forest/65">
+                  {eventTitle(activeConversation)}
                 </p>
+                </div>
               </div>
               <span className="rounded-[10px] border border-deep-forest/15 bg-deep-forest/5 px-3 py-1 text-xs font-black">
                 {activeConversation.status}
@@ -441,11 +467,23 @@ export default function ChatPage() {
                   {orderedMessages.map((message) => {
                     const mine = message.senderId === user?.id;
                     const images = getImageAttachments(message);
+                    const sender = senderForMessage(message, activeConversation);
+                    const senderName = displayUserName(sender, shortId(message.senderId));
                     return (
                       <div
                         key={message.id || message.clientMessageId}
-                        className={`flex ${mine ? "justify-end" : "justify-start"}`}
+                        className={`flex items-end gap-2 ${mine ? "justify-end" : "justify-start"}`}
                       >
+                        {!mine && (
+                          <img
+                            src={
+                              sender?.avatarUrl ||
+                              `https://api.dicebear.com/7.x/avataaars/svg?seed=${senderName}`
+                            }
+                            alt={senderName}
+                            className="h-8 w-8 rounded-full border border-deep-forest/10 object-cover"
+                          />
+                        )}
                         <div
                           className={`max-w-[82%] rounded-[18px] px-4 py-3 text-sm ${
                             mine
@@ -453,6 +491,11 @@ export default function ChatPage() {
                               : "border border-deep-forest/10 bg-white text-deep-forest"
                           }`}
                         >
+                          {!mine && (
+                            <p className="mb-1 text-xs font-black text-deep-forest/70">
+                              {senderName}
+                            </p>
+                          )}
                           {images.length > 0 && (
                             <div className="mb-2 grid max-w-[320px] grid-cols-2 gap-2">
                               {images.map((attachment) => (
