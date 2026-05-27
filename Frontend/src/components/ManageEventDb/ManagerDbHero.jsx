@@ -15,8 +15,8 @@ function ManagerDbHero({ thumbnail, title, status = "pending", onEditImage }) {
     : "border-emerald-200 bg-emerald-100 text-emerald-800";
 
   return (
-    <section className="overflow-hidden rounded-2xl border border-deep-forest/15 bg-pale-canvas shadow-[0_18px_45px_rgba(0,82,45,0.10)]">
-      <div className="relative aspect-[16/5] min-h-[220px] w-full overflow-hidden bg-deep-forest/10 max-sm:aspect-[4/3] max-sm:min-h-[240px]">
+    <section className="overflow-hidden rounded-lg border border-deep-forest/15 bg-pale-canvas shadow-[0_18px_45px_rgba(0,82,45,0.10)]">
+      <div className="relative aspect-[16/5] min-h-[240px] w-full overflow-hidden bg-deep-forest/10 max-sm:aspect-[4/3] max-sm:min-h-[260px]">
         {thumbnail ? (
           <img
             src={thumbnail}
@@ -50,7 +50,7 @@ function ManagerDbHero({ thumbnail, title, status = "pending", onEditImage }) {
 
         <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-            <h1 className="max-w-4xl font-beni text-6xl uppercase leading-[0.75] text-pale-canvas drop-shadow-sm sm:text-7xl md:text-8xl">
+            <h1 className="max-w-4xl break-words font-beni text-5xl uppercase leading-[0.82] !text-pale-canvas drop-shadow-sm sm:text-6xl md:text-7xl lg:text-8xl">
               {title}
             </h1>
             <span

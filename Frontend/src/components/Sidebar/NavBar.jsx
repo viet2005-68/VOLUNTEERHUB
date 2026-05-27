@@ -52,7 +52,7 @@ export default function NavBar() {
         <span className="w-12">
           <img src={Logo} alt="logo" className="max-h-max" />
         </span>
-        <span className="max-sm:hidden font-beni text-4xl leading-[0.7] text-foudre-pink uppercase max-sm:text-3xl">
+        <span className="max-sm:hidden font-beni text-4xl leading-[0.7] text-deep-forest uppercase max-sm:text-3xl">
           VolunteerHub
         </span>
       </div>

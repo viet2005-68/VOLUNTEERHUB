@@ -66,6 +66,25 @@ function MarkCompletionList() {
 
   const registrations = data?.items || [];
 
+  const getEventName = (reg) => reg.eventName || reg.event?.name || reg.event?.title || "";
+  const getEventId = (reg) => reg.eventId ?? reg.event?.id ?? null;
+  const getServiceHours = (reg) => {
+    const directHours = reg.serviceHours ?? reg.hoursLogged ?? reg.volunteerHours;
+    if (directHours !== undefined && directHours !== null && directHours !== "") {
+      const parsed = Number(directHours);
+      return Number.isFinite(parsed) ? parsed : null;
+    }
+
+    const start = reg.event?.startTime || reg.startTime;
+    const end = reg.event?.endTime || reg.endTime;
+    if (!start || !end) return null;
+
+    const minutes = (new Date(end).getTime() - new Date(start).getTime()) / 60000;
+    if (!Number.isFinite(minutes) || minutes <= 0) return null;
+
+    return Math.round((minutes / 60) * 10) / 10;
+  };
+
   // Local overrides for immediate UI after completion/note edit
   const [statusOverrides, setStatusOverrides] = useState({}); // { [regKey]: { status: "COMPLETED", note: string|null } }
   const getRegKey = (reg) =>
@@ -100,11 +119,12 @@ function MarkCompletionList() {
       name: reg.fullName || reg.username || "Unknown",
       email: reg.email || "",
       status: cardStatus,
-      hoursLogged: Math.floor(Math.random() * 4) + 1, // Random 1-4 hours
+      hoursLogged: getServiceHours(reg),
       feedback: statusOverrides[regKey]?.note ?? reg.note ?? undefined,
-      avatar: reg.avatarUrl || null,
-      eventName: reg.eventName,
-      eventId: reg.eventId,
+      avatar: reg.avatarUrl || reg.user?.avatarUrl || null,
+      eventName: getEventName(reg),
+      eventId: getEventId(reg),
+      registrationId: reg.registrationId,
     };
   });
 
@@ -302,8 +322,8 @@ function MarkCompletionList() {
               {isEditingNote ? "Edit Completion Note" : "Mark Completion"}
             </h3>
             <p className="mb-3 text-center text-sm font-medium leading-[1.2] text-deep-forest/70">
-              Event: {selectedReg?.eventName ?? "—"} • ID:{" "}
-              {selectedReg?.eventId ?? "—"}
+              Event: {selectedReg?.eventName || selectedReg?.event?.name || "Chưa có tên sự kiện"} • ID:{" "}
+              {selectedReg?.eventId ?? selectedReg?.event?.id ?? "N/A"}
             </p>
 
             <div className="space-y-4">

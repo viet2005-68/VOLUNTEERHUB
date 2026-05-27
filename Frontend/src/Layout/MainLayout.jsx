@@ -130,7 +130,7 @@ export default function MainLayout() {
       }`}
     >
       {/* Navbar fixed (desktop / tablet) */}
-      <header className="fixed top-0 left-0 right-0 z-50 border-b border-deep-forest/15 bg-pale-canvas/90 backdrop-blur-xl">
+      <header className="fixed top-0 left-0 right-0 z-50 border-b border-deep-forest/15 bg-ash-whisper/95 text-deep-forest backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center">
           <NavBar />
         </div>

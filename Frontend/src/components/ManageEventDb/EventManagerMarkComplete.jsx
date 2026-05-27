@@ -43,6 +43,17 @@ function EventManagerMarkComplete() {
   );
   const registrations = data?.data || [];
 
+  const serviceHours = useMemo(() => {
+    const start = eventData?.startTime;
+    const end = eventData?.endTime;
+    if (!start || !end) return null;
+
+    const minutes = (new Date(end).getTime() - new Date(start).getTime()) / 60000;
+    if (!Number.isFinite(minutes) || minutes <= 0) return null;
+
+    return Math.round((minutes / 60) * 10) / 10;
+  }, [eventData?.startTime, eventData?.endTime]);
+
   // Local overrides to instantly reflect COMPLETED + note edits before refetch returns
   const [statusOverrides, setStatusOverrides] = useState({}); // { [userId]: { status: "COMPLETED", note: string|null } }
 
@@ -54,12 +65,19 @@ function EventManagerMarkComplete() {
   const filteredRegistrations = registrations.filter((registration) => {
     const searchLower = searchQuery.toLowerCase();
     const user = registration.user || {};
+    const addressText =
+      typeof user.address === "string"
+        ? user.address
+        : [user.address?.street, user.address?.district, user.address?.province]
+            .filter(Boolean)
+            .join(" ");
+
     return (
       user.fullName?.toLowerCase().includes(searchLower) ||
       user.email?.toLowerCase().includes(searchLower) ||
       user.username?.toLowerCase().includes(searchLower) ||
       user.phoneNumber?.toLowerCase().includes(searchLower) ||
-      user.address?.toLowerCase().includes(searchLower)
+      addressText.toLowerCase().includes(searchLower)
     );
   });
 
@@ -80,9 +98,12 @@ function EventManagerMarkComplete() {
       name: user.fullName || user.name || user.username || "Unknown",
       email: user.email || "",
       status: cardStatus,
-      hoursLogged: Math.floor(Math.random() * 4) + 1, // Random 1-4 hours
+      hoursLogged: reg.serviceHours ?? reg.hoursLogged ?? serviceHours,
       feedback: statusOverrides[reg.userId]?.note ?? reg.note ?? undefined,
       avatar: user.avatarUrl || null,
+      eventName: reg.event?.name || reg.eventName || eventData?.name || "",
+      eventId: reg.eventId || reg.event?.id || eventData?.id || eventId,
+      registrationId: reg.id || reg.registrationId,
     };
   });
 
