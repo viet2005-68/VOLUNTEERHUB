@@ -118,32 +118,28 @@ export default function FilterHorizontal({
 
         {/* Categories & Sort */}
         {openFilter && (
-          <div className="grid gap-5 rounded-[20px] bg-ash-whisper/55 px-4 py-4 md:grid-cols-[minmax(0,1fr)_260px]">
+          <div className="grid gap-5 rounded-[20px] bg-ash-whisper/45 px-4 py-4 md:grid-cols-[minmax(0,1fr)_260px]">
             <div className="min-w-0">
-              <p className="font-bold text-deep-forest">Category</p>
-              <div className="mt-3 grid max-h-[200px] gap-2 overflow-y-auto scroll-smooth pr-2 scrollbar-thin scrollbar-thumb-foudre-pink/35 scrollbar-track-pale-canvas">
+              <p className="text-sm font-bold leading-[1.2] text-deep-forest">Category</p>
+              <div className="mt-3 flex flex-wrap gap-2">
                 {categories.map((c) => {
                   const active = selectedCategories.includes(c);
                   return (
-                    <label
+                    <button
                       key={c}
+                      type="button"
+                      onClick={() => toggleCategory(c)}
                       className={`flex items-center gap-3 rounded-[10px] border px-3 py-2 text-sm font-bold capitalize transition ${active ? "border-deep-forest bg-deep-forest text-pale-canvas" : "border-deep-forest/10 bg-pale-canvas text-deep-forest hover:bg-ash-whisper"}`}
                     >
-                      <input
-                        type="checkbox"
-                        value={c}
-                        onChange={(e) => toggleCategory(e.target.value)}
-                        checked={active}
-                        className="h-[16px] w-[16px] accent-foudre-pink"
-                      />
-                      <span className={active ? "text-pale-canvas" : "text-deep-forest/70"}>{c}</span>
-                    </label>
+                      <span className={active ? "h-[8px] w-[8px] rounded-full bg-pale-canvas" : "h-[8px] w-[8px] rounded-full bg-foudre-pink"} />
+                      <span>{c}</span>
+                    </button>
                   );
                 })}
               </div>
             </div>
             <div className="min-w-0">
-              <p className="mb-2 font-bold text-deep-forest">Sort By</p>
+              <p className="mb-2 text-sm font-bold leading-[1.2] text-deep-forest">Sort By</p>
               <DropdownSelect
                 className="w-full mb-3"
                 value={sortBy}
@@ -154,7 +150,7 @@ export default function FilterHorizontal({
                   { value: "Capacity", label: "Capacity" },
                 ]}
               />
-              <p className="mb-2 font-bold text-deep-forest">Order</p>
+              <p className="mb-2 text-sm font-bold leading-[1.2] text-deep-forest">Order</p>
               <DropdownSelect
                 className="w-full"
                 value={order}
