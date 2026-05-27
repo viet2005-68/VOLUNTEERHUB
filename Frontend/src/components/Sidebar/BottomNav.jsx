@@ -44,7 +44,10 @@ export default function BottomNav() {
     },
   ].filter((item) => user?.role !== "ADMIN" || item.key !== "messages");
 
-  const isActive = (path) => location.pathname.startsWith(path);
+  const isActive = (item) =>
+    item.key === "messages"
+      ? isMessagesPage
+      : location.pathname.startsWith(item.to);
   const isMessagesPage =
     location.pathname === "/dashboard/messages" ||
     location.pathname.startsWith("/dashboard/event-chat");
@@ -59,7 +62,7 @@ export default function BottomNav() {
               key={item.key}
               onClick={() => navigate(item.to)}
               className={`flex flex-col items-center text-xs font-bold focus:outline-none transition-colors ${
-                isActive(item.to) ? "text-foudre-pink" : "text-deep-forest/65"
+                isActive(item) ? "text-foudre-pink" : "text-deep-forest/65"
               }`}
             >
               <div className="relative">

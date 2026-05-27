@@ -8,7 +8,7 @@ import {
   X,
 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Navigate, useParams, useSearchParams } from "react-router-dom";
+import { Navigate, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import {
   chatQueryKey,
   mergeChatMessages,
@@ -190,6 +190,7 @@ const getImageAttachments = (message) =>
 
 export default function ChatPage() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { eventId: routeEventId } = useParams();
   const queryClient = useQueryClient();
@@ -276,7 +277,11 @@ export default function ChatPage() {
     const eventId = searchParams.get("eventId");
     if (!eventId) return;
     const volunteerId = searchParams.get("volunteerId") || undefined;
-    const queryKey = `${eventId}:${volunteerId || ""}`;
+    if (user?.role === ROLES.MANAGER && !volunteerId) {
+      navigate("/dashboard/event-chat/" + encodeURIComponent(eventId), { replace: true });
+      return;
+    }
+    const queryKey = eventId + ":" + (volunteerId || "");
     if (openedQueryRef.current === queryKey) return;
 
     openedQueryRef.current = queryKey;
@@ -300,7 +305,7 @@ export default function ChatPage() {
         onSettled: () => setOpeningFromQuery(false),
       }
     );
-  }, [isEventScoped, openChatConversation, searchParams, setSearchParams]);
+  }, [isEventScoped, navigate, openChatConversation, searchParams, setSearchParams, user?.role]);
 
   useEffect(() => {
     const addMessageToCache = (message) => {
