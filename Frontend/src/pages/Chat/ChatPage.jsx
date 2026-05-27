@@ -173,6 +173,17 @@ export default function ChatPage() {
   );
 
   useEffect(() => {
+    const bodyOverflow = document.body.style.overflow;
+    const htmlOverflow = document.documentElement.style.overflow;
+    document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = bodyOverflow;
+      document.documentElement.style.overflow = htmlOverflow;
+    };
+  }, []);
+
+  useEffect(() => {
     selectedRef.current = selectedId;
   }, [selectedId]);
 
@@ -381,7 +392,7 @@ export default function ChatPage() {
   const activeOtherName = conversationLabel(activeConversation, user?.id);
 
   return (
-    <div className="relative h-[calc(100dvh-136px)] min-h-0 overflow-hidden bg-white text-deep-forest md:h-[min(720px,calc(100vh-190px))] md:min-h-[620px] md:rounded-[20px] lg:grid lg:grid-cols-[330px_minmax(0,1fr)]">
+    <div className="relative h-full min-h-0 overflow-hidden bg-white text-deep-forest md:h-[min(720px,calc(100vh-190px))] md:min-h-[620px] md:rounded-[20px] lg:grid lg:grid-cols-[330px_minmax(0,1fr)]">
       {isConversationListOpen && (
         <button
           type="button"
@@ -391,7 +402,7 @@ export default function ChatPage() {
         />
       )}
       <aside
-        className={`fixed inset-x-0 top-16 z-40 max-h-[58dvh] min-h-0 flex-col overflow-hidden bg-pale-canvas shadow-xl lg:static lg:z-auto lg:flex lg:max-h-none lg:shadow-none lg:border-r lg:border-deep-forest/10 ${
+        className={`fixed inset-x-0 bottom-[72px] z-40 max-h-[70dvh] min-h-0 flex-col overflow-hidden rounded-t-[20px] bg-pale-canvas shadow-2xl lg:static lg:z-auto lg:flex lg:max-h-none lg:rounded-none lg:shadow-none lg:border-r lg:border-deep-forest/10 ${
           isConversationListOpen ? "flex" : "hidden"
         }`}
       >
@@ -399,7 +410,7 @@ export default function ChatPage() {
           <div className="flex h-[40px] w-[40px] shrink-0 items-center justify-center rounded-[10px] bg-deep-forest text-pale-canvas">
             <MessageSquare className="h-[20px] w-[20px]" />
           </div>
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <div className="truncate text-2xl font-black uppercase leading-[1.05] text-deep-forest">
               Messages
             </div>
@@ -407,6 +418,14 @@ export default function ChatPage() {
               Event conversations
             </p>
           </div>
+          <button
+            type="button"
+            onClick={() => setIsConversationListOpen(false)}
+            className="inline-flex h-[36px] w-[36px] shrink-0 items-center justify-center rounded-[10px] bg-deep-forest/5 text-deep-forest lg:hidden"
+            aria-label="Close conversations"
+          >
+            <X className="h-[18px] w-[18px]" />
+          </button>
         </div>
 
         {openingFromQuery && (
@@ -437,44 +456,52 @@ export default function ChatPage() {
                 }}
                 className={`w-full p-3 text-left transition ${
                   selectedId === conversation.id
-                    ? "rounded-l-[12px] bg-deep-forest text-pale-canvas"
+                    ? "mr-3 rounded-[12px] bg-deep-forest/8 text-deep-forest lg:mr-0 lg:rounded-l-[12px] lg:rounded-r-none lg:bg-deep-forest lg:text-pale-canvas"
                     : "mr-3 rounded-[12px] bg-white/70 hover:bg-deep-forest/5"
                 }`}
               >
-                <div className="flex items-center justify-between gap-2">
-                  <span className="truncate text-sm font-black">
-                    {eventTitle(conversation)}
-                  </span>
-                  {conversation.unreadCount > 0 && (
-                    <span
-                      className={`rounded-[10px] px-2 py-0.5 text-xs font-black ${
+                <div className="flex min-w-0 items-center gap-3">
+                  <ChatAvatar
+                    user={conversation.otherUser}
+                    name={conversationLabel(conversation, user?.id)}
+                  />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="truncate text-sm font-black">
+                        {conversationLabel(conversation, user?.id)}
+                      </span>
+                      {conversation.unreadCount > 0 && (
+                        <span
+                          className={`rounded-[10px] px-2 py-0.5 text-xs font-black ${
+                            selectedId === conversation.id
+                              ? "bg-deep-forest text-pale-canvas lg:bg-pale-canvas lg:text-deep-forest"
+                              : "bg-deep-forest text-pale-canvas"
+                          }`}
+                        >
+                          {conversation.unreadCount}
+                        </span>
+                      )}
+                    </div>
+                    <p
+                      className={`mt-1 truncate text-xs ${
                         selectedId === conversation.id
-                          ? "bg-pale-canvas text-deep-forest"
-                          : "bg-deep-forest text-pale-canvas"
+                          ? "text-deep-forest/70 lg:text-pale-canvas/80"
+                          : "text-deep-forest/65"
                       }`}
                     >
-                      {conversation.unreadCount}
-                    </span>
-                  )}
+                      {eventTitle(conversation)}
+                    </p>
+                    <p
+                      className={`mt-1 text-[11px] ${
+                        selectedId === conversation.id
+                          ? "text-deep-forest/50 lg:text-pale-canvas/65"
+                          : "text-deep-forest/45"
+                      }`}
+                    >
+                      {formatDateTime(conversation.lastMessageAt || conversation.updatedAt)}
+                    </p>
+                  </div>
                 </div>
-                <p
-                  className={`mt-1 truncate text-xs ${
-                    selectedId === conversation.id
-                      ? "text-pale-canvas/80"
-                      : "text-deep-forest/65"
-                  }`}
-                >
-                  {conversationLabel(conversation, user?.id)}
-                </p>
-                <p
-                  className={`mt-2 text-[11px] ${
-                    selectedId === conversation.id
-                      ? "text-pale-canvas/65"
-                      : "text-deep-forest/45"
-                  }`}
-                >
-                  {formatDateTime(conversation.lastMessageAt || conversation.updatedAt)}
-                </p>
               </button>
             ))
           )}

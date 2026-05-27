@@ -122,7 +122,11 @@ export default function MainLayout() {
     );
   }
   return (
-    <div className="min-h-screen bg-soft-gradient flex flex-col overflow-x-hidden text-deep-forest">
+    <div
+      className={`bg-soft-gradient flex flex-col overflow-x-hidden text-deep-forest ${
+        isMessagesPage ? "h-dvh overflow-hidden" : "min-h-screen"
+      }`}
+    >
       {/* Navbar fixed (desktop / tablet) */}
       <header className="fixed top-0 left-0 right-0 z-50 border-b border-deep-forest/15 bg-pale-canvas/90 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center">
@@ -144,7 +148,7 @@ export default function MainLayout() {
       <main
         className={`flex-1 ${
           isMessagesPage
-            ? "px-0 pb-[72px] pt-16 md:px-6 md:pb-30 md:pt-22 lg:px-8"
+            ? "mt-16 h-[calc(100dvh-136px)] overflow-hidden px-0 pb-0 pt-0 md:mt-0 md:h-auto md:px-6 md:pb-30 md:pt-22 lg:px-8"
             : `px-4 pb-30 sm:px-6 lg:px-8 ${
                 shouldShowBanner ? "pt-36" : "pt-22"
               }`
