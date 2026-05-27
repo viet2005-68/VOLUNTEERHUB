@@ -11,8 +11,9 @@ function ProjectCard({
   address,
   startTime,
   endTime,
-  capacity,
+  capacity = 0,
   participantCount,
+  registrationCount,
   status,
   ...restProps // Get all other props
 }) {
@@ -24,8 +25,13 @@ function ProjectCard({
   const location = address
     ? `${address.street}, ${address.district}, ${address.province}`
     : "N/A";
-  const registered = participantCountt || 0;
-  const availableSlots = capacity - registered;
+  const registered =
+    typeof participantCount === "number"
+      ? participantCount
+      : typeof registrationCount === "number"
+      ? registrationCount
+      : 0;
+  const availableSlots = Math.max(capacity - registered, 0);
   const categoryName = category?.name || "N/A";
 
   // Use default image if not provided
@@ -83,13 +89,13 @@ function ProjectCard({
             onClick={(e) => e.stopPropagation()}
             className="flex flex-row gap-2 items-center text-deep-forest/60 hover:text-foudre-pink transition-colors"
           >
-            <i class="ri-map-pin-fill"></i>
+            <i className="ri-map-pin-fill"></i>
             <p className="font-normal text-sm">{location}</p>
           </a>
         </div>
         <div className="flex flex-row gap-2 items-center justify-between mb-2 text-deep-forest/50 font-medium text-sm">
           <div className="flex flex-row gap-2 items-center justify-center">
-            <i class="ri-user-3-line"></i>
+            <i className="ri-user-3-line"></i>
             {registered}/{capacity}
           </div>
           <p>Available {availableSlots}</p>

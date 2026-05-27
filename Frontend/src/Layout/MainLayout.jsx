@@ -148,7 +148,7 @@ export default function MainLayout() {
       <main
         className={`flex-1 ${
           isMessagesPage
-            ? "mt-16 h-[calc(100dvh-136px)] overflow-hidden px-0 pb-0 pt-0 md:h-[calc(100dvh-64px)]"
+            ? "mt-16 h-[calc(100dvh-144px)] overflow-hidden px-0 pb-0 pt-0 md:h-[calc(100dvh-64px)]"
             : `px-4 pb-30 sm:px-6 lg:px-8 ${
                 shouldShowBanner ? "pt-36" : "pt-22"
               }`
