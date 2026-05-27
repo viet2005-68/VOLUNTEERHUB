@@ -11,7 +11,7 @@ export default function DashboardShell() {
   return (
     <div
       className={`flex flex-col bg-pale-canvas text-deep-forest ${
-        isMessagesPage ? "h-full min-h-0 gap-0" : "min-h-screen gap-10"
+        isMessagesPage ? "h-full min-h-0 gap-0" : "min-h-screen gap-8"
       }`}
     >
       <div className={isMessagesPage ? "hidden" : ""}>
