@@ -9,7 +9,10 @@ import {
 } from "recharts";
 import { useOwnedEventsPagination } from "../../hook/useEvent";
 
-const COLORS = ["#00522d", "#db3c8a", "#f29ebd", "#79b69c", "#d1cfe4"];
+const COLORS = ["#00522d", "#2f7b56", "#79b69c", "#8aa69a", "#d1cfe4"];
+
+const titleClass =
+  "mb-5 font-clash-grotesk text-2xl font-bold leading-[1.05] text-deep-forest";
 
 function EventPerformance() {
   // Fetch owned events with large page size to get all events
@@ -55,7 +58,7 @@ function EventPerformance() {
   if (isLoading) {
     return (
       <div className="rounded-[20px] border-2 border-ash-whisper bg-pale-canvas p-6 shadow-sm">
-        <h3 className="font-beni text-[42px] font-black uppercase leading-[0.75] text-deep-forest mb-5">
+        <h3 className={titleClass}>
           Event Performance
         </h3>
         <div className="flex items-center justify-center h-64">
@@ -68,7 +71,7 @@ function EventPerformance() {
   if (isError || chartData.length === 0) {
     return (
       <div className="rounded-[20px] border-2 border-ash-whisper bg-pale-canvas p-6 shadow-sm">
-        <h3 className="font-beni text-[42px] font-black uppercase leading-[0.75] text-deep-forest mb-5">
+        <h3 className={titleClass}>
           Event Performance
         </h3>
         <div className="flex items-center justify-center h-64">
@@ -89,7 +92,7 @@ function EventPerformance() {
           <p className="text-sm text-deep-forest/70">
             Participants: {data.participants}
           </p>
-          <p className="text-sm font-bold text-foudre-pink">{data.value}%</p>
+          <p className="text-sm font-bold text-deep-forest">{data.value}%</p>
         </div>
       );
     }
@@ -98,7 +101,7 @@ function EventPerformance() {
 
   return (
     <div className="rounded-[20px] border-2 border-ash-whisper bg-pale-canvas p-6 shadow-sm">
-      <h3 className="font-beni text-[42px] font-black uppercase leading-[0.75] text-deep-forest mb-5">
+      <h3 className={titleClass}>
         Event Performance
       </h3>
 

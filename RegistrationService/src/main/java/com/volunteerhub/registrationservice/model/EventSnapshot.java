@@ -34,6 +34,9 @@ public class EventSnapshot {
     @Column(name = "event_name")
     private String eventName;
 
+    @Column(name = "image_url", columnDefinition = "text")
+    private String imageUrl;
+
     @Column(name = "start_time")
     private java.time.LocalDateTime startTime;
 

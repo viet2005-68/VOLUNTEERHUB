@@ -131,6 +131,7 @@ public class NotificationService {
                 .payload(payload(
                         "category", eventCreatedMessage.getCategory().getName(),
                         "name", eventCreatedMessage.getName(),
+                        "imageUrl", eventCreatedMessage.getImageUrl(),
                         "start_time", eventCreatedMessage.getStartTime(),
                         "end_time", eventCreatedMessage.getEndTime()
                 ))
@@ -150,6 +151,7 @@ public class NotificationService {
                 payload(
                         "category", eventApprovedMessage.getCategory().getName(),
                         "name", eventApprovedMessage.getEventName(),
+                        "imageUrl", eventApprovedMessage.getImageUrl(),
                         "approved_time", eventApprovedMessage.getApprovedTime()
                 )
         ));
@@ -167,6 +169,7 @@ public class NotificationService {
                 eventRejectedMessage.getOwnerId(),
                 payload(
                         "name", eventRejectedMessage.getEventName(),
+                        "imageUrl", eventRejectedMessage.getImageUrl(),
                         "reason", eventRejectedMessage.getReason()
                 )
         ));
@@ -206,7 +209,10 @@ public class NotificationService {
                 registrationCreatedMessage.getUserId(),
                 registrationCreatedMessage.getEventId(),
                 registrationCreatedMessage.getEventOwnerId(),
-                payload("requested_at", registrationCreatedMessage.getCreatedAt())
+                payload(
+                        "imageUrl", registrationCreatedMessage.getImageUrl(),
+                        "requested_at", registrationCreatedMessage.getCreatedAt()
+                )
         ));
     }
 
@@ -216,7 +222,10 @@ public class NotificationService {
                 registrationApprovedMessage.getEventId().toString(),
                 registrationApprovedMessage.getEventId(),
                 registrationApprovedMessage.getUserId(),
-                payload("reviewed_at", registrationApprovedMessage.getReviewedAt())
+                payload(
+                        "imageUrl", registrationApprovedMessage.getImageUrl(),
+                        "reviewed_at", registrationApprovedMessage.getReviewedAt()
+                )
         ));
     }
 
@@ -226,7 +235,10 @@ public class NotificationService {
                 registrationRejectedMessage.getEventId().toString(),
                 registrationRejectedMessage.getEventId(),
                 registrationRejectedMessage.getUserId(),
-                payload("note", registrationRejectedMessage.getNote())
+                payload(
+                        "imageUrl", registrationRejectedMessage.getImageUrl(),
+                        "note", registrationRejectedMessage.getNote()
+                )
         ));
     }
 
@@ -236,7 +248,10 @@ public class NotificationService {
                 registrationCompletedMessage.getEventId().toString(),
                 registrationCompletedMessage.getEventId(),
                 registrationCompletedMessage.getUserId(),
-                payload("completed_at", registrationCompletedMessage.getCompletedAt())
+                payload(
+                        "imageUrl", registrationCompletedMessage.getImageUrl(),
+                        "completed_at", registrationCompletedMessage.getCompletedAt()
+                )
         ));
     }
 

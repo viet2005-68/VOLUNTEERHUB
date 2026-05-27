@@ -42,12 +42,13 @@ function NewEventsAnnounced({ className }) {
   }));
 
   return (
-    <div className={className}>
+    <div className={`h-full ${className || ""}`}>
       <ModalActivity
         title="New Events Announced"
         subtile="Recently Announced"
         viewMore={true}
         path="/dashboard/eventmanager"
+        className="min-h-[430px]"
       >
         {isLoading && (
           <>

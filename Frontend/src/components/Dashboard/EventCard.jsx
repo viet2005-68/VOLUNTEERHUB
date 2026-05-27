@@ -17,28 +17,30 @@ function EventCard({ label, value, icon, growth, unit }) {
   return (
     <div className="h-full text-deep-forest">
       <div className="h-full min-h-40 overflow-hidden rounded-2xl border border-deep-forest/15 bg-pale-canvas p-5">
-        <div className="flex h-full justify-between gap-4">
-          <div className="min-w-0 flex-1">
+        <div className="flex h-full flex-col justify-between gap-4">
+          <div className="flex items-start justify-between gap-4">
             <div className="text-base font-bold text-deep-forest/55 max-sm:text-sm">
               {label}
             </div>
-            <div className="mt-3 flex min-w-0 items-baseline gap-2">
-              <div className="max-w-full truncate text-4xl font-bold leading-none text-deep-forest max-sm:text-2xl">
-                {displayValue}
-              </div>
-              {unit && (
-                <span className="shrink-0 text-sm font-bold text-deep-forest/55">
-                  {unit}
-                </span>
-              )}
-              {growth && (
-                <span className="shrink-0 text-sm font-bold text-foudre-pink">
-                  {growth}
-                </span>
-              )}
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[14px] bg-ash-whisper text-deep-forest [&_svg]:h-7 [&_svg]:w-7 [&_svg]:text-deep-forest">
+              {icon}
             </div>
           </div>
-          <div className="flex shrink-0 items-end text-foudre-pink">{icon}</div>
+          <div className="flex min-w-0 items-baseline gap-2">
+            <div className="max-w-full truncate text-4xl font-bold leading-none text-deep-forest max-sm:text-2xl">
+              {displayValue}
+            </div>
+            {unit && (
+              <span className="shrink-0 text-sm font-bold text-deep-forest/55">
+                {unit}
+              </span>
+            )}
+            {growth && (
+              <span className="shrink-0 text-sm font-bold text-deep-forest">
+                {growth}
+              </span>
+            )}
+          </div>
         </div>
       </div>
     </div>

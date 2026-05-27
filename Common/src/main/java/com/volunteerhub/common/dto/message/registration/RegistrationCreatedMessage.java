@@ -13,6 +13,7 @@ public class RegistrationCreatedMessage implements RegistrationMessage{
     private Long registrationId;
     private String userId;
     private Long eventId;
+    private String imageUrl;
     private String eventOwnerId;
     private UserEventStatus status;
     private LocalDateTime createdAt;

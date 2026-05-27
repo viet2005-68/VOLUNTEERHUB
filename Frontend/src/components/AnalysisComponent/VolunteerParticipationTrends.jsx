@@ -96,7 +96,7 @@ function VolunteerParticipationTrends() {
           <Tooltip content={<CustomTooltip />} />
           <Legend />
           <Bar dataKey="applications" fill="#00522d" name="Applications" radius={[8, 8, 0, 0]} />
-          <Bar dataKey="completed" fill="#db3c8a" name="Completed" radius={[8, 8, 0, 0]} />
+          <Bar dataKey="completed" fill="#79b69c" name="Completed" radius={[8, 8, 0, 0]} />
         </BarChart>
       );
     }
@@ -110,7 +110,7 @@ function VolunteerParticipationTrends() {
           <Tooltip content={<CustomTooltip />} />
           <Legend />
           <Line type="monotone" dataKey="applications" stroke="#00522d" strokeWidth={3} name="Applications" />
-          <Line type="monotone" dataKey="serviceHours" stroke="#f29ebd" strokeWidth={3} name="Service Hours" />
+          <Line type="monotone" dataKey="serviceHours" stroke="#79b69c" strokeWidth={3} name="Service Hours" />
         </LineChart>
       );
     }
@@ -123,8 +123,8 @@ function VolunteerParticipationTrends() {
             <stop offset="95%" stopColor="#00522d" stopOpacity={0.1} />
           </linearGradient>
           <linearGradient id="colorCompleted" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#db3c8a" stopOpacity={0.8} />
-            <stop offset="95%" stopColor="#db3c8a" stopOpacity={0.1} />
+            <stop offset="5%" stopColor="#79b69c" stopOpacity={0.8} />
+            <stop offset="95%" stopColor="#79b69c" stopOpacity={0.1} />
           </linearGradient>
         </defs>
         <CartesianGrid strokeDasharray="3 3" stroke="#fce5df" />
@@ -143,7 +143,7 @@ function VolunteerParticipationTrends() {
         <Area
           type="monotone"
           dataKey="completed"
-          stroke="#db3c8a"
+          stroke="#79b69c"
           strokeWidth={2}
           fill="url(#colorCompleted)"
           name="Completed"
@@ -156,7 +156,7 @@ function VolunteerParticipationTrends() {
     <div className="rounded-[20px] border-2 border-ash-whisper bg-pale-canvas p-6 shadow-sm">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
-          <h3 className="font-beni text-[42px] font-black uppercase leading-[0.75] text-deep-forest">
+          <h3 className="font-clash-grotesk text-2xl font-bold leading-[1.05] text-deep-forest">
             Volunteer Participation Trends
           </h3>
           <p className="mt-2 text-sm font-medium text-deep-forest/65">
@@ -203,11 +203,11 @@ function VolunteerParticipationTrends() {
         </div>
         <div className="text-center">
           <p className="text-sm font-medium text-deep-forest/65 mb-1">Completed</p>
-          <p className="text-lg font-bold text-foudre-pink">{totals.completed}</p>
+          <p className="text-lg font-bold text-deep-forest">{totals.completed}</p>
         </div>
         <div className="text-center">
           <p className="text-sm font-medium text-deep-forest/65 mb-1">Service Hours</p>
-          <p className="text-lg font-bold text-foudre-pink">
+          <p className="text-lg font-bold text-deep-forest">
             {new Intl.NumberFormat("en-US", { maximumFractionDigits: 1 }).format(totals.serviceHours)}h
           </p>
         </div>

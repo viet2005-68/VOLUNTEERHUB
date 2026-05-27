@@ -12,6 +12,7 @@ public class RegistrationCompletedMessage implements RegistrationMessage{
 
     private Long registrationId;
     private Long eventId;
+    private String imageUrl;
     private String userId;
     private UserEventStatus status;
     private String note;

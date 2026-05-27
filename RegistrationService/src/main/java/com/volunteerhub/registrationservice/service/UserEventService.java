@@ -236,6 +236,7 @@ public class UserEventService {
             UserEventRequest request) {
         UserEvent userEvent = findEntityByUserIdAndEventId(participantId, eventId);
         EventSnapshot eventSnapshot = eventSnapshotService.findEntityById(eventId);
+        userEvent.setEventSnapshot(eventSnapshot);
         if (!eventSnapshot.getOwnerId().equals(userId)) {
             throw new AccessDeniedException(
                     "Insufficient permission to review user's request to event with id " + eventId);

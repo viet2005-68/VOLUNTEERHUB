@@ -14,8 +14,8 @@ function ImpactMetrics() {
       value: formatNumber(data?.totalServiceHours, { maximumFractionDigits: 1 }),
       suffix: "h",
       icon: Clock,
-      color: "text-foudre-pink",
-      bgColor: "bg-bubblegum-blush/25",
+      color: "text-deep-forest",
+      bgColor: "bg-ash-whisper",
     },
     {
       label: "Unique Volunteers",
@@ -40,7 +40,7 @@ function ImpactMetrics() {
 
   return (
     <div className="rounded-[20px] border-2 border-ash-whisper bg-pale-canvas p-6 shadow-sm">
-      <h3 className="mb-6 font-beni text-[42px] font-black uppercase leading-[0.75] text-deep-forest">Impact Metrics</h3>
+      <h3 className="mb-6 font-clash-grotesk text-2xl font-bold leading-[1.05] text-deep-forest">Impact Metrics</h3>
 
       {isLoading ? (
         <div className="flex h-64 items-center justify-center text-deep-forest/60">

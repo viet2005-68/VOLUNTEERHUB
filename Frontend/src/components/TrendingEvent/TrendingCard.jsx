@@ -1,6 +1,5 @@
 import React from "react";
 import Card from "../Card.jsx/Card";
-import { FaFire } from "react-icons/fa";
 import { FaArrowTrendUp } from "react-icons/fa6";
 import { Eye, Users, MessageSquare, ThumbsUp, FileText } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -13,6 +12,7 @@ function TrendingCard({ items }) {
     id,
     name,
     category,
+    imageUrl,
     registrationCount = 0,
     participantCount = 0,
     registrationGrowth = 0,
@@ -37,14 +37,25 @@ function TrendingCard({ items }) {
     navigate(`/dashboard/event/${id}/overview`);
   };
 
+  const fallbackInitial = name?.charAt(0)?.toUpperCase() || "E";
+
   return (
     <div className="rounded-2xl">
       <Card className="group border-2 border-ash-whisper bg-pale-canvas shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-bubblegum-blush hover:shadow-md">
         <div className="flex flex-row gap-4 items-center justify-between">
-          <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full bg-bubblegum-blush text-deep-forest">
-            <div className="w-7 h-7">
-              <FaFire className="h-full w-full object-contain text-foudre-pink" />
-            </div>
+          <div className="h-20 w-28 flex-shrink-0 overflow-hidden rounded-2xl border border-ash-whisper bg-ash-whisper">
+            {imageUrl ? (
+              <img
+                src={imageUrl}
+                alt={name}
+                className="block h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                loading="lazy"
+              />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center bg-ash-whisper text-xl font-bold text-deep-forest">
+                {fallbackInitial}
+              </div>
+            )}
           </div>
           <div className="flex min-w-0 flex-1 flex-col gap-2">
             <div className="flex flex-row justify-between gap-3 items-start">

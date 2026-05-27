@@ -89,7 +89,7 @@ function RegistrationCard({
         return {
           text: "Pending Approval",
           disabled: true,
-          className: "bg-amber-100 text-amber-800 border-2 border-amber-300 cursor-not-allowed",
+          className: "bg-amber-100 !text-deep-forest border-2 border-amber-300 cursor-not-allowed",
         };
       case "APPROVED":
         return {

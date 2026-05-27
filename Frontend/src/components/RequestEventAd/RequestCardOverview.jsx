@@ -6,7 +6,7 @@ import { Skeleton } from "@mui/material";
 import { BellOff } from "lucide-react";
 
 const SkeletonRequestCard = () => (
-  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 bg-white border rounded-xl shadow-sm mb-3 gap-4">
+  <div className="flex min-h-[142px] flex-col sm:flex-row sm:items-center sm:justify-between p-5 bg-pale-canvas border-2 border-ash-whisper rounded-2xl shadow-sm mb-3 gap-4">
     <div className="flex items-center gap-3">
       <Skeleton variant="circular" width={40} height={40} />
       <div className="flex flex-col gap-1">
@@ -21,7 +21,7 @@ const SkeletonRequestCard = () => (
   </div>
 );
 
-function RequestCardOverview() {
+function RequestCardOverview({ className }) {
   const { data, isLoading, isFetching, isError, error } =
     usePendingRegistrationsTop3ByNameAsc();
 
@@ -36,13 +36,13 @@ function RequestCardOverview() {
   const loading = isLoading || isFetching;
 
   return (
-    <div>
+    <div className={`h-full ${className || ""}`}>
       <ModalActivity
         title="Join Requests"
         subtile="Join Requests"
         viewMore={true}
         path="/dashboard/approve-registration"
-        className="flex flex-col justify-start"
+        className="flex flex-col justify-start min-h-[430px]"
       >
         {loading && [0, 1, 2, 3].map((i) => <SkeletonRequestCard key={i} />)}
 

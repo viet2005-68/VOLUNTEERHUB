@@ -39,8 +39,10 @@ function Analytics() {
       {/* Header */}
       <div className="flex flex-col gap-4 pl-1 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h1 className="flex items-center gap-3 font-beni text-[56px] font-black uppercase leading-[0.75] text-deep-forest md:text-[80px]">
-            <BarChart2 className="h-9 w-9 text-foudre-pink md:h-10 md:w-10" />
+          <h1 className="flex items-center gap-3 font-clash-grotesk text-3xl font-bold leading-[1.05] text-deep-forest md:text-4xl">
+            <span className="flex h-11 w-11 items-center justify-center rounded-[12px] bg-ash-whisper text-deep-forest">
+              <BarChart2 className="h-6 w-6" />
+            </span>
             Analytics & Reports
           </h1>
           <p className="mt-1 text-base font-medium leading-[1.2] text-deep-forest/70">

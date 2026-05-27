@@ -23,33 +23,31 @@ function AnnouncedEventCard({
     customFormat: "DD{sep}MM{sep}YYYY",
   });
   const navigate = useNavigate();
-  console.log("ididid", id);
 
   return (
     <div
-      className="bg-ash-whisper rounded-2xl"
+      className="rounded-2xl"
       onClick={(e) => {
         e.stopPropagation();
-        console.log("/dashboard/eventmanager/", id);
         navigate(`/dashboard/eventmanager/${id}`);
       }}
     >
-      <Card className>
-        <div className="flex justify-between relative">
-          <div className="text-md max-sm:text-sm flex flex-col gap-2 pl-5">
-            <p className="font-medium inline-flex items-center relative">
+      <Card className="min-h-[142px] cursor-pointer border-2 border-ash-whisper bg-pale-canvas transition-all hover:border-bubblegum-blush hover:shadow-md">
+        <div className="flex min-h-[100px] justify-between gap-5 relative">
+          <div className="text-md max-sm:text-sm flex min-w-0 flex-1 flex-col gap-3 pl-5">
+            <p className="font-bold inline-flex items-center relative text-deep-forest">
               {/* Ping indicator */}
               <span className="absolute -left-9 top-0 flex text-foudre-pink">
-                <span className="bg-foudre-pink text-pale-canvas text-xs font-bold rounded-lg px-1 py-1 max-sm:py-0 flex-shrink-0 max-sm:px-1 m">
+                <span className="bg-foudre-pink text-pale-canvas text-xs font-bold rounded-lg px-2 py-1 max-sm:py-0 flex-shrink-0 max-sm:px-1">
                   New
                 </span>
               </span>
 
               {/* Title text */}
-              <span className="ml-1 mb-1">{title}</span>
+              <span className="ml-1 mb-1 line-clamp-2">{title}</span>
             </p>
 
-            <div className="flex flex-row gap-5 text-deep-forest/65">
+            <div className="flex flex-row flex-wrap gap-x-8 gap-y-2 text-deep-forest/65">
               <div className="flex flex-1 gap-2 items-center">
                 <span>
                   <FiCalendar className="text-green-600" />
@@ -67,18 +65,19 @@ function AnnouncedEventCard({
                 </p>
               </div>
             </div>
-            <div className="flex flex-1 gap-1 items-center-safe text-deep-forest/65">
+            <div className="flex flex-1 gap-2 items-start text-deep-forest/65">
               <span>
                 <TfiLocationPin className="text-foudre-pink" />
               </span>
-              <span>{location}</span>
+              <span className="line-clamp-2">{location}</span>
             </div>
           </div>
 
-          <div className="flex self-center rounded-2xl w-24 max-md:w-20 max-sm:max-w-25 max-sm:max-h-25 bg-bubblegum-blush">
+          <div className="flex h-24 w-24 shrink-0 self-center overflow-hidden rounded-2xl bg-bubblegum-blush max-md:h-20 max-md:w-20">
             <img
               src={urlImg}
-              className="object-cover w-full h-full object-center aspect-square rounded-2xl"
+              alt={title}
+              className="object-cover w-full h-full object-center"
             ></img>
           </div>
         </div>

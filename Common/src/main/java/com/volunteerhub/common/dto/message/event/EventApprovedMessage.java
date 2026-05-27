@@ -14,6 +14,7 @@ public class EventApprovedMessage implements EventMessage{
 
     private Long eventId;
     private String eventName;
+    private String imageUrl;
     private CategoryResponse category;
     private int capacity;
     private String ownerId;

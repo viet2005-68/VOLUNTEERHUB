@@ -29,6 +29,7 @@ public class EventSnapshotService {
                 .status(eventSnapshotRequest.getStatus())
                 .ownerId(eventSnapshotRequest.getOwnerId())
                 .eventName(eventSnapshotRequest.getEventName())
+                .imageUrl(eventSnapshotRequest.getImageUrl())
                 .startTime(eventSnapshotRequest.getStartTime())
                 .endTime(eventSnapshotRequest.getEndTime())
                 .registrationDeadline(eventSnapshotRequest.getRegistrationDeadline())
@@ -52,6 +53,9 @@ public class EventSnapshotService {
         }
         if (eventSnapshotRequest.getEventName() != null) {
             eventSnapshot.setEventName(eventSnapshotRequest.getEventName());
+        }
+        if (eventSnapshotRequest.getImageUrl() != null) {
+            eventSnapshot.setImageUrl(eventSnapshotRequest.getImageUrl());
         }
         if (eventSnapshotRequest.getStartTime() != null) {
             eventSnapshot.setStartTime(eventSnapshotRequest.getStartTime());
