@@ -59,9 +59,14 @@ public class ChatService {
     }
 
     @Transactional(readOnly = true)
-    public List<ChatConversationResponse> listConversations(String currentUserId) {
-        return conversationRepository.findByManagerIdOrVolunteerIdOrderByLastMessageAtDesc(currentUserId, currentUserId)
-                .stream()
+    public List<ChatConversationResponse> listConversations(String currentUserId, Long eventId) {
+        List<ChatConversation> conversations = eventId == null
+                ? conversationRepository.findByManagerIdOrVolunteerIdOrderByLastMessageAtDesc(currentUserId, currentUserId)
+                : conversationRepository.findByEventIdAndManagerIdOrEventIdAndVolunteerIdOrderByLastMessageAtDesc(
+                        eventId, currentUserId, eventId, currentUserId
+                );
+
+        return conversations.stream()
                 .filter(conversation -> !Objects.equals(conversation.getManagerId(), conversation.getVolunteerId()))
                 .map(conversation -> chatMapper.toConversationResponse(conversation, currentUserId, unreadCount(conversation, currentUserId)))
                 .toList();

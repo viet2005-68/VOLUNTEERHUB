@@ -24,10 +24,11 @@ export const mergeChatMessages = (old = [], incoming = []) => {
   );
 };
 
-export const useConversations = () => {
+export const useConversations = (params = {}) => {
+  const { eventId } = params;
   return useQuery({
-    queryKey: [...CHAT_QUERY_KEY, "conversations"],
-    queryFn: listConversations,
+    queryKey: [...CHAT_QUERY_KEY, "conversations", eventId || "all"],
+    queryFn: () => listConversations({ eventId }),
     staleTime: 15 * 1000,
   });
 };

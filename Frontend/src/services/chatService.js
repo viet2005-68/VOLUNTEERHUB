@@ -26,12 +26,13 @@ const resolveWsUrl = () => {
   return `${protocol}//${window.location.host}/ws/chat`;
 };
 
-export const listConversations = async () => {
+export const listConversations = async ({ eventId } = {}) => {
+  const params = eventId ? { eventId: Number(eventId) } : undefined;
   try {
-    return await axiosClient.get(`${AGGREGATED_CHAT_BASE_URL}/conversations`);
+    return await axiosClient.get(`${AGGREGATED_CHAT_BASE_URL}/conversations`, { params });
   } catch (error) {
     if (shouldFallbackToChatService(error)) {
-      return axiosClient.get(`${CHAT_BASE_URL}/conversations`);
+      return axiosClient.get(`${CHAT_BASE_URL}/conversations`, { params });
     }
     throw error;
   }

@@ -16,7 +16,7 @@ import java.util.List;
 public interface ChatClient {
 
     @GetMapping("/conversations")
-    List<ChatConversationResponse> listConversations();
+    List<ChatConversationResponse> listConversations(@RequestParam(required = false) Long eventId);
 
     @GetMapping("/conversations/{conversationId}/messages")
     List<ChatMessageResponse> listMessages(@PathVariable Long conversationId,

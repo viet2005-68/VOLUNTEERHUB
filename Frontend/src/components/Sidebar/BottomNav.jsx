@@ -45,7 +45,9 @@ export default function BottomNav() {
   ].filter((item) => user?.role !== "ADMIN" || item.key !== "messages");
 
   const isActive = (path) => location.pathname.startsWith(path);
-  const isMessagesPage = location.pathname === "/dashboard/messages";
+  const isMessagesPage =
+    location.pathname === "/dashboard/messages" ||
+    location.pathname.startsWith("/dashboard/event-chat");
 
   return (
     <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-pale-canvas/95 border-t border-deep-forest/15 backdrop-blur-xl z-50">

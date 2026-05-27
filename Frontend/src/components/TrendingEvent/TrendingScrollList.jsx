@@ -88,7 +88,7 @@ export default function TrendingCardList() {
         {/* Scroll container */}
         <div
           ref={scrollRef}
-          className="flex flex-1 snap-x gap-3 overflow-x-auto scroll-smooth no-scrollbar md:gap-4"
+          className="flex flex-1 snap-x gap-3 overflow-x-auto scroll-smooth no-scrollbar md:gap-4 rounded-2xl"
         >
           {trendingEvents.map((event, index) => (
             <TrendingCardHorizontal

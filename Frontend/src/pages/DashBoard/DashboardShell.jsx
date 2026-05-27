@@ -4,7 +4,9 @@ import DashboardLayout from "./DashboardLayout";
 
 export default function DashboardShell() {
   const location = useLocation();
-  const isMessagesPage = location.pathname === "/dashboard/messages";
+  const isMessagesPage =
+    location.pathname === "/dashboard/messages" ||
+    location.pathname.startsWith("/dashboard/event-chat");
 
   return (
     <div

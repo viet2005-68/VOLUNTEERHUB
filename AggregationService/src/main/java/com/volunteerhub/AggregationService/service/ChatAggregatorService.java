@@ -30,8 +30,8 @@ public class ChatAggregatorService {
     private final EventClient eventClient;
     private final UserClient userClient;
 
-    public List<AggregatedChatConversationResponse> listConversations() {
-        List<ChatConversationResponse> conversations = chatClient.listConversations();
+    public List<AggregatedChatConversationResponse> listConversations(Long eventId) {
+        List<ChatConversationResponse> conversations = chatClient.listConversations(eventId);
         if (conversations == null || conversations.isEmpty()) {
             return List.of();
         }

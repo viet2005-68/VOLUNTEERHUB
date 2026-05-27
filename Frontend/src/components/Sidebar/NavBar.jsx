@@ -1,15 +1,15 @@
 import { BellDot, MessageSquare } from "lucide-react";
-import React, { useState } from "react";
+import React from "react";
 import { useAuth } from "../../hook/useAuth";
 import { ROLES } from "../../constant/role";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Logo } from "../../assets/img/index";
 import DropDown from "../Dropdown/DropDown";
 import DropDownItem from "../Dropdown/DropDownItem";
 import { LOGIN_LINK } from "../../constant/constNavigate";
 export default function NavBar() {
   const navigate = useNavigate();
-  const [navChoice, setNavChoice] = useState("Dashboard");
+  const location = useLocation();
   const { user, logout } = useAuth();
 
   console.log("==== NavBar Check ====");
@@ -30,6 +30,22 @@ export default function NavBar() {
   const displayName = user?.name ?? "Guest";
   const roleLabel = user?.role ? normalizeRole(user.role) : "Guest";
   const canUseChat = user?.role !== ROLES.ADMIN;
+  const isActiveNav = (key) => {
+    if (key === "Dashboard") return location.pathname === "/dashboard";
+    if (key === "Opportunities") return location.pathname.startsWith("/opportunities");
+    if (key === "Messages") {
+      return location.pathname === "/dashboard/messages" || location.pathname.startsWith("/dashboard/event-chat");
+    }
+    return false;
+  };
+  const navItemClass = (key) =>
+    [
+      "cursor-pointer rounded-[10px] px-4 py-3 text-deep-forest transition-colors",
+      "hover:bg-ash-whisper hover:text-deep-forest",
+      isActiveNav(key) ? "bg-bubblegum-blush/35" : "",
+    ]
+      .filter(Boolean)
+      .join(" ");
   return (
     <div className="flex flex-row justify-between w-full text-deep-forest">
       <div className="flex items-center -space-x-1">
@@ -45,26 +61,16 @@ export default function NavBar() {
           <li
             onClick={() => {
               navigate("/dashboard");
-              setNavChoice("Dashboard");
             }}
-            className={`cursor-pointer rounded-[10px] px-4 py-3 transition-colors hover:bg-ash-whisper ${
-              navChoice === "Dashboard"
-                ? "bg-deep-forest text-pale-canvas"
-                : "text-deep-forest"
-            }`}
+            className={navItemClass("Dashboard")}
           >
             DashBoard
           </li>
           <li
             onClick={() => {
               navigate("/opportunities");
-              setNavChoice("Opportunities");
             }}
-            className={`cursor-pointer rounded-[10px] px-4 py-3 transition-colors hover:bg-ash-whisper ${
-              navChoice === "Opportunities"
-                ? "bg-deep-forest text-pale-canvas"
-                : "text-deep-forest"
-            }`}
+            className={navItemClass("Opportunities")}
           >
             Opportunities
           </li>
@@ -73,13 +79,8 @@ export default function NavBar() {
             <li
               onClick={() => {
                 navigate("/dashboard/messages");
-                setNavChoice("Messages");
               }}
-              className={`cursor-pointer rounded-[10px] px-4 py-3 transition-colors hover:bg-ash-whisper ${
-                navChoice === "Messages"
-                  ? "bg-deep-forest text-pale-canvas"
-                  : "text-deep-forest"
-              }`}
+              className={navItemClass("Messages")}
             >
               Messages
             </li>

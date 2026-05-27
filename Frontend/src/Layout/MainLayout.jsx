@@ -20,7 +20,9 @@ export default function MainLayout() {
   const [isCheckingBan, setIsCheckingBan] = useState(true);
   const [showBanner, setShowBanner] = useState(true);
   const [showScrollTop, setShowScrollTop] = useState(false);
-  const isMessagesPage = location.pathname === "/dashboard/messages";
+  const isMessagesPage =
+    location.pathname === "/dashboard/messages" ||
+    location.pathname.startsWith("/dashboard/event-chat");
 
   // Check profile completeness (only fetch once user is loaded and not banned)
   const { data: profileValidation, isLoading: isLoadingProfile } =

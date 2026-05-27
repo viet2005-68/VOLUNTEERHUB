@@ -8,7 +8,7 @@ import {
   X,
 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Navigate, useSearchParams } from "react-router-dom";
+import { Navigate, useParams, useSearchParams } from "react-router-dom";
 import {
   chatQueryKey,
   mergeChatMessages,
@@ -23,6 +23,7 @@ import {
 import { createChatClient } from "../../services/chatService";
 import { useAuth } from "../../hook/useAuth";
 import { ROLES } from "../../constant/role";
+import { useEventDetail } from "../../hook/useEvent";
 
 const IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 const MAX_IMAGES = 5;
@@ -190,8 +191,15 @@ const getImageAttachments = (message) =>
 export default function ChatPage() {
   const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
+  const { eventId: routeEventId } = useParams();
   const queryClient = useQueryClient();
-  const { data: conversations = [], isLoading } = useConversations();
+  const isEventScoped = Boolean(routeEventId);
+  const { data: scopedEvent } = useEventDetail(routeEventId, {
+    enabled: isEventScoped,
+  });
+  const { data: conversations = [], isLoading } = useConversations({
+    eventId: routeEventId,
+  });
   const { mutate: openChatConversation } = useOpenConversation();
   const sendMessage = useSendChatMessage();
   const uploadMedia = useUploadChatMedia();
@@ -224,6 +232,14 @@ export default function ChatPage() {
       ),
     [messages]
   );
+  const scopedEventData = scopedEvent?.data || scopedEvent;
+  const scopedEventTitle =
+    scopedEventData?.name ||
+    (activeConversation
+      ? eventTitle(activeConversation)
+      : "Event #" + (routeEventId || ""));
+  const pageTitle = isEventScoped ? "Event Chat" : "Messages";
+  const pageSubtitle = isEventScoped ? scopedEventTitle : "Event conversations";
 
   useEffect(() => {
     const bodyOverflow = document.body.style.overflow;
@@ -245,12 +261,18 @@ export default function ChatPage() {
   }, [selectedImages]);
 
   useEffect(() => {
-    if (!selectedId && conversations.length > 0) {
+    if (conversations.length === 0) {
+      setSelectedId(null);
+      return;
+    }
+
+    if (!selectedId || !conversations.some((item) => item.id === selectedId)) {
       setSelectedId(conversations[0].id);
     }
   }, [conversations, selectedId]);
 
   useEffect(() => {
+    if (isEventScoped) return;
     const eventId = searchParams.get("eventId");
     if (!eventId) return;
     const volunteerId = searchParams.get("volunteerId") || undefined;
@@ -278,7 +300,7 @@ export default function ChatPage() {
         onSettled: () => setOpeningFromQuery(false),
       }
     );
-  }, [openChatConversation, searchParams, setSearchParams]);
+  }, [isEventScoped, openChatConversation, searchParams, setSearchParams]);
 
   useEffect(() => {
     const addMessageToCache = (message) => {
@@ -466,10 +488,10 @@ export default function ChatPage() {
           </div>
           <div className="min-w-0 flex-1">
             <div className="truncate text-2xl font-black uppercase leading-[1.05] text-deep-forest">
-              Messages
+              {pageTitle}
             </div>
             <p className="text-xs font-bold text-deep-forest/60">
-              Event conversations
+              {pageSubtitle}
             </p>
           </div>
           <button
@@ -497,7 +519,7 @@ export default function ChatPage() {
             </div>
           ) : conversations.length === 0 ? (
             <div className="rounded-[10px] bg-white/70 p-4 text-sm text-deep-forest/65">
-              No conversations yet.
+              {isEventScoped ? "No conversations for this event yet." : "No conversations yet."}
             </div>
           ) : (
             conversations.map((conversation) => (
@@ -780,7 +802,9 @@ export default function ChatPage() {
                 No Chat Selected
               </h2>
               <p className="mt-2 max-w-sm text-sm text-deep-forest/65">
-                Open a conversation from an event page or choose one from the list.
+                {isEventScoped
+                  ? "Choose a volunteer conversation for this event."
+                  : "Open a conversation from an event page or choose one from the list."}
               </p>
             </div>
           </div>

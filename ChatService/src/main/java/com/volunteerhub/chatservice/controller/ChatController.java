@@ -33,8 +33,8 @@ public class ChatController {
     }
 
     @GetMapping("/conversations")
-    public List<ChatConversationResponse> listConversations() {
-        return chatService.listConversations(currentUserId());
+    public List<ChatConversationResponse> listConversations(@RequestParam(required = false) Long eventId) {
+        return chatService.listConversations(currentUserId(), eventId);
     }
 
     @GetMapping("/conversations/{conversationId}/messages")

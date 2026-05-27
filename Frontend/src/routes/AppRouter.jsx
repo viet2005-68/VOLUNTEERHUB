@@ -123,6 +123,7 @@ function AppRouter() {
             <Route path="markcompletion" element={<MarkCompletionList />} />
             <Route path="notifications" element={<Notifications />} />
             <Route path="messages" element={<ChatPage />} />
+            <Route path="event-chat/:eventId" element={<ChatPage />} />
             <Route path="eventmanager" element={<EventManager />} />
             <Route path="manager-analytics" element={<Analytics />} />
           </Route>

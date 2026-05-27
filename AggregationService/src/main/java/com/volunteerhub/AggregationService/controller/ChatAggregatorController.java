@@ -23,8 +23,9 @@ public class ChatAggregatorController {
     private final ChatAggregatorService chatAggregatorService;
 
     @GetMapping("/conversations")
-    public ResponseEntity<List<AggregatedChatConversationResponse>> listConversations() {
-        return ResponseEntity.ok(chatAggregatorService.listConversations());
+    public ResponseEntity<List<AggregatedChatConversationResponse>> listConversations(
+            @RequestParam(required = false) Long eventId) {
+        return ResponseEntity.ok(chatAggregatorService.listConversations(eventId));
     }
 
     @GetMapping("/conversations/{conversationId}/messages")
