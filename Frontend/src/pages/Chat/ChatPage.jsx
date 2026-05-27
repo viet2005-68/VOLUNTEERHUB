@@ -74,7 +74,7 @@ export default function ChatPage() {
   const [selectedImages, setSelectedImages] = useState([]);
   const [hasMoreOlder, setHasMoreOlder] = useState(true);
   const [openingFromQuery, setOpeningFromQuery] = useState(false);
-  const bottomRef = useRef(null);
+  const messagePaneRef = useRef(null);
   const fileInputRef = useRef(null);
   const openedQueryRef = useRef("");
   const clientRef = useRef(null);
@@ -182,7 +182,11 @@ export default function ChatPage() {
   }, [selectedId]);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+    const pane = messagePaneRef.current;
+    if (!pane) return;
+    requestAnimationFrame(() => {
+      pane.scrollTop = pane.scrollHeight;
+    });
   }, [orderedMessages.length, selectedId]);
 
   useEffect(() => {
@@ -229,6 +233,9 @@ export default function ChatPage() {
 
   const handleLoadOlder = () => {
     if (!selectedId || orderedMessages.length === 0) return;
+    const pane = messagePaneRef.current;
+    const previousScrollHeight = pane?.scrollHeight || 0;
+    const previousScrollTop = pane?.scrollTop || 0;
     const oldestMessage = orderedMessages[0];
     loadOlderMessages.mutate(
       {
@@ -239,6 +246,12 @@ export default function ChatPage() {
       {
         onSuccess: (olderMessages) => {
           setHasMoreOlder(olderMessages.length >= MESSAGE_PAGE_SIZE);
+          requestAnimationFrame(() => {
+            const nextPane = messagePaneRef.current;
+            if (!nextPane) return;
+            nextPane.scrollTop =
+              nextPane.scrollHeight - previousScrollHeight + previousScrollTop;
+          });
         },
       }
     );
@@ -291,16 +304,16 @@ export default function ChatPage() {
   const canSend = !!selectedId && !isReadOnly && (draft.trim() || selectedImages.length > 0);
 
   return (
-    <div className="grid min-h-[720px] overflow-hidden rounded-[20px] border border-deep-forest/15 bg-white text-deep-forest lg:grid-cols-[330px_minmax(0,1fr)]">
-      <aside className="border-b border-deep-forest/10 bg-pale-canvas p-4 lg:border-b-0 lg:border-r">
+    <div className="grid h-[min(720px,calc(100vh-190px))] min-h-[620px] overflow-hidden rounded-[20px] border border-deep-forest/15 bg-white text-deep-forest lg:grid-cols-[330px_minmax(0,1fr)]">
+      <aside className="flex min-h-0 flex-col border-b border-deep-forest/10 bg-pale-canvas p-4 lg:border-b-0 lg:border-r">
         <div className="mb-5 flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-[10px] bg-deep-forest text-pale-canvas">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-deep-forest text-pale-canvas">
             <MessageSquare className="h-5 w-5" />
           </div>
           <div className="min-w-0">
-            <h1 className="font-beni text-[58px] leading-[0.72] text-deep-forest">
+            <div className="truncate text-2xl font-black uppercase leading-[1.05] text-deep-forest">
               Messages
-            </h1>
+            </div>
             <p className="text-xs font-bold text-deep-forest/60">
               Event conversations
             </p>
@@ -314,7 +327,7 @@ export default function ChatPage() {
           </div>
         )}
 
-        <div className="space-y-2">
+        <div className="min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
           {isLoading ? (
             <div className="flex items-center gap-2 text-sm text-deep-forest/65">
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -376,14 +389,14 @@ export default function ChatPage() {
         </div>
       </aside>
 
-      <section className="flex min-h-[680px] flex-col">
+      <section className="flex min-h-0 flex-col">
         {activeConversation ? (
           <>
             <header className="flex items-center justify-between border-b border-deep-forest/10 bg-white px-5 py-4">
               <div className="min-w-0">
-                <h2 className="font-clash-grotesk text-lg font-black leading-[1.1] text-deep-forest">
+                <div className="truncate text-xl font-black leading-[1.1] text-deep-forest">
                   Event #{activeConversation.eventId}
-                </h2>
+                </div>
                 <p className="mt-1 flex items-center gap-2 text-xs font-bold text-deep-forest/65">
                   <Users className="h-3.5 w-3.5" />
                   {conversationLabel(activeConversation, user?.id)}
@@ -394,7 +407,10 @@ export default function ChatPage() {
               </span>
             </header>
 
-            <div className="flex-1 overflow-y-auto bg-pale-canvas/55 px-4 py-5">
+            <div
+              ref={messagePaneRef}
+              className="min-h-0 flex-1 overflow-y-auto overscroll-contain bg-pale-canvas/55 px-4 py-5"
+            >
               {isLoadingMessages ? (
                 <div className="flex items-center justify-center gap-2 text-sm text-deep-forest/65">
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -472,7 +488,6 @@ export default function ChatPage() {
                       </div>
                     );
                   })}
-                  <div ref={bottomRef} />
                 </div>
               )}
             </div>
