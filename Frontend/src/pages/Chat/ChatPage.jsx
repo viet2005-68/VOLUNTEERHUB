@@ -456,7 +456,7 @@ export default function ChatPage() {
         />
       )}
       <aside
-        className={`fixed inset-x-0 bottom-[72px] z-40 max-h-[70dvh] min-h-0 flex-col overflow-hidden rounded-t-[20px] bg-pale-canvas shadow-2xl lg:static lg:z-auto lg:flex lg:max-h-none lg:rounded-none lg:shadow-none lg:border-r lg:border-deep-forest/10 ${
+        className={`fixed inset-x-0 bottom-[72px] z-40 max-h-[70dvh] min-h-0 flex-col overflow-hidden overflow-x-hidden rounded-t-[20px] bg-pale-canvas shadow-2xl lg:static lg:z-auto lg:flex lg:max-h-none lg:rounded-none lg:shadow-none lg:border-r lg:border-deep-forest/10 ${
           isConversationListOpen ? "flex" : "hidden"
         }`}
       >
@@ -489,14 +489,14 @@ export default function ChatPage() {
           </div>
         )}
 
-        <div className="min-h-0 flex-1 space-y-1 overflow-y-auto overscroll-contain pl-3">
+        <div className="min-h-0 flex-1 space-y-2 overflow-y-auto overflow-x-hidden overscroll-contain px-3">
           {isLoading ? (
             <div className="flex items-center gap-2 text-sm text-deep-forest/65">
               <Loader2 className="h-[16px] w-[16px] animate-spin" />
               Loading conversations...
             </div>
           ) : conversations.length === 0 ? (
-            <div className="mr-3 rounded-[10px] bg-white/70 p-4 text-sm text-deep-forest/65">
+            <div className="rounded-[10px] bg-white/70 p-4 text-sm text-deep-forest/65">
               No conversations yet.
             </div>
           ) : (
@@ -510,8 +510,8 @@ export default function ChatPage() {
                 }}
                 className={`w-full p-3 text-left transition ${
                   selectedId === conversation.id
-                    ? "mr-3 rounded-[12px] bg-deep-forest/8 text-deep-forest lg:mr-0 lg:rounded-l-[12px] lg:rounded-r-none lg:bg-deep-forest lg:text-pale-canvas"
-                    : "mr-3 rounded-[12px] bg-white/70 hover:bg-deep-forest/5"
+                    ? "rounded-[12px] bg-deep-forest text-pale-canvas"
+                    : "rounded-[12px] bg-white/70 hover:bg-deep-forest/5"
                 }`}
               >
                 <div className="flex min-w-0 items-center gap-3">
@@ -528,7 +528,7 @@ export default function ChatPage() {
                         <span
                           className={`rounded-[10px] px-2 py-0.5 text-xs font-black ${
                             selectedId === conversation.id
-                              ? "bg-deep-forest text-pale-canvas lg:bg-pale-canvas lg:text-deep-forest"
+                              ? "bg-pale-canvas text-deep-forest"
                               : "bg-deep-forest text-pale-canvas"
                           }`}
                         >
@@ -539,7 +539,7 @@ export default function ChatPage() {
                     <p
                       className={`mt-1 truncate text-xs ${
                         selectedId === conversation.id
-                          ? "text-deep-forest/70 lg:text-pale-canvas/80"
+                          ? "text-pale-canvas/80"
                           : "text-deep-forest/65"
                       }`}
                     >
@@ -548,7 +548,7 @@ export default function ChatPage() {
                     <p
                       className={`mt-1 text-[11px] ${
                         selectedId === conversation.id
-                          ? "text-deep-forest/50 lg:text-pale-canvas/65"
+                          ? "text-pale-canvas/65"
                           : "text-deep-forest/45"
                       }`}
                     >
