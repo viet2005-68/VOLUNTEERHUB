@@ -8,11 +8,7 @@ function NotificationList({ items, loadMore, hasMore, isLoading }) {
 
   // Hàm scroll đến đầu
   const scrollToTop = () => {
-    virtuosoRef.current?.scrollToIndex({
-      index: 0,
-      align: "start",
-      behavior: "smooth",
-    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   // Footer component for loading state
@@ -38,9 +34,9 @@ function NotificationList({ items, loadMore, hasMore, isLoading }) {
   };
 
   return (
-    <div className="h-[55vh] max-h-[700px] min-h-[320px] bg-white p-3 sm:p-4">
+    <div className="relative overflow-visible bg-white p-3 sm:p-4">
       {items.length === 0 ? (
-        <div className="flex items-center justify-center h-full">
+        <div className="flex min-h-[220px] items-center justify-center">
           <div className="text-center">
             <div className="text-yellow-500 text-5xl mb-4 flex justify-center">
               <Bell className="w-12 h-12" />
@@ -52,7 +48,7 @@ function NotificationList({ items, loadMore, hasMore, isLoading }) {
         <>
           <Virtuoso
             ref={virtuosoRef}
-            style={{ height: "100%" }}
+            useWindowScroll
             data={items}
             endReached={loadMore}
             itemContent={(index, noti) => (

@@ -189,7 +189,7 @@ function MarkCompletionList() {
   if (isError) {
     return (
       <div className="rounded-[25px] border-2 border-ash-whisper bg-pale-canvas p-8">
-        <div className="text-center py-8 text-sm font-bold leading-[1.2] text-foudre-pink">
+        <div className="text-center py-8 text-sm font-bold leading-[1.2] text-deep-forest">
           Failed to load volunteers
         </div>
       </div>
@@ -221,7 +221,7 @@ function MarkCompletionList() {
               setSearchQuery(e.target.value);
               setPage(1);
             }}
-            className="w-full rounded-[10px] border-2 border-ash-whisper bg-pale-canvas/80 px-4 py-4 pl-[48px] pr-4 text-sm font-medium leading-[1.2] text-deep-forest placeholder:text-deep-forest/55 focus:border-foudre-pink focus:outline-none"
+            className="w-full rounded-[10px] border-2 border-ash-whisper bg-pale-canvas/80 px-4 py-4 pl-[48px] pr-4 text-sm font-medium leading-[1.2] text-deep-forest placeholder:text-deep-forest/55 focus:border-deep-forest focus:outline-none"
           />
         </div>
 
@@ -229,7 +229,7 @@ function MarkCompletionList() {
         <div className="relative flex flex-wrap items-center justify-end gap-3">
           <button
             onClick={() => {}}
-            className="inline-flex items-center justify-center gap-2 rounded-[10px] bg-foudre-pink px-4 py-3 text-sm font-bold leading-[0.85] text-pale-canvas transition hover:bg-deep-forest whitespace-nowrap"
+            className="inline-flex items-center justify-center gap-2 rounded-[10px] bg-deep-forest px-4 py-3 text-sm font-bold leading-[0.85] text-pale-canvas transition hover:bg-deep-forest/90 whitespace-nowrap"
           >
             <CheckCircle className="h-5 w-5 flex-shrink-0" />
             <span className="sm:hidden">Mark All</span>
@@ -239,7 +239,7 @@ function MarkCompletionList() {
           </button>
           <button
             onClick={() => {}}
-            className="inline-flex items-center justify-center gap-2 rounded-[10px] border border-deep-forest/20 bg-pale-canvas px-4 py-3 text-sm font-bold leading-[0.85] text-deep-forest transition hover:border-foudre-pink hover:bg-ash-whisper hover:text-foudre-pink whitespace-nowrap"
+            className="inline-flex items-center justify-center gap-2 rounded-[10px] border border-deep-forest/20 bg-pale-canvas px-4 py-3 text-sm font-bold leading-[0.85] text-deep-forest transition hover:border-deep-forest hover:bg-ash-whisper hover:text-deep-forest whitespace-nowrap"
           >
             <Send className="h-5 w-5 flex-shrink-0" />
             <span className="hidden xs:inline">Send Certificates</span>
@@ -265,7 +265,7 @@ function MarkCompletionList() {
       </div>
 
       {/* Tip Box */}
-      <div className="rounded-[20px] border border-foudre-pink/20 bg-ash-whisper/60 p-4">
+      <div className="rounded-[20px] border border-deep-forest/20 bg-ash-whisper/60 p-4">
         <p className="text-sm font-medium leading-[1.2] text-deep-forest/75">
           <span className="font-semibold">Tip:</span> Filter by "Attended" to
           view the list of approved volunteers, then mark them as "Completed"
@@ -297,8 +297,8 @@ function MarkCompletionList() {
       {/* Completion Note Modal */}
       {selectedReg && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-deep-forest/65 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-[500px] rounded-[20px] border border-foudre-pink/25 bg-pale-canvas p-6 text-deep-forest">
-            <h3 className="font-beni text-[46px] font-black uppercase leading-[0.7] text-foudre-pink">
+          <div className="w-full max-w-[500px] rounded-[20px] border border-deep-forest/25 bg-pale-canvas p-6 text-deep-forest">
+            <h3 className="font-beni text-[46px] font-black uppercase leading-[0.7] text-deep-forest">
               {isEditingNote ? "Edit Completion Note" : "Mark Completion"}
             </h3>
             <p className="mb-3 text-center text-sm font-medium leading-[1.2] text-deep-forest/70">
@@ -316,14 +316,14 @@ function MarkCompletionList() {
                   onChange={(e) => setNote(e.target.value)}
                   placeholder="Enter completion note (optional)"
                   rows={3}
-                  className="w-full rounded-[10px] border-2 border-ash-whisper bg-pale-canvas px-4 py-3 text-sm font-medium leading-[1.2] text-deep-forest placeholder:text-deep-forest/45 focus:border-foudre-pink focus:outline-none"
+                  className="w-full rounded-[10px] border-2 border-ash-whisper bg-pale-canvas px-4 py-3 text-sm font-medium leading-[1.2] text-deep-forest placeholder:text-deep-forest/45 focus:border-deep-forest focus:outline-none"
                   disabled={reviewMutation.isPending}
                 />
               </div>
 
               <div className="flex justify-end gap-3 mt-4">
                 <button
-                  className="rounded-[10px] border border-deep-forest bg-transparent px-4 py-3 text-sm font-bold text-deep-forest transition hover:border-foudre-pink hover:bg-ash-whisper hover:text-foudre-pink"
+                  className="rounded-[10px] border border-deep-forest bg-transparent px-4 py-3 text-sm font-bold text-deep-forest transition hover:border-deep-forest hover:bg-ash-whisper hover:text-deep-forest"
                   onClick={() => {
                     setSelectedReg(null);
                     setNote("");
@@ -336,7 +336,7 @@ function MarkCompletionList() {
                 <button
                   onClick={handleComplete}
                   disabled={reviewMutation.isPending}
-                  className="rounded-[10px] bg-foudre-pink px-4 py-3 text-sm font-bold text-pale-canvas transition hover:bg-deep-forest disabled:cursor-not-allowed disabled:opacity-50"
+                  className="rounded-[10px] bg-deep-forest px-4 py-3 text-sm font-bold text-pale-canvas transition hover:bg-deep-forest/90 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {reviewMutation.isPending
                     ? "Processing..."

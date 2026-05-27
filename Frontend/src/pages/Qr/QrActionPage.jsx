@@ -8,7 +8,7 @@ import {
   ScanLine,
   TriangleAlert,
 } from "lucide-react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { Html5Qrcode } from "html5-qrcode";
 import { extractQrToken } from "../../utils/qrToken";
 
@@ -43,10 +43,12 @@ export default function QrActionPage({
   resultCtaPath,
 }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
   const tokenFromUrl = searchParams.get("token") || "";
   const mutation = useMutationHook();
   const hasSubmittedRef = useRef(false);
+  const submittedUrlTokenRef = useRef("");
   const scannerRef = useRef(null);
   const [scannerKey, setScannerKey] = useState(0);
   const [manualValue, setManualValue] = useState("");
@@ -95,9 +97,12 @@ export default function QrActionPage({
   );
 
   useEffect(() => {
-    if (tokenFromUrl) {
-      submitQrValue(tokenFromUrl);
+    if (!tokenFromUrl || submittedUrlTokenRef.current === tokenFromUrl) {
+      return;
     }
+
+    submittedUrlTokenRef.current = tokenFromUrl;
+    submitQrValue(tokenFromUrl);
   }, [submitQrValue, tokenFromUrl]);
 
   useEffect(() => {
@@ -157,6 +162,12 @@ export default function QrActionPage({
     setResult(null);
     setStatus("scanning");
     setMessage(initialMessage);
+
+    if (tokenFromUrl) {
+      navigate(location.pathname, { replace: true });
+      return;
+    }
+
     setScannerKey((prev) => prev + 1);
   };
 

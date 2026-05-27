@@ -20,7 +20,7 @@ function MarkCompletionCard({
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
           <div className="flex items-center gap-3 sm:gap-4">
             {/* Avatar */}
-            <div className="h-12 w-12 flex-shrink-0 overflow-hidden rounded-full border-2 border-bubblegum-blush bg-ash-whisper flex items-center justify-center">
+            <div className="h-12 w-12 flex-shrink-0 overflow-hidden rounded-full border-2 border-deep-forest/20 bg-ash-whisper flex items-center justify-center">
               {avatar ? (
                 <img
                   src={avatar}
@@ -40,7 +40,7 @@ function MarkCompletionCard({
                 <p className="text-sm font-bold text-deep-forest sm:text-base">
                   {name}
                 </p>
-                <span className="rounded-[10px] border border-foudre-pink/20 bg-ash-whisper px-3 py-1 text-xs font-bold text-foudre-pink sm:text-sm">
+                <span className="rounded-[10px] border border-deep-forest/20 bg-ash-whisper px-3 py-1 text-xs font-bold text-deep-forest sm:text-sm">
                   Registered
                 </span>
               </div>
@@ -57,14 +57,14 @@ function MarkCompletionCard({
           <div className="flex items-center gap-2 sm:gap-3">
             <button
               onClick={() => onMarkAttended(volunteer)}
-              className="flex flex-1 items-center justify-center gap-2 rounded-[10px] border border-deep-forest/20 bg-pale-canvas px-4 py-3 text-sm font-bold leading-[0.85] text-deep-forest transition hover:border-foudre-pink hover:bg-ash-whisper hover:text-foudre-pink sm:flex-initial"
+              className="flex flex-1 items-center justify-center gap-2 rounded-[10px] border border-deep-forest/20 bg-pale-canvas px-4 py-3 text-sm font-bold leading-[0.85] text-deep-forest transition hover:border-deep-forest hover:bg-ash-whisper hover:text-deep-forest sm:flex-initial"
             >
               <CheckCircle className="h-5 w-5" />
               <span>Mark Attended</span>
             </button>
             <button
               onClick={() => onMarkAbsent(volunteer)}
-              className="flex flex-1 items-center justify-center gap-2 rounded-[10px] border border-deep-forest/20 bg-pale-canvas px-4 py-3 text-sm font-bold leading-[0.85] text-deep-forest transition hover:border-foudre-pink hover:bg-ash-whisper hover:text-foudre-pink sm:flex-initial"
+              className="flex flex-1 items-center justify-center gap-2 rounded-[10px] border border-deep-forest/20 bg-pale-canvas px-4 py-3 text-sm font-bold leading-[0.85] text-deep-forest transition hover:border-deep-forest hover:bg-ash-whisper hover:text-deep-forest sm:flex-initial"
             >
               <XCircle className="h-5 w-5" />
               <span>Mark Absent</span>
@@ -82,7 +82,7 @@ function MarkCompletionCard({
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
           <div className="flex items-center gap-3 sm:gap-4">
             {/* Avatar */}
-            <div className="h-12 w-12 flex-shrink-0 overflow-hidden rounded-full border-2 border-bubblegum-blush bg-ash-whisper flex items-center justify-center">
+            <div className="h-12 w-12 flex-shrink-0 overflow-hidden rounded-full border-2 border-deep-forest/20 bg-ash-whisper flex items-center justify-center">
               {avatar ? (
                 <img
                   src={avatar}
@@ -102,7 +102,7 @@ function MarkCompletionCard({
                 <p className="text-sm font-bold text-deep-forest sm:text-base">
                   {name}
                 </p>
-                <span className="rounded-[10px] bg-foudre-pink px-3 py-1 text-xs font-bold text-pale-canvas sm:text-sm">
+                <span className="rounded-[10px] bg-deep-forest px-3 py-1 text-xs font-bold text-pale-canvas sm:text-sm">
                   Attended
                 </span>
               </div>
@@ -121,7 +121,7 @@ function MarkCompletionCard({
           {/* Mark Completed Button */}
           <button
             onClick={() => onMarkCompleted(volunteer)}
-            className="flex w-full items-center justify-center gap-2 rounded-[10px] bg-foudre-pink px-4 py-3 text-sm font-bold leading-[0.85] text-pale-canvas transition hover:bg-deep-forest sm:w-auto"
+            className="flex w-full items-center justify-center gap-2 rounded-[10px] bg-deep-forest px-4 py-3 text-sm font-bold leading-[0.85] text-pale-canvas transition hover:bg-deep-forest/90 sm:w-auto"
           >
             <Award className="h-4 w-4" />
             <span>Mark Completed</span>
@@ -138,7 +138,7 @@ function MarkCompletionCard({
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
           <div className="flex items-start sm:items-center gap-3 sm:gap-4 flex-1">
             {/* Avatar */}
-            <div className="h-12 w-12 flex-shrink-0 overflow-hidden rounded-full border-2 border-bubblegum-blush bg-ash-whisper flex items-center justify-center">
+            <div className="h-12 w-12 flex-shrink-0 overflow-hidden rounded-full border-2 border-deep-forest/20 bg-ash-whisper flex items-center justify-center">
               {avatar ? (
                 <img
                   src={avatar}
@@ -161,7 +161,7 @@ function MarkCompletionCard({
                 <span className="rounded-[10px] border border-deep-forest/15 bg-deep-forest/10 px-3 py-1 text-xs font-bold text-deep-forest sm:text-sm">
                   Completed
                 </span>
-                <Award className="h-4 w-4 text-foudre-pink sm:h-5 sm:w-5" />
+                <Award className="h-4 w-4 text-deep-forest sm:h-5 sm:w-5" />
               </div>
               <p className="mb-2 truncate text-xs font-medium text-deep-forest/65 sm:text-sm">
                 {email}
@@ -183,7 +183,7 @@ function MarkCompletionCard({
           {/* Edit Button */}
           <button
             onClick={() => onEditCompletion(volunteer)}
-            className="flex w-full items-center justify-center gap-2 rounded-[10px] bg-foudre-pink px-4 py-3 text-sm font-bold leading-[0.85] text-pale-canvas transition hover:bg-deep-forest sm:w-auto"
+            className="flex w-full items-center justify-center gap-2 rounded-[10px] bg-deep-forest px-4 py-3 text-sm font-bold leading-[0.85] text-pale-canvas transition hover:bg-deep-forest/90 sm:w-auto"
           >
             <PencilLine className="h-4 w-4" />
             <span>Edit Completion</span>
@@ -200,7 +200,7 @@ function MarkCompletionCard({
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
           <div className="flex items-center gap-3 sm:gap-4">
             {/* Avatar */}
-            <div className="h-12 w-12 flex-shrink-0 overflow-hidden rounded-full border-2 border-bubblegum-blush bg-ash-whisper flex items-center justify-center">
+            <div className="h-12 w-12 flex-shrink-0 overflow-hidden rounded-full border-2 border-deep-forest/20 bg-ash-whisper flex items-center justify-center">
               {avatar ? (
                 <img
                   src={avatar}
@@ -220,7 +220,7 @@ function MarkCompletionCard({
                 <p className="text-sm font-bold text-deep-forest sm:text-base">
                   {name}
                 </p>
-                <span className="rounded-[10px] border border-foudre-pink/20 bg-foudre-pink/10 px-3 py-1 text-xs font-bold text-foudre-pink sm:text-sm">
+                <span className="rounded-[10px] border border-deep-forest/20 bg-deep-forest/10 px-3 py-1 text-xs font-bold text-deep-forest sm:text-sm">
                   Absent
                 </span>
               </div>
@@ -236,7 +236,7 @@ function MarkCompletionCard({
           {/* Undo Button */}
           <button
             onClick={() => onUndo(volunteer)}
-            className="w-full rounded-[10px] border border-deep-forest/20 bg-pale-canvas px-4 py-3 text-sm font-bold leading-[0.85] text-deep-forest transition hover:border-foudre-pink hover:bg-ash-whisper hover:text-foudre-pink sm:w-auto"
+            className="w-full rounded-[10px] border border-deep-forest/20 bg-pale-canvas px-4 py-3 text-sm font-bold leading-[0.85] text-deep-forest transition hover:border-deep-forest hover:bg-ash-whisper hover:text-deep-forest sm:w-auto"
           >
             Undo
           </button>

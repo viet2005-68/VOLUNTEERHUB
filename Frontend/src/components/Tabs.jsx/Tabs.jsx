@@ -56,8 +56,8 @@ export default function Tabs({
     [
       "flex-1 min-w-fit px-5 py-3 rounded-[10px] text-sm font-bold leading-[0.85] text-center max-sm:text-xs transition-colors",
       isActive
-        ? "bg-bubblegum-blush text-deep-forest"
-        : "text-deep-forest hover:bg-bubblegum-blush/40",
+        ? "bg-deep-forest text-pale-canvas"
+        : "text-deep-forest hover:bg-deep-forest/10",
     ].join(" ");
 
   const tabItems = items.map((it) => {

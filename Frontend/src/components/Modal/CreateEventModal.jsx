@@ -43,7 +43,7 @@ function CreateEventModal({ isOpen, onClose }) {
           <X className="h-5 w-5" />
         </button>
 
-        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-24 pt-7 sm:p-6">
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-7 sm:p-6">
           <CreateEvent onSuccess={handleSuccess} onCancel={handleCancel} />
         </div>
       </div>
