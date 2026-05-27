@@ -76,7 +76,7 @@ export default function TrendingCardList() {
         </button>
       </div>
 
-      <div className="relative flex items-center gap-3 rounded-[20px] bg-pale-canvas p-3">
+      <div className="relative flex items-center gap-3 rounded-[20px] bg-ash-whisper p-3">
         {/* Left button */}
         <button
           onClick={scrollLeft}
