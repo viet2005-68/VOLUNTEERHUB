@@ -324,8 +324,8 @@ export default function ChatPage() {
     <div className="grid h-[min(720px,calc(100vh-190px))] min-h-[620px] overflow-hidden rounded-[20px] bg-white text-deep-forest lg:grid-cols-[330px_minmax(0,1fr)]">
       <aside className="flex min-h-0 flex-col bg-pale-canvas lg:border-r lg:border-deep-forest/10">
         <div className="flex items-center gap-3 px-4 pb-5 pt-4">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-deep-forest text-pale-canvas">
-            <MessageSquare className="h-5 w-5" />
+          <div className="flex h-[40px] w-[40px] shrink-0 items-center justify-center rounded-[10px] bg-deep-forest text-pale-canvas">
+            <MessageSquare className="h-[20px] w-[20px]" />
           </div>
           <div className="min-w-0">
             <div className="truncate text-2xl font-black uppercase leading-[1.05] text-deep-forest">
@@ -417,7 +417,7 @@ export default function ChatPage() {
                     `https://api.dicebear.com/7.x/avataaars/svg?seed=${activeOtherName}`
                   }
                   alt={activeOtherName}
-                  className="h-11 w-11 shrink-0 rounded-full object-cover"
+                  className="h-[44px] w-[44px] shrink-0 rounded-full object-cover"
                 />
                 <div className="min-w-0">
                 <div className="truncate text-xl font-black leading-[1.1] text-deep-forest">
@@ -481,7 +481,7 @@ export default function ChatPage() {
                               `https://api.dicebear.com/7.x/avataaars/svg?seed=${senderName}`
                             }
                             alt={senderName}
-                            className="h-8 w-8 rounded-full object-cover"
+                            className="h-[34px] w-[34px] rounded-full object-cover"
                           />
                         )}
                         <div
@@ -584,7 +584,7 @@ export default function ChatPage() {
                   aria-label="Attach image"
                   title="Attach image"
                 >
-                  <ImagePlus className="h-5 w-5" />
+                  <ImagePlus className="h-[20px] w-[20px]" />
                 </button>
                 <textarea
                   value={draft}
@@ -607,9 +607,9 @@ export default function ChatPage() {
                   aria-label="Send message"
                 >
                   {isSending ? (
-                    <Loader2 className="h-5 w-5 animate-spin" />
+                    <Loader2 className="h-[20px] w-[20px] animate-spin" />
                   ) : (
-                    <Send className="h-5 w-5" />
+                    <Send className="h-[20px] w-[20px]" />
                   )}
                 </button>
               </div>
