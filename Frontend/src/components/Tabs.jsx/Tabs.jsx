@@ -1,5 +1,6 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 export default function Tabs({
   items = [],
@@ -9,6 +10,7 @@ export default function Tabs({
   onChange,
   variant = "header",
 }) {
+  const scrollerRef = React.useRef(null);
   const [active, setActive] = React.useState(
     defaultKey || (items[0] && items[0].key)
   );
@@ -22,9 +24,16 @@ export default function Tabs({
     onChange?.(key);
   }
 
+  function scrollTabs(direction) {
+    scrollerRef.current?.scrollBy({
+      left: direction * 180,
+      behavior: "smooth",
+    });
+  }
+
   const baseClass =
     variant === "header"
-      ? "w-full rounded-[20px] bg-ash-whisper p-1.5 flex flex-1 items-center justify-around gap-2 overflow-x-auto text-center"
+      ? "flex flex-1 items-center justify-around gap-2 overflow-x-auto text-center [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       : "inline-flex gap-2 items-center";
 
   const tabClass = (isActive) =>
@@ -35,44 +44,77 @@ export default function Tabs({
         : "text-deep-forest hover:bg-bubblegum-blush/40",
     ].join(" ");
 
+  const tabItems = items.map((it) => {
+    const displayLabel = it.shortLabel ? (
+      <>
+        <span className="hidden md:inline">{it.label}</span>
+        <span className="md:hidden">{it.shortLabel}</span>
+      </>
+    ) : (
+      it.label
+    );
+
+    if (asLink && it.to) {
+      return (
+        <NavLink
+          key={it.key}
+          to={it.to}
+          className={({ isActive }) => tabClass(isActive)}
+          end
+        >
+          <div className="px-[0px]">{displayLabel}</div>
+        </NavLink>
+      );
+    }
+
+    const isActive = current === it.key;
+    return (
+      <button
+        key={it.key}
+        role="tab"
+        aria-selected={isActive}
+        className={tabClass(isActive)}
+        onClick={() => handleSelect(it.key)}
+      >
+        {displayLabel}
+      </button>
+    );
+  });
+
+  if (variant !== "header") {
+    return (
+      <div className={baseClass} role="tablist" aria-label="Tabs">
+        {tabItems}
+      </div>
+    );
+  }
+
   return (
-    <div className={baseClass} role="tablist" aria-label="Tabs">
-      {items.map((it) => {
-        const displayLabel = it.shortLabel ? (
-          <>
-            <span className="hidden md:inline">{it.label}</span>
-            <span className="md:hidden">{it.shortLabel}</span>
-          </>
-        ) : (
-          it.label
-        );
-
-        if (asLink && it.to) {
-          return (
-            <NavLink
-              key={it.key}
-              to={it.to}
-              className={({ isActive }) => tabClass(isActive)}
-              end
-            >
-              <div className="px-[0px]">{displayLabel}</div>
-            </NavLink>
-          );
-        }
-
-        const isActive = current === it.key;
-        return (
-          <button
-            key={it.key}
-            role="tab"
-            aria-selected={isActive}
-            className={tabClass(isActive)}
-            onClick={() => handleSelect(it.key)}
-          >
-            {displayLabel}
-          </button>
-        );
-      })}
+    <div className="relative w-full rounded-[20px] bg-ash-whisper p-1.5">
+      <button
+        type="button"
+        onClick={() => scrollTabs(-1)}
+        className="absolute left-1 top-1/2 z-10 inline-flex h-[30px] w-[30px] -translate-y-1/2 items-center justify-center rounded-[10px] bg-pale-canvas text-deep-forest md:hidden"
+        aria-label="Scroll tabs left"
+      >
+        <ChevronLeft className="h-[18px] w-[18px]" />
+      </button>
+      <div
+        ref={scrollerRef}
+        className={`${baseClass} px-[34px] md:px-0`}
+        role="tablist"
+        aria-label="Tabs"
+      >
+        {tabItems}
+      </div>
+      <button
+        type="button"
+        onClick={() => scrollTabs(1)}
+        className="absolute right-1 top-1/2 z-10 inline-flex h-[30px] w-[30px] -translate-y-1/2 items-center justify-center rounded-[10px] bg-pale-canvas text-deep-forest md:hidden"
+        aria-label="Scroll tabs right"
+      >
+        <ChevronRight className="h-[18px] w-[18px]" />
+      </button>
     </div>
   );
 }

@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   ImagePlus,
   Loader2,
+  Menu,
   MessageSquare,
   Send,
   X,
@@ -148,6 +149,7 @@ export default function ChatPage() {
   const [selectedImages, setSelectedImages] = useState([]);
   const [hasMoreOlder, setHasMoreOlder] = useState(true);
   const [openingFromQuery, setOpeningFromQuery] = useState(false);
+  const [isConversationListOpen, setIsConversationListOpen] = useState(false);
   const messagePaneRef = useRef(null);
   const fileInputRef = useRef(null);
   const openedQueryRef = useRef("");
@@ -379,8 +381,20 @@ export default function ChatPage() {
   const activeOtherName = conversationLabel(activeConversation, user?.id);
 
   return (
-    <div className="grid h-[calc(100dvh-136px)] min-h-0 grid-rows-[auto_minmax(0,1fr)] overflow-hidden bg-white text-deep-forest md:h-[min(720px,calc(100vh-190px))] md:min-h-[620px] md:rounded-[20px] lg:grid-cols-[330px_minmax(0,1fr)] lg:grid-rows-none">
-      <aside className="flex max-h-[180px] min-h-0 flex-col bg-pale-canvas lg:max-h-none lg:border-r lg:border-deep-forest/10">
+    <div className="relative h-[calc(100dvh-136px)] min-h-0 overflow-hidden bg-white text-deep-forest md:h-[min(720px,calc(100vh-190px))] md:min-h-[620px] md:rounded-[20px] lg:grid lg:grid-cols-[330px_minmax(0,1fr)]">
+      {isConversationListOpen && (
+        <button
+          type="button"
+          className="fixed inset-x-0 bottom-[72px] top-16 z-30 bg-black/20 lg:hidden"
+          onClick={() => setIsConversationListOpen(false)}
+          aria-label="Close conversation list"
+        />
+      )}
+      <aside
+        className={`fixed inset-x-0 top-16 z-40 max-h-[58dvh] min-h-0 flex-col overflow-hidden bg-pale-canvas shadow-xl lg:static lg:z-auto lg:flex lg:max-h-none lg:shadow-none lg:border-r lg:border-deep-forest/10 ${
+          isConversationListOpen ? "flex" : "hidden"
+        }`}
+      >
         <div className="flex items-center gap-3 px-4 py-3 md:pb-5 md:pt-4">
           <div className="flex h-[40px] w-[40px] shrink-0 items-center justify-center rounded-[10px] bg-deep-forest text-pale-canvas">
             <MessageSquare className="h-[20px] w-[20px]" />
@@ -417,7 +431,10 @@ export default function ChatPage() {
               <button
                 type="button"
                 key={conversation.id}
-                onClick={() => setSelectedId(conversation.id)}
+                onClick={() => {
+                  setSelectedId(conversation.id);
+                  setIsConversationListOpen(false);
+                }}
                 className={`w-full p-3 text-left transition ${
                   selectedId === conversation.id
                     ? "rounded-l-[12px] bg-deep-forest text-pale-canvas"
@@ -464,11 +481,20 @@ export default function ChatPage() {
         </div>
       </aside>
 
-      <section className="flex min-h-0 min-w-0 flex-col overflow-x-hidden">
+      <section className="flex h-full min-h-0 min-w-0 flex-col overflow-x-hidden">
         {activeConversation ? (
           <>
             <header className="flex items-center justify-between gap-4 bg-white px-5 py-4">
               <div className="flex min-w-0 items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsConversationListOpen(true)}
+                  className="inline-flex h-[40px] w-[40px] shrink-0 items-center justify-center rounded-[10px] bg-deep-forest/5 text-deep-forest lg:hidden"
+                  aria-label="Open conversation list"
+                  title="Open conversation list"
+                >
+                  <Menu className="h-[20px] w-[20px]" />
+                </button>
                 <ChatAvatar
                   user={activeConversation.otherUser}
                   name={activeOtherName}
