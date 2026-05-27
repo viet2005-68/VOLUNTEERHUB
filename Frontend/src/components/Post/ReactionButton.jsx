@@ -201,7 +201,7 @@ export default function ReactionButton({
         ref={holderRef}
         role="button"
         tabIndex={0}
-        className={`inline-flex items-center gap-3 px-4 py-2 rounded-lg transition-all duration-200 ${
+        className={`inline-flex items-center gap-3 px-5 py-2.5 rounded-lg transition-all duration-200 ${
           current
             ? "bg-ash-whisper text-deep-forest shadow-sm"
             : "bg-pale-canvas hover:bg-ash-whisper text-deep-forest/75 hover:text-deep-forest"

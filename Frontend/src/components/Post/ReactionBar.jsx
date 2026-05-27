@@ -95,8 +95,8 @@ export default function ReactionBar({
     : [];
 
   return (
-    <div className="flex flex-wrap items-center gap-3 text-deep-forest">
-      <div className="flex flex-row gap-2 items-stretch">
+    <div className="flex flex-wrap items-center gap-x-5 gap-y-3 text-deep-forest">
+      <div className="flex flex-row gap-3 items-stretch">
         <ReactionButton
           initialReaction={currentReactionKey}
           onReact={(r) => {
@@ -127,7 +127,7 @@ export default function ReactionBar({
           small={compact}
         />
         {!compact && reactionEntries.length > 0 && (
-          <div className="flex flex-wrap items-center gap-2 px-3 py-2 bg-ash-whisper/70 rounded-lg border border-ash-whisper">
+          <div className="flex flex-wrap items-center gap-2.5 px-4 py-2 bg-ash-whisper/70 rounded-lg border border-ash-whisper">
             {reactionEntries.map(([key, count]) => (
               <span
                 key={key}
@@ -146,7 +146,7 @@ export default function ReactionBar({
       {hiddenComment && (
         <button
           onClick={() => onCommentClick?.(post.id)}
-          className="inline-flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-ash-whisper transition-colors text-deep-forest font-bold"
+          className="inline-flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-ash-whisper transition-colors text-deep-forest font-bold"
         >
           <FaCommentAlt className="w-5 h-5" />
           {commentLength > 0 ? (
@@ -160,7 +160,7 @@ export default function ReactionBar({
       {onShare && (
         <button
           onClick={() => onShare?.(post.id)}
-          className="inline-flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-ash-whisper transition-colors text-deep-forest font-bold"
+          className="inline-flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-ash-whisper transition-colors text-deep-forest font-bold"
         >
           <FaShare className="w-5 h-5" />
           {!compact && (

@@ -20,13 +20,13 @@ function TrendingEvent() {
       <ModalActivity title="Trending Events" subtile="Most popular events">
         {isLoading && (
           <div className="flex items-center justify-center py-8">
-            <div className="text-gray-500">Loading trending events...</div>
+            <div className="font-semibold text-deep-forest/60">Loading trending events...</div>
           </div>
         )}
 
         {isError && (
           <div className="flex items-center justify-center py-8">
-            <div className="text-red-500">
+            <div className="font-semibold text-foudre-pink">
               Error: {error?.message || "Failed to load trending events"}
             </div>
           </div>
@@ -34,7 +34,7 @@ function TrendingEvent() {
 
         {!isLoading && !isError && trendingEvents.length === 0 && (
           <div className="flex items-center justify-center py-8">
-            <div className="text-gray-500">No trending events available</div>
+            <div className="font-semibold text-deep-forest/60">No trending events available</div>
           </div>
         )}
 
@@ -46,7 +46,7 @@ function TrendingEvent() {
 
         {!isLoading && !isError && trendingEvents.length > 0 && (
           <div
-            className="flex flex-row items-center justify-end gap-1 cursor-pointer hover:text-red-500 transition-colors text-sm font-semibold"
+            className="flex flex-row items-center justify-end gap-1 cursor-pointer text-sm font-bold text-deep-forest hover:text-foudre-pink transition-colors"
             onClick={() => navigate("/trending")}
           >
             <p>See all trending</p>

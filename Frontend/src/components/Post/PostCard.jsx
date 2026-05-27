@@ -244,7 +244,7 @@ export default function PostCard({
       </p>
       {renderImageGrid()}
 
-      <footer className="mt-6 pt-4 border-t border-ash-whisper relative">
+      <footer className="mt-8 pt-6 border-t border-ash-whisper relative">
         <ReactionBar
           post={post}
           onReact={onReactLocal}
