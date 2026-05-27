@@ -217,9 +217,9 @@ function MarkCompletionList() {
   }
 
   return (
-    <div className="flex flex-col gap-6 rounded-[25px] border border-ash-whisper bg-pale-canvas/90 p-5 text-deep-forest sm:gap-8 sm:border-2 sm:p-6 md:p-8">
+    <div className="flex flex-col gap-6 rounded-[25px] border border-ash-whisper bg-pale-canvas/90 px-7 pb-7 pt-10 text-deep-forest sm:gap-8 sm:border-2 sm:px-8 sm:pb-8 sm:pt-12 md:px-10 md:pb-10 md:pt-14">
       {/* Header */}
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-3 pl-1">
         <h2 className="font-beni text-[56px] font-black uppercase leading-[0.7] text-deep-forest md:text-[80px]">
           Volunteer Completion Management
         </h2>

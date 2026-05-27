@@ -54,10 +54,10 @@ export default function Tabs({
 
   const tabClass = (isActive) =>
     [
-      "flex-1 min-w-fit px-5 py-3 rounded-[10px] text-sm font-bold leading-[0.85] text-center max-sm:text-xs transition-colors",
+      "inline-flex flex-1 shrink-0 items-center justify-center whitespace-nowrap px-5 py-3 rounded-[10px] text-sm font-bold leading-[0.85] text-center max-sm:text-xs transition-colors",
       isActive
-        ? "bg-deep-forest text-pale-canvas"
-        : "text-deep-forest hover:bg-deep-forest/10",
+        ? "bg-bubblegum-blush text-deep-forest ring-1 ring-foudre-pink/25"
+        : "text-deep-forest hover:bg-bubblegum-blush/45",
     ].join(" ");
 
   const tabItems = items.map((it) => {
@@ -78,7 +78,7 @@ export default function Tabs({
           className={({ isActive }) => tabClass(isActive)}
           end
         >
-          <div className="px-[0px]">{displayLabel}</div>
+          <span className="block text-current">{displayLabel}</span>
         </NavLink>
       );
     }
