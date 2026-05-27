@@ -13,8 +13,10 @@ export default function PostCard({
   hiddenComment,
   onEdit,
   onDelete,
+  onShare,
 }) {
   const [showMenu, setShowMenu] = useState(false);
+  const [avatarFailed, setAvatarFailed] = useState(false);
   const menuRef = useClickOutside(() => setShowMenu(false));
   const openModal = (options = {}) => onOpenPost(post, options);
   const imageCount = Array.isArray(post.images) ? post.images.length : 0;
@@ -33,7 +35,7 @@ export default function PostCard({
     if (!imageCount) return null;
 
     const baseWrapperClass =
-      "relative overflow-hidden rounded-2xl border border-blue-50 shadow-sm";
+      "relative overflow-hidden rounded-2xl border border-ash-whisper shadow-sm";
     const baseImageClass =
       "w-full object-cover transition-transform duration-200 hover:scale-[1.02] cursor-pointer";
 
@@ -177,21 +179,26 @@ export default function PostCard({
   };
 
   return (
-    <article className="rounded-xl shadow-lg p-6 mb-6 bg-white border border-blue-100">
+    <article className="rounded-[20px] shadow-sm p-6 mb-6 bg-pale-canvas border-2 border-ash-whisper">
       <header className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-full bg-yellow-400/50 flex items-center justify-center font-bold text-white text-lg shadow-md">
-            <img
-              src={post.author.avatarUrl}
-              alt={post.author.name}
-              className="w-full h-full rounded-full"
-            />
+        <div className="flex min-w-0 items-center gap-4">
+          <div className="w-14 h-14 shrink-0 overflow-hidden rounded-full border-2 border-bubblegum-blush bg-ash-whisper flex items-center justify-center font-bold text-deep-forest text-lg shadow-sm">
+            {post.author.avatarUrl && !avatarFailed ? (
+              <img
+                src={post.author.avatarUrl}
+                alt={post.author.name}
+                className="block h-full w-full object-cover"
+                onError={() => setAvatarFailed(true)}
+              />
+            ) : (
+              <span>{post.author.name?.charAt(0)?.toUpperCase() || "U"}</span>
+            )}
           </div>
-          <div>
-            <div className="font-bold text-gray-900 text-lg leading-tight">
+          <div className="min-w-0">
+            <div className="font-bold text-deep-forest text-lg leading-tight truncate">
               {post.author.name}
             </div>
-            <div className="text-sm text-gray-500 font-medium">
+            <div className="text-sm text-deep-forest/60 font-medium">
               {new Date(post.createdAt).toLocaleString("vi-VN", {
                 hour: "2-digit",
                 minute: "2-digit",
@@ -205,16 +212,16 @@ export default function PostCard({
           <div className="relative" ref={menuRef}>
             <button
               onClick={() => setShowMenu(!showMenu)}
-              className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+              className="p-2 rounded-full hover:bg-ash-whisper transition-colors"
               aria-label="Post options"
             >
-              <MoreVertical className="w-5 h-5 text-gray-600" />
+              <MoreVertical className="w-5 h-5 text-deep-forest/70" />
             </button>
             {showMenu && (
-              <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-10">
+              <div className="absolute right-0 mt-2 w-48 bg-pale-canvas rounded-lg shadow-lg border border-ash-whisper py-1 z-10">
                 <button
                   onClick={handleEdit}
-                  className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+                  className="w-full px-4 py-2 text-left text-sm text-deep-forest hover:bg-ash-whisper flex items-center gap-2"
                 >
                   <Edit2 className="w-4 h-4" />
                   Edit Post
@@ -232,12 +239,12 @@ export default function PostCard({
         )}
       </header>
 
-      <p className="mt-6 text-gray-800 text-base leading-relaxed font-medium">
+      <p className="mt-6 text-deep-forest text-base leading-relaxed font-medium">
         {post.text}
       </p>
       {renderImageGrid()}
 
-      <footer className="mt-6 pt-4 border-t border-blue-100 relative">
+      <footer className="mt-6 pt-4 border-t border-ash-whisper relative">
         <ReactionBar
           post={post}
           onReact={onReactLocal}
@@ -245,6 +252,7 @@ export default function PostCard({
           commentLength={commentLength}
           hiddenComment={true}
           eventId={post?.eventId}
+          onShare={onShare}
         />
       </footer>
     </article>

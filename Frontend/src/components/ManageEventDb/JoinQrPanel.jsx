@@ -77,14 +77,14 @@ export default function JoinQrPanel({ eventId, eventStatus }) {
   return (
     <section className="rounded-2xl border border-deep-forest/15 bg-pale-canvas p-5 text-deep-forest shadow-[0_14px_34px_rgba(0,82,45,0.08)] sm:p-6">
       <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
-        <div className="flex min-w-0 gap-4">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-deep-forest text-pale-canvas shadow-sm">
-            <QrCode className="h-6 w-6" />
+        <div className="flex min-w-0 items-start gap-5">
+          <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-[16px] bg-deep-forest text-pale-canvas shadow-sm sm:h-[72px] sm:w-[72px]">
+            <QrCode className="h-9 w-9 sm:h-10 sm:w-10" strokeWidth={2.4} />
           </div>
-          <div className="min-w-0">
-            <h3 className="font-beni text-5xl uppercase leading-[0.75] text-deep-forest sm:text-6xl">
+          <div className="min-w-0 pt-1">
+            <div role="heading" aria-level={3} className="font-beni text-[52px] font-black uppercase leading-[0.72] text-deep-forest sm:text-[64px]">
               Join QR
-            </h3>
+            </div>
             <p className="mt-2 max-w-3xl text-sm font-medium leading-[1.35] text-deep-forest/65">
               Scan-to-join link for this event. Regenerate to reveal a fresh web QR when needed.
             </p>

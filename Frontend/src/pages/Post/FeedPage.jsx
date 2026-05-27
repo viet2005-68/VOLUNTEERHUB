@@ -6,7 +6,11 @@ import PostCard from "../../components/Post/PostCard";
 import PostModal from "../../components/Post/PostModal";
 import EditPostModal from "../../components/Post/EditPostModal";
 import "../../index.css";
-import { useInfinitePosts, useDeletePost } from "../../hook/useCommunity";
+import {
+  useInfinitePosts,
+  useDeletePost,
+  useSharePost,
+} from "../../hook/useCommunity";
 import { useNavbar } from "../../hook/useNavbar";
 import { useAuth } from "../../hook/useAuth";
 import toast from "react-hot-toast";
@@ -48,28 +52,71 @@ export default function FeedPage() {
 
   // Delete mutation
   const { mutate: deletePost } = useDeletePost(id, showDeleteConfirm?.id);
+  const { mutate: sharePost } = useSharePost(id);
 
   // Map dữ liệu API
-
-  const mapApiPost = (p) => ({
-    id: p?.id,
-    eventId: id, // Add eventId from URL params
-    author: {
-      name: p?.owner?.fullName ?? "Unknown",
-      avatarUrl: p?.owner?.avatarUrl,
-    },
-    text: p?.content ?? "",
-    images: Array.isArray(p?.imageUrls) ? p.imageUrls : [],
-    createdAt: p?.createdAt,
-    comments: [],
-    reactions: {},
-    userReaction: null,
-    ownerId: p?.owner?.id,
+  const normalizeReactionCounts = (counts = {}) => ({
+    LIKE: Number(counts.LIKE || 0),
+    LOVE: Number(counts.LOVE || 0),
+    HAHA: Number(counts.HAHA || 0),
+    WOW: Number(counts.WOW || 0),
+    SAD: Number(counts.SAD || 0),
+    ANGRY: Number(counts.ANGRY || 0),
   });
+
+  const reactionEnumToKey = (type) => {
+    const map = {
+      LIKE: "like",
+      LOVE: "love",
+      HAHA: "haha",
+      WOW: "wow",
+      SAD: "sad",
+      ANGRY: "angry",
+    };
+    return map[type] || null;
+  };
+
+  const reactionKeyToEnum = (type) => {
+    const map = {
+      like: "LIKE",
+      love: "LOVE",
+      haha: "HAHA",
+      wow: "WOW",
+      sad: "SAD",
+      angry: "ANGRY",
+    };
+    return map[type] || null;
+  };
+
+  const mapApiPost = (p) => {
+    const myReactionType = p?.myReactionType || p?.myReaction?.type || null;
+    const reactionCounts = normalizeReactionCounts(p?.reactionCounts);
+
+    return {
+      id: p?.id,
+      eventId: id, // Add eventId from URL params
+      author: {
+        name: p?.owner?.fullName ?? "Unknown",
+        avatarUrl: p?.owner?.avatarUrl,
+      },
+      text: p?.content ?? "",
+      images: Array.isArray(p?.imageUrls) ? p.imageUrls : [],
+      createdAt: p?.createdAt,
+      comments: [],
+      commentCount: Number(p?.commentCount || 0),
+      reactionCount: Number(p?.reactionCount || 0),
+      reactionCounts,
+      reactions: reactionCounts,
+      myReaction: p?.myReaction || null,
+      myReactionType,
+      userReaction: reactionEnumToKey(myReactionType),
+      shareCount: Number(p?.shareCount || 0),
+      ownerId: p?.owner?.id,
+    };
+  };
 
   useEffect(() => {
     if (!data) return;
-    console.log(data);
     const mapped = data.pages.flatMap((page) =>
       Array.isArray(page?.content) ? page.content.map(mapApiPost) : []
     );
@@ -81,14 +128,17 @@ export default function FeedPage() {
 
   // Tạo bài viết mới
   const handleCreate = (newPost) => {
-    const _minimal = {
-      id: newPost.id ?? Date.now(),
-      content: newPost.content ?? "",
-      text: newPost.text ?? newPost.content ?? "",
-      images: Array.isArray(newPost.images) ? newPost.images : [],
-      author: newPost.author ?? { name: currentUser.name },
-      createdAt: newPost.createdAt ?? new Date().toISOString(),
-    };
+    const created = mapApiPost({
+      ...newPost,
+      owner: newPost?.owner ?? {
+        id: user?.id,
+        fullName: user?.fullName || user?.name || user?.username || currentUser.name,
+        avatarUrl: user?.avatarUrl,
+      },
+      imageUrls: newPost?.imageUrls ?? newPost?.images ?? [],
+      createdAt: newPost?.createdAt ?? new Date().toISOString(),
+    });
+    setPosts((prev) => [{ ...created, _localCreated: true }, ...prev]);
   };
 
   // Modal handlers
@@ -186,53 +236,79 @@ export default function FeedPage() {
     });
   };
 
+  const handleShare = (postId) => {
+    sharePost(postId, {
+      onSuccess: (updatedPost) => {
+        const nextShareCount = Number(updatedPost?.shareCount || 0);
+        setPosts((prev) =>
+          prev.map((post) =>
+            post.id === postId
+              ? {
+                  ...post,
+                  shareCount: nextShareCount || Number(post.shareCount || 0) + 1,
+                }
+              : post
+          )
+        );
+        setActivePost((post) =>
+          post?.id === postId
+            ? {
+                ...post,
+                shareCount: nextShareCount || Number(post.shareCount || 0) + 1,
+              }
+            : post
+        );
+        const shareUrl = `${window.location.origin}/opportunities/discussion/${id}?postId=${postId}`;
+        navigator.clipboard?.writeText(shareUrl).catch(() => {});
+        toast.success("Post link copied.");
+      },
+    });
+  };
+
   // Local reactions (UI-only)
+  const applyLocalReaction = (post, type) => {
+    const previousKey = post.userReaction || reactionEnumToKey(post.myReactionType);
+    const alreadySelected = previousKey === type;
+    const nextKey = alreadySelected ? null : type;
+    const nextCounts = normalizeReactionCounts(post.reactionCounts || post.reactions);
+
+    if (previousKey) {
+      const previousEnum = reactionKeyToEnum(previousKey);
+      if (previousEnum) {
+        nextCounts[previousEnum] = Math.max(0, Number(nextCounts[previousEnum] || 0) - 1);
+      }
+    }
+
+    if (nextKey) {
+      const nextEnum = reactionKeyToEnum(nextKey);
+      if (nextEnum) {
+        nextCounts[nextEnum] = Number(nextCounts[nextEnum] || 0) + 1;
+      }
+    }
+
+    const nextEnumType = nextKey ? reactionKeyToEnum(nextKey) : null;
+
+    return {
+      ...post,
+      reactions: nextCounts,
+      reactionCounts: nextCounts,
+      userReaction: nextKey,
+      myReactionType: nextEnumType,
+      myReaction: nextEnumType
+        ? { ...(post.myReaction || {}), type: nextEnumType }
+        : null,
+    };
+  };
+
   const reactTo = (postId, type) => {
     setPosts((prev) =>
-      prev.map((p) => {
-        if (p.id !== postId) return p;
-        const already = p.userReaction === type;
-        const newReactions = { ...(p.reactions || {}) };
-        let newUserReaction = p.userReaction;
-        if (already) {
-          // remove
-          newReactions[type] = Math.max(0, (newReactions[type] || 0) - 1);
-          newUserReaction = null;
-        } else {
-          // switch or add
-          if (p.userReaction) {
-            newReactions[p.userReaction] = Math.max(
-              0,
-              (newReactions[p.userReaction] || 0) - 1
-            );
-          }
-          newReactions[type] = (newReactions[type] || 0) + 1;
-          newUserReaction = type;
-        }
-        return { ...p, reactions: newReactions, userReaction: newUserReaction };
-      })
+      prev.map((p) => (p.id === postId ? applyLocalReaction(p, type) : p))
     );
 
     // also update activePost if it's the same
     setActivePost((ap) => {
       if (!ap || ap.id !== postId) return ap;
-      const p = posts.find((x) => x.id === postId) || ap;
-      const already = p.userReaction === type;
-      let newReactions = { ...(p.reactions || {}) };
-      let newUserReaction = p.userReaction;
-      if (already) {
-        newReactions[type] = Math.max(0, (newReactions[type] || 0) - 1);
-        newUserReaction = null;
-      } else {
-        if (p.userReaction)
-          newReactions[p.userReaction] = Math.max(
-            0,
-            (newReactions[p.userReaction] || 0) - 1
-          );
-        newReactions[type] = (newReactions[type] || 0) + 1;
-        newUserReaction = type;
-      }
-      return { ...ap, reactions: newReactions, userReaction: newUserReaction };
+      return applyLocalReaction(ap, type);
     });
   };
 
@@ -244,7 +320,7 @@ export default function FeedPage() {
     }
   };
   const Footer = () => (
-    <div className="py-4 text-center text-sm text-gray-500">
+    <div className="py-4 text-center text-sm font-semibold text-deep-forest/60">
       {isFetchingNextPage
         ? "Loading..."
         : hasNextPage
@@ -254,7 +330,6 @@ export default function FeedPage() {
         : null}
     </div>
   );
-  console.log("post", posts);
 
   return (
     <div className="min-h-screen py-4">
@@ -271,10 +346,10 @@ export default function FeedPage() {
         />
 
         {status === "loading" && (
-          <div className="text-center text-gray-500 mt-4">Loading...</div>
+          <div className="text-center text-deep-forest/60 mt-4">Loading...</div>
         )}
         {status === "error" && (
-          <div className="text-center text-red-500 mt-4">Can't load posts.</div>
+          <div className="text-center text-foudre-pink mt-4">Can't load posts.</div>
         )}
 
         <Virtuoso
@@ -292,6 +367,8 @@ export default function FeedPage() {
               hiddenComment={hiddenComment}
               onEdit={handleEditPost}
               onDelete={handleDeletePost}
+              onShare={handleShare}
+              commentLength={post.commentCount ?? post.comments?.length ?? 0}
             />
           )}
           components={{ Footer }}
@@ -309,6 +386,7 @@ export default function FeedPage() {
         onEditComment={editComment}
         onDeleteComment={deleteComment}
         onReact={reactTo}
+        onShare={handleShare}
         postId={activePost?.id}
         eventId={id}
       />
@@ -329,16 +407,16 @@ export default function FeedPage() {
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl shadow-lg p-6 max-w-md w-full">
-            <h3 className="text-xl font-semibold mb-4">Delete Post</h3>
-            <p className="text-gray-600 mb-6">
+          <div className="bg-pale-canvas rounded-2xl border-2 border-ash-whisper shadow-lg p-6 max-w-md w-full">
+            <h3 className="text-xl font-bold text-deep-forest mb-4">Delete Post</h3>
+            <p className="text-deep-forest/70 mb-6">
               Are you sure you want to delete this post? This action cannot be
               undone.
             </p>
             <div className="flex gap-3 justify-end">
               <button
                 onClick={() => setShowDeleteConfirm(null)}
-                className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition"
+                className="px-4 py-2 rounded-lg border border-ash-whisper text-deep-forest hover:bg-ash-whisper transition"
               >
                 Cancel
               </button>

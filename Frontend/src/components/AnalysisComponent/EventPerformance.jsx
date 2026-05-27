@@ -9,7 +9,7 @@ import {
 } from "recharts";
 import { useOwnedEventsPagination } from "../../hook/useEvent";
 
-const COLORS = ["#10b981", "#3b82f6", "#ef4444", "#f59e0b", "#8b5cf6"];
+const COLORS = ["#00522d", "#db3c8a", "#f29ebd", "#79b69c", "#d1cfe4"];
 
 function EventPerformance() {
   // Fetch owned events with large page size to get all events
@@ -54,12 +54,12 @@ function EventPerformance() {
 
   if (isLoading) {
     return (
-      <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+      <div className="rounded-[20px] border-2 border-ash-whisper bg-pale-canvas p-6 shadow-sm">
+        <h3 className="font-beni text-[42px] font-black uppercase leading-[0.75] text-deep-forest mb-5">
           Event Performance
         </h3>
         <div className="flex items-center justify-center h-64">
-          <div className="text-gray-500">Loading events...</div>
+          <div className="text-deep-forest/60">Loading events...</div>
         </div>
       </div>
     );
@@ -67,12 +67,12 @@ function EventPerformance() {
 
   if (isError || chartData.length === 0) {
     return (
-      <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+      <div className="rounded-[20px] border-2 border-ash-whisper bg-pale-canvas p-6 shadow-sm">
+        <h3 className="font-beni text-[42px] font-black uppercase leading-[0.75] text-deep-forest mb-5">
           Event Performance
         </h3>
         <div className="flex items-center justify-center h-64">
-          <div className="text-gray-500">
+          <div className="text-deep-forest/60">
             {isError ? "Failed to load events" : "No events found"}
           </div>
         </div>
@@ -83,13 +83,13 @@ function EventPerformance() {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
-        <div className="bg-white p-3 rounded-lg shadow-lg border border-gray-200">
-          <p className="font-semibold text-gray-900">{data.name}</p>
-          <p className="text-sm text-gray-600">{data.category}</p>
-          <p className="text-sm text-gray-600">
+        <div className="rounded-[10px] border border-ash-whisper bg-pale-canvas p-3 shadow-lg">
+          <p className="font-bold text-deep-forest">{data.name}</p>
+          <p className="text-sm text-deep-forest/70">{data.category}</p>
+          <p className="text-sm text-deep-forest/70">
             Participants: {data.participants}
           </p>
-          <p className="text-sm font-semibold text-blue-600">{data.value}%</p>
+          <p className="text-sm font-bold text-foudre-pink">{data.value}%</p>
         </div>
       );
     }
@@ -97,8 +97,8 @@ function EventPerformance() {
   };
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">
+    <div className="rounded-[20px] border-2 border-ash-whisper bg-pale-canvas p-6 shadow-sm">
+      <h3 className="font-beni text-[42px] font-black uppercase leading-[0.75] text-deep-forest mb-5">
         Event Performance
       </h3>
 
@@ -107,10 +107,10 @@ function EventPerformance() {
           <div key={index} className="space-y-2">
             <div className="flex justify-between items-center">
               <div>
-                <p className="font-medium text-gray-900 text-sm">
+                <p className="font-bold text-deep-forest text-sm">
                   {event.name}
                 </p>
-                <p className="text-xs text-gray-500">{event.category}</p>
+                <p className="text-xs text-deep-forest/60">{event.category}</p>
               </div>
               <div className="text-right">
                 <p
@@ -119,10 +119,10 @@ function EventPerformance() {
                 >
                   {event.value}%
                 </p>
-                <p className="text-xs text-gray-500">{event.participants}</p>
+                <p className="text-xs text-deep-forest/60">{event.participants}</p>
               </div>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
+            <div className="w-full rounded-full bg-ash-whisper h-2">
               <div
                 className="h-2 rounded-full transition-all duration-300"
                 style={{
@@ -136,7 +136,7 @@ function EventPerformance() {
       </div>
 
       {/* Mini Pie Chart */}
-      <div className="mt-6 h-48">
+      <div className="mt-7 h-48">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
@@ -145,7 +145,7 @@ function EventPerformance() {
               cy="50%"
               innerRadius={40}
               outerRadius={70}
-              fill="#8884d8"
+              fill="#00522d"
               paddingAngle={5}
               dataKey="value"
             >

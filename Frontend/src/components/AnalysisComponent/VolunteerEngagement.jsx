@@ -35,11 +35,11 @@ function VolunteerEngagement() {
 
   if (isLoading) {
     return (
-      <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900 mb-6">
+      <div className="rounded-[20px] border-2 border-ash-whisper bg-pale-canvas p-6 shadow-sm">
+        <h3 className="font-beni text-[42px] font-black uppercase leading-[0.75] text-deep-forest mb-6">
           Volunteer Engagement
         </h3>
-        <div className="flex items-center justify-center h-64 text-gray-500">
+        <div className="flex items-center justify-center h-64 text-deep-forest/60">
           Loading analytics...
         </div>
       </div>
@@ -47,8 +47,8 @@ function VolunteerEngagement() {
   }
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-      <h3 className="text-lg font-semibold text-gray-900 mb-6">
+    <div className="rounded-[20px] border-2 border-ash-whisper bg-pale-canvas p-6 shadow-sm">
+      <h3 className="font-beni text-[42px] font-black uppercase leading-[0.75] text-deep-forest mb-6">
         Volunteer Engagement
       </h3>
 
@@ -59,16 +59,16 @@ function VolunteerEngagement() {
           return (
             <div key={item.label} className="space-y-2">
               <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <Icon className="h-4 w-4 text-blue-600" />
+                <div className="flex items-center gap-2 text-sm font-medium text-deep-forest/70">
+                  <Icon className="h-4 w-4 text-foudre-pink" />
                   {item.label}
                 </div>
-                <span className="text-xl font-bold text-gray-900">{item.value}</span>
+                <span className="text-xl font-bold text-deep-forest">{item.value}</span>
               </div>
               {percent !== null && (
-                <div className="h-2 rounded-full bg-gray-200">
+                <div className="h-2 rounded-full bg-ash-whisper">
                   <div
-                    className="h-2 rounded-full bg-blue-600 transition-all duration-300"
+                    className="h-2 rounded-full bg-deep-forest transition-all duration-300"
                     style={{ width: `${Math.min(percent, 100)}%` }}
                   />
                 </div>

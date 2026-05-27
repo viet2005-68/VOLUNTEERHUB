@@ -2,6 +2,8 @@ package com.volunteerhub.communityservice.service;
 
 import com.volunteerhub.common.dto.PageResponse;
 import com.volunteerhub.common.dto.PostResponse;
+import com.volunteerhub.common.dto.ReactionResponse;
+import com.volunteerhub.common.enums.ReactionType;
 import com.volunteerhub.communityservice.dto.PageNumAndSizeResponse;
 import com.volunteerhub.communityservice.dto.PostRequest;
 import com.volunteerhub.communityservice.mapper.PostMapper;
@@ -19,13 +21,18 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 @Service
@@ -65,10 +72,13 @@ public class PostService {
 
     @PostAuthorize("hasRole('ADMIN') or @eventRegistrationService.isParticipant(returnObject.eventId)")
     public PostResponse findById(Long id) {
+        String currentUserId = getCurrentUserId();
         return postMapper.toDto(
                 postRepository.findById(id).orElseThrow(() -> new NoSuchElementException("Post with id " + id + " does not exist")),
                 getCachedReactionCount(id),
-                getCachedCommentCount(id)
+                getCachedCommentCount(id),
+                getReactionCountsByType(id),
+                getMyReaction(currentUserId, id)
         );
     }
 
@@ -77,11 +87,14 @@ public class PostService {
         PageNumAndSizeResponse pageNumAndSize = PaginationValidation.validate(pageNum, pageSize);
         Sort sort = order.equals("desc") ? Sort.by(sortedBy).descending() : Sort.by(sortedBy).ascending();
         Page<Post> page = postRepository.findByEventId(eventId, PageRequest.of(pageNumAndSize.getPageNum(), pageNumAndSize.getPageSize(), sort));
+        String currentUserId = getCurrentUserId();
         List<PostResponse> dtoList = page.getContent().stream()
                 .map(post -> postMapper.toDto(
                         post,
                         getCachedReactionCount(post.getId()),
-                        getCachedCommentCount(post.getId())
+                        getCachedCommentCount(post.getId()),
+                        getReactionCountsByType(post.getId()),
+                        getMyReaction(currentUserId, post.getId())
                 ))
                 .toList();
         return PageResponse.<PostResponse>builder()
@@ -104,7 +117,7 @@ public class PostService {
                 .build();
         Post savedPost = postRepository.save(post);
         postPublisher.publishPostCreatedEvent(postMapper.toPostCreatedMessage(savedPost));
-        return postMapper.toDto(savedPost, 0, 0);
+        return postMapper.toDto(savedPost, 0, 0, emptyReactionCounts(), null);
     }
 
     // TODO: Delete old images
@@ -120,7 +133,14 @@ public class PostService {
         if (postRequest.getContent() != null) {
             post.setContent(postRequest.getContent());
         }
-        return postMapper.toDto(postRepository.save(post), getCachedReactionCount(postId), getCachedCommentCount(postId));
+        Post savedPost = postRepository.save(post);
+        return postMapper.toDto(
+                savedPost,
+                getCachedReactionCount(postId),
+                getCachedCommentCount(postId),
+                getReactionCountsByType(postId),
+                getMyReaction(userId, postId)
+        );
     }
 
     // TODO: Delete old images
@@ -130,7 +150,27 @@ public class PostService {
             throw new AccessDeniedException("Insufficient permission to delete this record.");
         }
         postRepository.delete(post);
-        return postMapper.toDto(post, getCachedReactionCount(postId), getCachedCommentCount(postId));
+        return postMapper.toDto(
+                post,
+                getCachedReactionCount(postId),
+                getCachedCommentCount(postId),
+                getReactionCountsByType(postId),
+                getMyReaction(userId, postId)
+        );
+    }
+
+    @PreAuthorize("hasRole('ADMIN') or @postService.canAccessPost(authentication.name, #postId)")
+    public PostResponse share(String userId, Long postId) {
+        Post post = findEntityById(postId);
+        post.setShareCount(post.getShareCount() + 1);
+        Post savedPost = postRepository.save(post);
+        return postMapper.toDto(
+                savedPost,
+                getCachedReactionCount(postId),
+                getCachedCommentCount(postId),
+                getReactionCountsByType(postId),
+                getMyReaction(userId, postId)
+        );
     }
 
     public boolean canAccessPost(String userId, Long postId) {
@@ -147,5 +187,39 @@ public class PostService {
         LocalDateTime startDate = endDate.minusDays(days);
 
         return postRepository.countByEventIdAndCreatedAtBetween(eventId, startDate, endDate);
+    }
+
+    private String getCurrentUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication == null ? null : authentication.getName();
+    }
+
+    private Map<String, Long> emptyReactionCounts() {
+        Map<String, Long> counts = new LinkedHashMap<>();
+        Arrays.stream(ReactionType.values()).forEach(type -> counts.put(type.name(), 0L));
+        return counts;
+    }
+
+    private Map<String, Long> getReactionCountsByType(Long postId) {
+        Map<String, Long> counts = emptyReactionCounts();
+        reactionRepository.countReactionsByType(postId)
+                .forEach(item -> counts.put(item.getType(), item.getCount()));
+        return counts;
+    }
+
+    private ReactionResponse getMyReaction(String userId, Long postId) {
+        if (userId == null || "anonymousUser".equals(userId)) {
+            return null;
+        }
+        return reactionRepository.findByOwnerIdAndPostId(userId, postId)
+                .map(reaction -> ReactionResponse.builder()
+                        .id(reaction.getId())
+                        .ownerId(reaction.getOwnerId())
+                        .postId(postId)
+                        .type(reaction.getType())
+                        .createdAt(reaction.getCreatedAt())
+                        .updatedAt(reaction.getUpdatedAt())
+                        .build())
+                .orElse(null);
     }
 }

@@ -17,6 +17,7 @@ export default function RegistrationPage() {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [page, setPage] = useState(1);
   const [selectedReg, setSelectedReg] = useState(null);
+  const [failedAvatarIds, setFailedAvatarIds] = useState(() => new Set());
   const isFirstLoad = useRef(true);
 
   // Debounce search input
@@ -52,6 +53,15 @@ export default function RegistrationPage() {
 
   const handlePageChange = (event, value) => {
     setPage(value);
+  };
+
+  const handleAvatarError = (registrationKey) => {
+    setFailedAvatarIds((current) => {
+      if (current.has(registrationKey)) return current;
+      const next = new Set(current);
+      next.add(registrationKey);
+      return next;
+    });
   };
 
   const formatDateTime = (dateString) => {
@@ -112,29 +122,38 @@ export default function RegistrationPage() {
         <div className="md:hidden space-y-3">
           {data?.items && data.items.length > 0 ? (
             data.items.map((reg) => {
+              const registrationKey =
+                reg.registrationId ??
+                `${reg.eventId ?? "event"}-${reg.userId ?? reg.fullName ?? "volunteer"}`;
+              const avatarInitial =
+                reg.fullName?.trim()?.charAt(0)?.toUpperCase() || "V";
+              const avatarSrc =
+                reg.avatarUrl ||
+                `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(
+                  reg.fullName || "volunteer"
+                )}`;
+              const hasAvatarError = failedAvatarIds.has(registrationKey);
+
               return (
                 <div
-                  key={reg.registrationId}
+                  key={registrationKey}
                   className="overflow-hidden rounded-[20px] border border-deep-forest/10 bg-pale-canvas shadow-lg shadow-deep-forest/10"
                 >
                   {/* Header: Avatar, Name and Status */}
                   <div className="flex items-start gap-3 p-4">
                     {/* Avatar */}
-                    <div className="flex-shrink-0">
-                      {reg.avatarUrl ? (
+                    <div className="h-12 w-12 shrink-0 overflow-hidden rounded-full border-2 border-bubblegum-blush bg-ash-whisper">
+                      {!hasAvatarError ? (
                         <img
-                          src={reg.avatarUrl}
+                          src={avatarSrc}
                           alt={reg.fullName || "Volunteer"}
-                          className="h-12 w-12 rounded-full object-cover border-2 border-bubblegum-blush"
+                          className="block h-full w-full object-cover"
+                          onError={() => handleAvatarError(registrationKey)}
                         />
                       ) : (
-                        <img
-                          src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${
-                            reg.fullName || "volunteer"
-                          }`}
-                          alt="avatar"
-                          className="h-12 w-12 rounded-full object-cover border-2 border-bubblegum-blush"
-                        />
+                        <div className="flex h-full w-full items-center justify-center text-sm font-bold text-deep-forest">
+                          {avatarInitial}
+                        </div>
                       )}
                     </div>
 
@@ -149,7 +168,7 @@ export default function RegistrationPage() {
                     </div>
 
                     {/* Status Badge */}
-                    <div className="flex-shrink-0">
+                    <div className="max-w-[120px] shrink-0">
                       <RegistrationStatusBadge
                         status={reg.registrationStatus || reg.status}
                       />
@@ -160,29 +179,9 @@ export default function RegistrationPage() {
                   <div className="space-y-2 border-t border-deep-forest/10 px-4 py-3">
                     {/* Registration Date */}
                     <div className="flex items-center gap-2 text-sm text-deep-forest/65">
-                      <svg
-                        className="w-4 h-4 flex-shrink-0"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                        />
-                      </svg>
-                      <span className="truncate">
-                        {formatDateTime(reg.registeredAt)}
-                      </span>
-                    </div>
-
-                    {/* Phone Number */}
-                    {reg.phoneNumber && (
-                      <div className="flex items-center gap-2 text-sm text-deep-forest/65">
+                      <div className="flex h-5 w-5 shrink-0 items-center justify-center">
                         <svg
-                          className="w-4 h-4 flex-shrink-0"
+                          className="h-4 w-4"
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -191,9 +190,33 @@ export default function RegistrationPage() {
                             strokeLinecap="round"
                             strokeLinejoin="round"
                             strokeWidth={2}
-                            d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                           />
                         </svg>
+                      </div>
+                      <span className="truncate">
+                        {formatDateTime(reg.registeredAt)}
+                      </span>
+                    </div>
+
+                    {/* Phone Number */}
+                    {reg.phoneNumber && (
+                      <div className="flex items-center gap-2 text-sm text-deep-forest/65">
+                        <div className="flex h-5 w-5 shrink-0 items-center justify-center">
+                          <svg
+                            className="h-4 w-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                            />
+                          </svg>
+                        </div>
                         <span className="truncate">{reg.phoneNumber}</span>
                       </div>
                     )}

@@ -12,7 +12,6 @@ export default function CommentItem({
   currentUserName = "You",
   depth = 0,
 }) {
-  console.log("CommentItem comment:", comment);
   // Thêm vào đầu component (sau line 15)
   const [showAllReplies, setShowAllReplies] = useState(false);
 
@@ -23,6 +22,7 @@ export default function CommentItem({
 
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(comment.content || "");
+  const [avatarFailed, setAvatarFailed] = useState(false);
 
   // Check if this comment belongs to current user
   const isOwnComment = String(comment.ownerId) === String(currentUserId);
@@ -112,29 +112,34 @@ export default function CommentItem({
     <div className={`${isReply ? "ml-8 mt-2" : ""}`}>
       <div
         className={`p-3 rounded-lg ${
-          isOwnComment ? "bg-blue-50" : "bg-gray-50"
+          isOwnComment ? "bg-ash-whisper/70" : "bg-pale-canvas"
         }`}
       >
         <div className="flex gap-2">
           {/* Avatar */}
           <div className="flex-shrink-0">
-            <div className="w-8 h-8 rounded-full bg-yellow-400/50 flex items-center justify-center text-white text-xs font-semibold">
-              <img
-                src={comment.avatarUrl}
-                alt={comment.ownerName}
-                className="w-full h-full rounded-full object-cover"
-              />
+            <div className="w-8 h-8 overflow-hidden rounded-full bg-ash-whisper border border-bubblegum-blush flex items-center justify-center text-deep-forest text-xs font-semibold">
+              {comment.avatarUrl && !avatarFailed ? (
+                <img
+                  src={comment.avatarUrl}
+                  alt={comment.ownerName}
+                  className="block h-full w-full object-cover"
+                  onError={() => setAvatarFailed(true)}
+                />
+              ) : (
+                <span>{comment.ownerName?.charAt(0)?.toUpperCase() || "U"}</span>
+              )}
             </div>
           </div>
 
           <div className="flex-1 min-w-0">
             {/* Comment content */}
-            <div className="bg-gray-100 rounded-2xl px-3 py-2">
-              <div className="font-semibold text-sm">
+            <div className="bg-ash-whisper/70 rounded-2xl px-3 py-2">
+              <div className="font-semibold text-sm text-deep-forest">
                 {comment.ownerName || "Unknown"}
               </div>
               {!isEditing ? (
-                <div className="text-sm text-gray-800 break-words">
+                <div className="text-sm text-deep-forest break-words">
                   {comment.content}
                 </div>
               ) : (
@@ -142,20 +147,20 @@ export default function CommentItem({
                   <textarea
                     value={editText}
                     onChange={(e) => setEditText(e.target.value)}
-                    className="w-full bg-white rounded-md border border-gray-300 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-300"
+                    className="w-full bg-pale-canvas rounded-md border border-ash-whisper px-3 py-2 text-sm text-deep-forest outline-none focus:ring-2 focus:ring-bubblegum-blush"
                     rows={3}
                   />
                   <div className="mt-2 flex gap-2">
                     <button
                       type="submit"
-                      className="px-3 py-1 text-sm rounded-md bg-blue-600 text-white hover:bg-blue-700"
+                      className="px-3 py-1 text-sm rounded-md bg-deep-forest text-white hover:bg-foudre-pink"
                       disabled={!editText.trim()}
                     >
                       Save
                     </button>
                     <button
                       type="button"
-                      className="px-3 py-1 text-sm rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300"
+                      className="px-3 py-1 text-sm rounded-md bg-ash-whisper text-deep-forest hover:bg-bubblegum-blush/40"
                       onClick={handleEditCancel}
                     >
                       Cancel
@@ -169,25 +174,25 @@ export default function CommentItem({
               {!isEditing && (
                 <button
                   onClick={() => handleReplyClick(comment)}
-                  className="text-gray-600 hover:underline font-semibold"
+                  className="text-deep-forest/70 hover:text-deep-forest hover:underline font-semibold"
                 >
                   Reply
                 </button>
               )}
-              <span className="text-gray-500">
+              <span className="text-deep-forest/55">
                 {formatDate(comment.createdAt)}
               </span>
               {isOwnComment && !isEditing && (
                 <>
                   <button
                     onClick={handleEditStart}
-                    className="text-gray-600 hover:underline"
+                    className="text-deep-forest/70 hover:text-deep-forest hover:underline"
                   >
                     Edit
                   </button>
                   <button
                     onClick={handleDelete}
-                    className="text-gray-600 hover:underline"
+                    className="text-deep-forest/70 hover:text-deep-forest hover:underline"
                   >
                     Remove
                   </button>
@@ -200,10 +205,10 @@ export default function CommentItem({
                 onSubmit={handleReplySubmit}
                 className="lg:mt-5 mt-2 flex gap-2 items-center relative py-0"
               >
-                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-green-400 to-blue-500 flex items-center justify-center text-white text-xs font-semibold flex-shrink-0 absolute -left-0 top-2">
+                <div className="w-6 h-6 rounded-full bg-deep-forest flex items-center justify-center text-white text-xs font-semibold flex-shrink-0 absolute -left-0 top-2">
                   {(currentUserName && currentUserName[0]) || "?"}
                 </div>
-                <div className="flex-1 flex gap-2 bg-gray-200 rounded-xl px-2 py-2 pl-8 pr-5 pb-5">
+                <div className="flex-1 flex gap-2 bg-ash-whisper rounded-xl px-2 py-2 pl-8 pr-5 pb-5">
                   <textarea
                     type="text"
                     value={replyText}
@@ -218,14 +223,14 @@ export default function CommentItem({
                         ? `Reply to ${replyToUser.name}...`
                         : "Write a reply..."
                     }
-                    className="flex-1 px-3 py-2 text-sm focus:outline-none   bg-gray-200 resize-none overflow-auto"
+                    className="flex-1 px-3 py-2 text-sm text-deep-forest focus:outline-none bg-ash-whisper resize-none overflow-auto"
                     style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
                     autoFocus
                   />
                   <button
                     type="submit"
                     disabled={!replyText.trim()}
-                    className="text-blue-600 hover:text-blue-700 disabled:text-gray-400 text-sm font-semibold absolute bottom-2 right-2"
+                    className="text-deep-forest hover:text-foudre-pink disabled:text-deep-forest/35 text-sm font-semibold absolute bottom-2 right-2"
                   >
                     <Send />
                   </button>
@@ -241,7 +246,7 @@ export default function CommentItem({
           {!showAllReplies && hasHiddenReplies && (
             <button
               onClick={() => setShowAllReplies(true)}
-              className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-800 font-semibold"
+              className="flex items-center gap-2 text-sm text-deep-forest/60 hover:text-deep-forest font-semibold"
             >
               <span className="text-lg">⤷</span>
               <span>View more {hiddenRepliesCount}</span>
@@ -263,7 +268,7 @@ export default function CommentItem({
           {showAllReplies && hasHiddenReplies && (
             <button
               onClick={() => setShowAllReplies(false)}
-              className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-900 font-semibold"
+              className="flex items-center gap-2 px-3 py-2 text-sm text-deep-forest/70 hover:text-deep-forest font-semibold"
             >
               <span className="text-lg">⤴</span>
               <span>Hide replies</span>

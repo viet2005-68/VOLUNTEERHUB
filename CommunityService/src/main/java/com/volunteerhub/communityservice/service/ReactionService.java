@@ -127,9 +127,9 @@ public class ReactionService {
     }
 
     public ReactionResponse getReaction(String userId, Long postId) {
-        Reaction reaction = reactionRepository.findByOwnerIdAndPostId(userId, postId).orElseThrow(() ->
-                new NoSuchElementException("No reaction found!"));;
-        return reactionMapper.toDto(reaction);
+        return reactionRepository.findByOwnerIdAndPostId(userId, postId)
+                .map(reactionMapper::toDto)
+                .orElse(null);
     }
 
     public ReactionResponse delete(String userId, Long reactionId) {

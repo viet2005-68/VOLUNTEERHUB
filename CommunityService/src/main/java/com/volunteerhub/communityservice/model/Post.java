@@ -43,6 +43,10 @@ public class Post {
     @Column(name = "owner_id", nullable = false)
     private String ownerId;
 
+    @Builder.Default
+    @Column(name = "share_count", nullable = false)
+    private int shareCount = 0;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;

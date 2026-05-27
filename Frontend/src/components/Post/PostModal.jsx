@@ -23,11 +23,13 @@ export default function PostModal({
   onEditComment,
   onDeleteComment,
   onReact,
+  onShare,
   startImageIndex,
   postId,
   eventId,
 }) {
   const [text, setText] = useState("");
+  const [avatarFailed, setAvatarFailed] = useState(false);
 
   const commentsRef = useRef(null);
   const inputRef = useRef(null);
@@ -54,6 +56,7 @@ export default function PostModal({
   useEffect(() => {
     if (open) {
       setLightboxIndex(startImageIndex ?? 0);
+      setAvatarFailed(false);
     }
   }, [startImageIndex, open]);
 
@@ -123,36 +126,43 @@ export default function PostModal({
               />
             </div>
           </div>
-          <div className="md:col-span-2 order-2 flex flex-col bg-white md:rounded-r-lg md:overflow-hidden relative">
+          <div className="md:col-span-2 order-2 flex flex-col bg-pale-canvas md:rounded-r-lg md:overflow-hidden relative">
             {/* Close button  */}
             <button
               type="button"
               aria-label="Close"
               title="Close"
               onClick={onClose}
-              className="max-sm:hidden absolute top-3 right-3 p-2 rounded-full border border-black bg-white/90 text-gray-700 hover:bg-gray-200 shadow-md transition-colors duration-150"
+              className="max-sm:hidden absolute top-3 right-3 p-2 rounded-full border border-ash-whisper bg-pale-canvas/90 text-deep-forest hover:bg-ash-whisper shadow-md transition-colors duration-150"
             >
               <X className="w-5 h-5" />
             </button>
             <div className="md:flex-1 md:overflow-y-auto px-6 py-4 pr-4 max-sm:pr-1 max-md:px-3 max-md:py-0 max-md:pb-24">
               <div className="flex flex-col gap-2 lg:mt-10 max-md:mt-4">
                 <div
-                  className="flex justify-start items-center p-0 border-b-1 border-gray-400 pb-2 lg:hidden"
+                  className="flex justify-start items-center p-0 border-b-1 border-ash-whisper pb-2 lg:hidden"
                   onClick={onClose}
                 >
                   <IoMdArrowRoundBack className="text-white bg-black rounded-full p-0 h-5 w-5" />
                 </div>
                 <div className="flex items-center gap-2 flex-row">
                   <div className="flex items-center gap-2 flex-row">
-                    <img
-                      src={post.author.avatarUrl}
-                      alt=""
-                      className="object-cover w-12 h-12 rounded-full bg-yellow-400/50"
-                    />
+                    <div className="h-12 w-12 shrink-0 overflow-hidden rounded-full border-2 border-bubblegum-blush bg-ash-whisper flex items-center justify-center text-deep-forest font-bold">
+                      {post.author.avatarUrl && !avatarFailed ? (
+                        <img
+                          src={post.author.avatarUrl}
+                          alt={post.author.name}
+                          className="block h-full w-full object-cover"
+                          onError={() => setAvatarFailed(true)}
+                        />
+                      ) : (
+                        <span>{post.author.name?.charAt(0)?.toUpperCase() || "U"}</span>
+                      )}
+                    </div>
                   </div>
-                  <div className="text-lg text-black">
+                  <div className="text-lg font-bold text-deep-forest">
                     <p>{post.author.name}</p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs font-medium text-deep-forest/60">
                       {new Date(post.createdAt).toLocaleString()}
                     </p>
                   </div>
@@ -174,7 +184,7 @@ export default function PostModal({
                     {post.text}
                   </p>
                   <span
-                    className="text-blue-500 cursor-pointer"
+                    className="text-foudre-pink font-bold cursor-pointer"
                     onClick={toggleShowMore}
                   >
                     {showMore ? "Show less" : "Show more"}
@@ -185,6 +195,7 @@ export default function PostModal({
                 <ReactionBar
                   post={post}
                   onReact={onReact}
+                  onShare={onShare}
                   onCommentClick={focusComments}
                   commentLength={comments.length}
                   eventId={eventId}
@@ -196,7 +207,7 @@ export default function PostModal({
                   Comments ({comments.length})
                 </h4>
                 {isLoadingComments ? (
-                  <div className="text-sm text-gray-500">
+                  <div className="text-sm text-deep-forest/60">
                     ...Loading comments
                   </div>
                 ) : (
@@ -214,7 +225,7 @@ export default function PostModal({
                 )}
               </div>
             </div>
-            <div className="border-t bg-white md:sticky md:-bottom-4 md:px-0 max-md:fixed max-md:bottom-0 max-md:left-0 max-md:right-0 max-md:z-50">
+            <div className="border-t border-ash-whisper bg-pale-canvas md:sticky md:-bottom-4 md:px-0 max-md:fixed max-md:bottom-0 max-md:left-0 max-md:right-0 max-md:z-50">
               <CommentInput
                 value={text}
                 onChange={(e) => setText(e.target.value)}

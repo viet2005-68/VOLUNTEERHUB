@@ -17,6 +17,30 @@ const REACTION_ICONS = {
   angry: "😡",
 };
 
+const toKeyType = (enumType) => {
+  const map = {
+    LIKE: "like",
+    LOVE: "love",
+    HAHA: "haha",
+    WOW: "wow",
+    SAD: "sad",
+    ANGRY: "angry",
+  };
+  return map[enumType] || null;
+};
+
+const toEnumType = (key) => {
+  const map = {
+    like: "LIKE",
+    love: "LOVE",
+    haha: "HAHA",
+    wow: "WOW",
+    sad: "SAD",
+    angry: "ANGRY",
+  };
+  return map[key] || "LIKE";
+};
+
 export default function ReactionBar({
   post,
   onReact,
@@ -27,60 +51,51 @@ export default function ReactionBar({
   hiddenComment = false,
   eventId,
 }) {
-  // Fetch current user's reaction
+  const embeddedCounts = post?.reactionCounts || post?.reactions;
+  const hasEmbeddedCounts =
+    embeddedCounts && typeof embeddedCounts === "object";
+  const embeddedMyReaction =
+    post?.myReaction ||
+    (post?.myReactionType ? { type: post.myReactionType } : null);
+  const hasEmbeddedMyReaction =
+    Object.prototype.hasOwnProperty.call(post || {}, "myReaction") ||
+    Object.prototype.hasOwnProperty.call(post || {}, "myReactionType");
 
-  const { data: myReaction } = useMyReaction(eventId, post?.id);
+  const { data: myReaction } = useMyReaction(eventId, post?.id, {
+    initialData: embeddedMyReaction,
+    enabled: !hasEmbeddedMyReaction,
+  });
 
-  // Fetch reaction counts from API
-  const { data: reactionCounts } = useReactions(eventId, post?.id);
+  const { data: reactionCounts } = useReactions(eventId, post?.id, undefined, {
+    initialData: embeddedCounts,
+    enabled: !hasEmbeddedCounts,
+  });
 
-  // Map ENUM
-  const toKeyType = (enumType) => {
-    const map = {
-      LIKE: "like",
-      LOVE: "love",
-      HAHA: "haha",
-      WOW: "wow",
-      SAD: "sad",
-      ANGRY: "angry",
-    };
-    return map[enumType] || null;
-  };
+  const resolvedMyReaction = hasEmbeddedMyReaction ? embeddedMyReaction : myReaction;
+  const resolvedReactionCounts = hasEmbeddedCounts ? embeddedCounts : reactionCounts;
 
-  const toEnumType = (key) => {
-    const map = {
-      like: "LIKE",
-      love: "LOVE",
-      haha: "HAHA",
-      wow: "WOW",
-      sad: "SAD",
-      angry: "ANGRY",
-    };
-    return map[key] || "LIKE";
-  };
-
-  const currentReactionKey = myReaction?.type
-    ? toKeyType(myReaction.type)
+  const currentReactionKey = resolvedMyReaction?.type
+    ? toKeyType(resolvedMyReaction.type)
     : null;
 
   // Hook for background API call
   const { mutate: createReaction, isPending } = useCreateReaction(
     eventId,
     post?.id,
-    myReaction
+    resolvedMyReaction
   );
 
   if (!post) return null;
 
   // Convert ENUM keys to lowercase for display
-  const reactionEntries = reactionCounts
-    ? Object.entries(reactionCounts)
+  const reactionEntries = resolvedReactionCounts
+    ? Object.entries(resolvedReactionCounts)
         .map(([enumKey, count]) => [toKeyType(enumKey), count])
         .filter(([, count]) => count > 0) // Only show reactions with count > 0
     : [];
 
   return (
-    <div className="flex flex-wrap items-center gap-3 text-gray-700">
+    <div className="flex flex-wrap items-center gap-3 text-deep-forest">
       <div className="flex flex-row gap-2 items-stretch">
         <ReactionButton
           initialReaction={currentReactionKey}
@@ -90,11 +105,6 @@ export default function ReactionBar({
 
             // Skip if mutation is already pending to avoid race condition
             if (isPending) {
-              console.log("=== MUTATION PENDING ===");
-              console.log(
-                "Skipping API call - previous request still in progress"
-              );
-              console.log("=======================");
               return;
             }
 
@@ -110,18 +120,6 @@ export default function ReactionBar({
               } else {
                 // User selected a reaction → create/update
                 const enumType = toEnumType(r);
-
-                if (currentReactionKey && currentReactionKey !== r) {
-                  console.log(
-                    "Expected: BE will UPDATE from",
-                    currentReactionKey.toUpperCase(),
-                    "to",
-                    enumType
-                  );
-                } else if (currentReactionKey === r) {
-                  console.log("Expected: BE will TOGGLE OFF (same reaction)");
-                }
-
                 createReaction(enumType);
               }
             }
@@ -129,11 +127,11 @@ export default function ReactionBar({
           small={compact}
         />
         {!compact && reactionEntries.length > 0 && (
-          <div className="flex flex-wrap items-center gap-2 px-3 py-2 bg-blue-50 rounded-lg border border-blue-100">
+          <div className="flex flex-wrap items-center gap-2 px-3 py-2 bg-ash-whisper/70 rounded-lg border border-ash-whisper">
             {reactionEntries.map(([key, count]) => (
               <span
                 key={key}
-                className="inline-flex items-center gap-1.5 text-sm font-semibold text-blue-700"
+                className="inline-flex items-center gap-1.5 text-sm font-bold text-deep-forest"
               >
                 <span className="text-lg leading-none">
                   {REACTION_ICONS[key] ?? "👍"}
@@ -148,7 +146,7 @@ export default function ReactionBar({
       {hiddenComment && (
         <button
           onClick={() => onCommentClick?.(post.id)}
-          className={`inline-flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-blue-50 transition-colors text-blue-600 font-semibold`}
+          className="inline-flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-ash-whisper transition-colors text-deep-forest font-bold"
         >
           <FaCommentAlt className="w-5 h-5" />
           {commentLength > 0 ? (
@@ -162,10 +160,14 @@ export default function ReactionBar({
       {onShare && (
         <button
           onClick={() => onShare?.(post.id)}
-          className="inline-flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-blue-50 transition-colors text-blue-600 font-semibold"
+          className="inline-flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-ash-whisper transition-colors text-deep-forest font-bold"
         >
           <FaShare className="w-5 h-5" />
-          <span>{compact ? "" : "Chia sẻ"}</span>
+          {!compact && (
+            <span>
+              {post.shareCount > 0 ? `Chia sẻ (${post.shareCount})` : "Chia sẻ"}
+            </span>
+          )}
         </button>
       )}
     </div>

@@ -91,7 +91,7 @@ const CreatPost = ({ user, onCreate, eventId }) => {
 
   return (
     <div
-      className="w-full bg-white rounded-md p-2 shadow-sm relative focus-within:outline-none focus-within:ring-2 focus-within:ring-blue-300 ring-1 ring-blue-300 duration-150 transition-all"
+      className="w-full bg-pale-canvas rounded-[20px] p-2 shadow-sm relative focus-within:outline-none focus-within:ring-2 focus-within:ring-bubblegum-blush border-2 border-ash-whisper duration-150 transition-all"
       aria-busy={loading}
     >
       <div
@@ -104,7 +104,7 @@ const CreatPost = ({ user, onCreate, eventId }) => {
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder="Enter your post content..."
-            className="w-full resize-none rounded-md p-2 focus:outline-none border-none"
+            className="w-full resize-none rounded-xl border-2 border-bubblegum-blush bg-pale-canvas p-3 text-deep-forest placeholder-deep-forest/45 focus:outline-none focus:border-foudre-pink"
             rows={3}
           />
 
@@ -132,7 +132,7 @@ const CreatPost = ({ user, onCreate, eventId }) => {
           <div className="mt-3 flex items-center justify-between">
             <div
               className={`flex items-center gap-2 ${
-                isDragging ? "ring-2 ring-blue-300 rounded-md p-1" : ""
+                isDragging ? "ring-2 ring-bubblegum-blush rounded-md p-1" : ""
               }`}
               onDragEnter={() => setIsDragging(true)}
               onDragLeave={() => setIsDragging(false)}
@@ -141,7 +141,7 @@ const CreatPost = ({ user, onCreate, eventId }) => {
             >
               <button
                 type="button"
-                className="rounded px-2 py-1 text-sm text-blue-500 hover:text-blue-600 focus:outline-none"
+                className="rounded px-2 py-1 text-sm text-deep-forest hover:text-foudre-pink focus:outline-none"
                 onClick={() => fileInputRef.current?.click()}
               >
                 <span className="inline-flex items-center self-center">
@@ -156,7 +156,7 @@ const CreatPost = ({ user, onCreate, eventId }) => {
                 onChange={handleImageChange}
                 className="hidden"
               />
-              <span className="text-xs text-gray-500 max-sm:hidden">
+              <span className="text-xs font-medium text-deep-forest/60 max-sm:hidden">
                 Drag and drop images here or click to select
               </span>
             </div>
@@ -169,13 +169,13 @@ const CreatPost = ({ user, onCreate, eventId }) => {
               disabled={
                 loading || (!text.trim() && images.length === 0) || !eventId
               }
-              className="px-5 py-1 rounded-md bg-blue-600 text-white disabled:bg-gray-300 disabled:cursor-not-allowed cursor-pointer"
+              className="px-5 py-2 rounded-lg bg-deep-forest text-white font-bold hover:bg-foudre-pink disabled:bg-ash-whisper disabled:text-deep-forest/40 disabled:cursor-not-allowed cursor-pointer transition-colors"
             >
               {loading ? "Posting..." : "Post"}
             </button>
             {loading && (
-              <div className="absolute inset-0 bg-white/70 backdrop-blur-sm rounded-md flex items-center justify-center z-10">
-                <div className="flex items-center gap-2 text-gray-700">
+              <div className="absolute inset-0 bg-pale-canvas/75 backdrop-blur-sm rounded-[18px] flex items-center justify-center z-10">
+                <div className="flex items-center gap-2 text-deep-forest">
                   <Loader2 className="w-5 h-5 animate-spin" />
                   <span>Posting...</span>
                 </div>

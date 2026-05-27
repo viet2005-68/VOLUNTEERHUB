@@ -2,7 +2,6 @@ import { useMutation, useQuery, useQueryClient, useInfiniteQuery } from "@tansta
 import CommunityService from "../services/CommunityService";
 import { useEffect } from "react";
 import toast from "react-hot-toast";
-import { data } from "react-router-dom";
 
 const COMMUNITY_QUERY_KEY = ["community"];
 
@@ -123,7 +122,6 @@ export const useInfinitePosts = (eventId, options = {}) => {
 // Chuẩn hóa: chỉ giữ 2 cấp (cha + con). Mọi reply sâu hơn đều gán parentId về id của comment cha cấp 1.
 export const useComments = (eventId, postId) => {
     const normalizeCommentsOneLevel = (nodes = []) => {
-        console.log(data)
         const flat = [];
         nodes.forEach((node) => {
             if (!node || !node.comment) return;
@@ -236,8 +234,8 @@ const normalizeReactionCounts = (apiResponse) => {
     // Merge API response with default values
     if (apiResponse && typeof apiResponse === 'object') {
         Object.keys(allReactions).forEach(key => {
-            if (apiResponse[key] !== undefined && typeof apiResponse[key] === 'number') {
-                allReactions[key] = apiResponse[key];
+            if (apiResponse[key] !== undefined) {
+                allReactions[key] = Number(apiResponse[key]) || 0;
             }
         });
     }
@@ -247,7 +245,7 @@ const normalizeReactionCounts = (apiResponse) => {
     return allReactions;
 };
 
-export const useReactions = (eventId, postId, params) => {
+export const useReactions = (eventId, postId, params, options = {}) => {
     const { pageNum = 0, pageSize = 10 } = params || {};
 
     return useQuery({
@@ -257,34 +255,42 @@ export const useReactions = (eventId, postId, params) => {
 
             return normalizeReactionCounts(result);
         },
-        enabled: !!eventId && !!postId,
+        enabled: !!eventId && !!postId && options.enabled !== false,
+        initialData: options.initialData
+            ? normalizeReactionCounts(options.initialData)
+            : undefined,
         keepPreviousData: true,
     });
 };
 
 // Hook to get current user's reaction for a post
 // API already returns only current user's reaction
-export const useMyReaction = (eventId, postId) => {
+export const useMyReaction = (eventId, postId, options = {}) => {
     return useQuery({
         queryKey: [...COMMUNITY_QUERY_KEY, "myReaction", eventId, postId],
         queryFn: async () => {
             const result = await CommunityService.getMyReaction(eventId, postId);
-            console.log("=== GET My Reaction ===");
-            console.log("Event ID:", eventId);
-            console.log("Post ID:", postId);
-            console.log("API Response:", result);
-
-            // API returns { content: [reaction], ... }
-            // If user has reacted, content[0] will have the reaction
-            // If user hasn't reacted, content will be empty
-            const myReaction = result?.content?.[0] || null;
-            console.log("My Reaction:", myReaction);
-            console.log("======================");
-
-            return myReaction;
+            return result || null;
         },
-        enabled: !!eventId && !!postId,
+        enabled: !!eventId && !!postId && options.enabled !== false,
+        initialData: options.initialData,
         staleTime: 1000 * 30, // 30 seconds
+    });
+};
+
+export const useSharePost = (eventId) => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: (postId) => CommunityService.sharePost(eventId, postId),
+        onSuccess: () => {
+            queryClient.invalidateQueries([...COMMUNITY_QUERY_KEY, "posts", eventId]);
+            queryClient.invalidateQueries([...COMMUNITY_QUERY_KEY, "postsInfinite", eventId]);
+        },
+        onError: (error) => {
+            const message = error?.response?.data?.message || error.message || "Failed to share post";
+            toast.error(message);
+        },
     });
 };
 
@@ -299,11 +305,6 @@ export const useCreateReaction = (eventId, postId, currentUserReaction = null) =
     return useMutation({
         // Accept either ENUM string (LIKE, SAD) or lowercase key (like, sad)
         mutationFn: async (input) => {
-            console.log("=== useCreateReaction mutationFn ===");
-            console.log("Input:", input);
-            console.log("Input type:", typeof input);
-            console.log("Current User Reaction:", currentUserReaction);
-
             let reactionEnum;
 
             if (typeof input === "string") {
@@ -319,16 +320,10 @@ export const useCreateReaction = (eventId, postId, currentUserReaction = null) =
                 reactionEnum = "LIKE";
             }
 
-            console.log("Final Reaction ENUM:", reactionEnum);
-
             // If clicking same reaction -> delte
             const payload = { type: reactionEnum };
 
-            console.log("Payload:", payload);
-            const result = await CommunityService.createReaction(eventId, postId, payload);
-            console.log("Result:", result);
-            console.log("===================================");
-            return result;
+            return CommunityService.createReaction(eventId, postId, payload);
         },
 
         onMutate: async (input) => {
@@ -339,8 +334,6 @@ export const useCreateReaction = (eventId, postId, currentUserReaction = null) =
             return { input };
         },
         onSuccess: () => {
-
-
             queryClient.invalidateQueries([...COMMUNITY_QUERY_KEY, "reactions", eventId, postId]);
             queryClient.invalidateQueries([...COMMUNITY_QUERY_KEY, "myReaction", eventId, postId]);
             queryClient.invalidateQueries([...COMMUNITY_QUERY_KEY, "post", eventId, postId]);
@@ -348,9 +341,6 @@ export const useCreateReaction = (eventId, postId, currentUserReaction = null) =
             queryClient.invalidateQueries([...COMMUNITY_QUERY_KEY, "postsInfinite", eventId]);
         },
         onError: (error) => {
-            console.log("=== Reaction Error ===");
-            console.log("Error:", error);
-            console.log("Error response:", error?.response);
             const message = error?.response?.data?.message || error.message || "Failed to update reaction";
             toast.error(message);
         },

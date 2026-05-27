@@ -176,7 +176,7 @@ export default function ReactionButton({
           onPointerLeave={onBarPointerLeave}
           onPointerUp={onBarPointerUp}
         >
-          <div className="bg-white rounded-3xl px-2 py-3 shadow-2xl border border-blue-200 flex items-center gap-3">
+          <div className="bg-pale-canvas rounded-3xl px-2 py-3 shadow-2xl border border-ash-whisper flex items-center gap-3">
             {REACTIONS.map((r, i) => {
               const isHover = i === hoverIndex;
               return (
@@ -184,8 +184,8 @@ export default function ReactionButton({
                   key={r.key}
                   className={`w-12 h-12 flex items-center justify-center text-2xl transition-all duration-200 rounded-full ${
                     isHover
-                      ? "transform -translate-y-3 scale-125 bg-blue-50"
-                      : "hover:bg-gray-50"
+                      ? "transform -translate-y-3 scale-125 bg-ash-whisper"
+                      : "hover:bg-ash-whisper/70"
                   }`}
                 >
                   <span>{r.label}</span>
@@ -203,8 +203,8 @@ export default function ReactionButton({
         tabIndex={0}
         className={`inline-flex items-center gap-3 px-4 py-2 rounded-lg transition-all duration-200 ${
           current
-            ? "bg-blue-100 text-blue-700 shadow-md"
-            : "bg-gray-50 hover:bg-blue-50 text-gray-700 hover:text-blue-600"
+            ? "bg-ash-whisper text-deep-forest shadow-sm"
+            : "bg-pale-canvas hover:bg-ash-whisper text-deep-forest/75 hover:text-deep-forest"
         } cursor-pointer select-none font-semibold`}
         onClick={handleClick}
         onPointerDown={onPointerDown}
