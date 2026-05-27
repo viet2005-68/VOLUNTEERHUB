@@ -11,14 +11,12 @@ import org.springframework.context.annotation.Configuration;
 
 import org.springframework.amqp.core.Queue;
 
-
 @Configuration
 public class RabbitMQConfig {
 
-    public static final String EVENT_EXCHANGE = "analysis-event-exchange";
-    public static final String USER_EXCHANGE = "analysis-user-exchange";
-    public static final String COMMUNITY_EXCHANGE = "analysis-community-exchange";
-    public static final String REGISTRATION_EXCHANGE = "analysis-registration-exchange";
+    public static final String EVENT_EXCHANGE = "event-exchange";
+    public static final String NOTIFICATION_EXCHANGE = "notification-exchange";
+    public static final String USER_NOTIFICATION_EXCHANGE = "user-notification-exchange";
 
     // Exchange cho publisher (cache / internal)
     public static final String ANALYTIC_EXCHANGE = "analytic-exchange";
@@ -37,13 +35,13 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    public TopicExchange userExchange() {
-        return new TopicExchange(USER_EXCHANGE);
+    public TopicExchange notificationExchange() {
+        return new TopicExchange(NOTIFICATION_EXCHANGE);
     }
 
     @Bean
-    public TopicExchange communityExchange() {
-        return new TopicExchange(COMMUNITY_EXCHANGE);
+    public TopicExchange userNotificationExchange() {
+        return new TopicExchange(USER_NOTIFICATION_EXCHANGE);
     }
 
     @Bean
@@ -58,13 +56,13 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    public Binding bindUser(Queue analyticQueue, TopicExchange userExchange) {
-        return BindingBuilder.bind(analyticQueue).to(userExchange).with("user.*");
+    public Binding bindNotification(Queue analyticQueue, TopicExchange notificationExchange) {
+        return BindingBuilder.bind(analyticQueue).to(notificationExchange).with("notification.*");
     }
 
     @Bean
-    public Binding bindCommunity(Queue analyticQueue, TopicExchange communityExchange) {
-        return BindingBuilder.bind(analyticQueue).to(communityExchange).with("community.*");
+    public Binding bindUserNotification(Queue analyticQueue, TopicExchange userNotificationExchange) {
+        return BindingBuilder.bind(analyticQueue).to(userNotificationExchange).with("user-notification.*");
     }
 
     // Message converter

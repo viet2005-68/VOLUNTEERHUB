@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 @Configuration
 public class ServiceClientConfig {
 
-    @Value("${services.user.url:http://localhost:8081/api/v1/users/users}")
+    @Value("${services.user.url:http://localhost:8081/api/v1/users}")
     private String userServiceUrl;
 
     @Value("${services.event.url:http://localhost:8082/api/v1/events}")
@@ -22,7 +22,6 @@ public class ServiceClientConfig {
 
     @Value("${services.registration.url:http://localhost:8084/api/v1/registrations}")
     private String registrationServiceUrl;
-
 
     @Bean("userClient")
     public RestClient userClient(RestClient.Builder builder) {
