@@ -53,9 +53,9 @@ function RequestCardOverview() {
         )}
 
         {!loading && !isError && items.length === 0 && (
-          <div className="text-sm text-gray-500 flex flex-col gap-2 mt-5 items-center justify-center flex-1">
-            <div className="w-12 h-12 mx-auto">
-              <BellOff className="w-full h-full text-gray-500" />
+          <div className="text-sm text-deep-forest/60 flex flex-col gap-2 mt-5 items-center justify-center flex-1">
+            <div className="mx-auto flex h-[64px] w-[64px] items-center justify-center rounded-full bg-deep-forest/5">
+              <BellOff className="h-[32px] w-[32px] text-deep-forest/45" />
             </div>
             <div>No new requests.</div>
           </div>

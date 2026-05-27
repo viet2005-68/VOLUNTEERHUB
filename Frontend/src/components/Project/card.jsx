@@ -37,7 +37,7 @@ function ProjectCard({
   const isApproved = status === "APPROVED";
 
   const getPercentage = (registered, capacity) => {
-    return (registered / capacity) * 100;
+    return capacity > 0 ? (registered / capacity) * 100 : 0;
   };
 
   // Handle navigation with event data
@@ -46,8 +46,8 @@ function ProjectCard({
   };
 
   return (
-    <div className="bg-white text-black flex flex-col font-roboto rounded-2xl font-bold hover:shadow-slate-300 duration-300 ease-in-out border border-gray-600/20 overflow-hidden">
-      <div className="block w-full aspect-[16/9] overflow-hidden rounded-t-2xl relative pt-0">
+    <div className="flex flex-col overflow-hidden rounded-[20px] border border-deep-forest/15 bg-pale-canvas font-clash-grotesk font-bold text-deep-forest transition-colors duration-300 hover:border-foudre-pink/45">
+      <div className="block w-full aspect-[16/9] overflow-hidden rounded-t-[20px] relative pt-0">
         <img
           src={displayImage}
           className={`${
@@ -55,25 +55,25 @@ function ProjectCard({
           } object-cover w-full h-full hover:scale-105 transition-all duration-300 ease-in-out`}
         />
         {categoryName && (
-          <p className="absolute top-3 right-3 text-white rounded-xl px-3 py-1 text-xs bg-blue-500/80 capitalize">
+          <p className="absolute top-3 right-3 rounded-[10px] bg-foudre-pink px-3 py-2 text-xs font-bold capitalize text-pale-canvas">
             {categoryName}
           </p>
         )}
         {!isApproved && (
-          <p className="absolute top-3 left-3 text-white rounded-xl px-3 py-1 text-xs bg-gray-500/80">
+          <p className="absolute top-3 left-3 rounded-[10px] bg-deep-forest/80 px-3 py-2 text-xs font-bold text-pale-canvas">
             {status}
           </p>
         )}
       </div>
       <div className="p-4 flex flex-col gap-2 flex-grow justify-between">
-        <div className="text-xl max-sm:text-lg font-bold line-clamp-2">
+        <div className="line-clamp-2 text-xl font-bold leading-[1.05] text-deep-forest max-sm:text-lg">
           {title}
         </div>
-        <div className="flex flex-row gap-2 items-center text-slate-500 ">
+        <div className="flex flex-row gap-2 items-center text-deep-forest/60 ">
           <i className="ri-calendar-line"></i>
           <p className="font-normal text-sm">{formatDateTime(date)}</p>
         </div>
-        <div className="flex flex-row gap-2 items-center text-slate-500">
+        <div className="flex flex-row gap-2 items-center text-deep-forest/60">
           <a
             href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
               location
@@ -81,25 +81,25 @@ function ProjectCard({
             target="_blank"
             rel="noopener noreferrer"
             onClick={(e) => e.stopPropagation()}
-            className="flex flex-row gap-2 items-center text-slate-500 hover:text-red-400 transition-colors"
+            className="flex flex-row gap-2 items-center text-deep-forest/60 hover:text-foudre-pink transition-colors"
           >
             <i class="ri-map-pin-fill"></i>
             <p className="font-normal text-sm">{location}</p>
           </a>
         </div>
-        <div className="flex flex-row gap-2 items-center justify-between mb-2 text-slate-400 font-medium text-sm">
+        <div className="flex flex-row gap-2 items-center justify-between mb-2 text-deep-forest/50 font-medium text-sm">
           <div className="flex flex-row gap-2 items-center justify-center">
             <i class="ri-user-3-line"></i>
             {registered}/{capacity}
           </div>
-          <p>Avaiable {availableSlots}</p>
+          <p>Available {availableSlots}</p>
         </div>
-        <div className="w-full bg-red-100 rounded-full h-3 mb-8">
+        <div className="mb-8 h-3 w-full rounded-full bg-ash-whisper">
           <div
             className={`${
               !isApproved || registered === capacity
-                ? "bg-gray-500/80"
-                : "bg-red-500/80"
+                ? "bg-deep-forest/35"
+                : "bg-deep-forest"
             } h-3 rounded-full transition-all duration-300`}
             style={{
               width: `${getPercentage(registered, capacity)}%`,
@@ -111,9 +111,9 @@ function ProjectCard({
           <button
             className={`w-full ${
               !isApproved || registered === capacity
-                ? "cursor-not-allowed bg-gray-500/80"
-                : "cursor-pointer bg-red-500/80"
-            } text-white rounded-xl py-2 font-bold text-sm  transition-all duration-500 ease-in-out hover:scale-105 font-jost  border-none active:scale-95`}
+                ? "cursor-not-allowed bg-deep-forest/35"
+                : "cursor-pointer bg-deep-forest hover:bg-foudre-pink"
+            } rounded-[10px] py-3 text-sm font-bold text-pale-canvas transition-colors duration-200 font-clash-grotesk border-none active:scale-95`}
             onClick={handleViewDetails}
             disabled={!isApproved}
           >

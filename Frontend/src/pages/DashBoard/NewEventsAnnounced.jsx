@@ -87,8 +87,8 @@ function NewEventsAnnounced({ className }) {
         )}
         {!isLoading && !isError && cards.length === 0 && (
           <div className="text-sm text-deep-forest/65 flex flex-col gap-6 mt-5 items-center">
-            <div className="w-12 h-12 mx-auto">
-              <BellOff className="w-full h-full text-deep-forest/45" />
+            <div className="mx-auto flex h-[64px] w-[64px] items-center justify-center rounded-full bg-deep-forest/5">
+              <BellOff className="h-[32px] w-[32px] text-deep-forest/45" />
             </div>
             <div>No new announcements.</div>
           </div>

@@ -36,22 +36,22 @@ export default function FilterHorizontal({
   ];
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow-md border border-gray-600/20">
+    <div className="rounded-[20px] border border-deep-forest/15 bg-pale-canvas p-4 text-deep-forest">
       <div className="flex flex-col gap-3">
         {/* Search */}
         <div className="flex-1 relative">
-          <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
+          <FiSearch className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-deep-forest/55" />
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search opportunities..."
-            className="w-full rounded-xl px-4 py-3 pl-10 bg-gray-50 border border-gray-200 focus:ring focus:ring-blue-200 caret-blue-600"
+            className="w-full rounded-[10px] border border-deep-forest/15 bg-pale-canvas px-4 py-3 pl-10 text-sm font-bold text-deep-forest caret-foudre-pink outline-none transition placeholder:text-deep-forest/45 focus:border-foudre-pink focus:ring-4 focus:ring-foudre-pink/15"
           />
         </div>
 
         {/* Controls */}
-        <div className="flex justify-between gap-2 max-sm:block flex-row">
-          <div className="flex items-center gap-4 flex-4/5 flex-wrap">
+        <div className="flex flex-col justify-between gap-3 sm:flex-row">
+          <div className="flex flex-1 flex-wrap items-center gap-3">
             <DropdownSelect
               value={status}
               onChange={setStatus}
@@ -60,7 +60,7 @@ export default function FilterHorizontal({
                 { value: "open", label: "Open" },
                 { value: "closed", label: "Closed" },
               ]}
-              className="flex-1 max-sm:block lg:max-w-32"
+              className="min-w-[150px] flex-1 lg:max-w-[180px]"
             />
 
             <DropdownSelect
@@ -74,31 +74,31 @@ export default function FilterHorizontal({
                 }
               }}
               options={timeRangeOptions}
-              className="flex-1 max-sm:block lg:max-w-36"
+              className="min-w-[150px] flex-1 lg:max-w-[190px]"
             />
 
             {/* Custom Date Range Pickers */}
             {timeRange === "custom" && (
               <div className="flex items-center gap-2 flex-wrap">
                 <div className="relative">
-                  <FiCalendar className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none w-4 h-4" />
+                  <FiCalendar className="pointer-events-none absolute left-3 top-1/2 h-[16px] w-[16px] -translate-y-1/2 text-deep-forest/50" />
                   <input
                     type="date"
                     value={customStartDate || ""}
                     onChange={(e) => setCustomStartDate?.(e.target.value)}
-                    className="pl-9 pr-3 py-2 border border-gray-200 rounded-lg bg-gray-50 focus:ring focus:ring-blue-200 text-sm"
+                    className="rounded-[10px] border border-deep-forest/15 bg-pale-canvas py-2 pl-9 pr-3 text-sm font-bold text-deep-forest outline-none focus:border-foudre-pink focus:ring-4 focus:ring-foudre-pink/15"
                     placeholder="Start date"
                   />
                 </div>
-                <span className="text-gray-400">→</span>
+                <span className="font-bold text-deep-forest/45">→</span>
                 <div className="relative">
-                  <FiCalendar className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none w-4 h-4" />
+                  <FiCalendar className="pointer-events-none absolute left-3 top-1/2 h-[16px] w-[16px] -translate-y-1/2 text-deep-forest/50" />
                   <input
                     type="date"
                     value={customEndDate || ""}
                     onChange={(e) => setCustomEndDate?.(e.target.value)}
                     min={customStartDate || undefined}
-                    className="pl-9 pr-3 py-2 border border-gray-200 rounded-lg bg-gray-50 focus:ring focus:ring-blue-200 text-sm"
+                    className="rounded-[10px] border border-deep-forest/15 bg-pale-canvas py-2 pl-9 pr-3 text-sm font-bold text-deep-forest outline-none focus:border-foudre-pink focus:ring-4 focus:ring-foudre-pink/15"
                     placeholder="End date"
                   />
                 </div>
@@ -109,7 +109,7 @@ export default function FilterHorizontal({
           <div className="max-md:justify-end flex">
             <button
               onClick={() => setOpenFilter(!openFilter)}
-              className="bg-blue-500 text-white px-4 py-2 rounded-lg max-sm:mt-2"
+              className="rounded-[10px] bg-bubblegum-blush px-5 py-3 text-sm font-bold text-pale-canvas transition hover:bg-foudre-pink active:scale-95"
             >
               Filter
             </button>
@@ -118,34 +118,32 @@ export default function FilterHorizontal({
 
         {/* Categories & Sort */}
         {openFilter && (
-          <div className="flex flex-row bg-gray-100 py-4 px-4 rounded-xl">
-            <div className="basis-1/2 max-md:basis-3/4 flex-col">
-              <p className="font-bold">Category</p>
-              <div className="mt-3 md:flex flex-col overflow-y-auto scroll-smooth max-h-[200px] scrollbar-thin scrollbar-thumb-red-400/20 scrollbar-track-white">
+          <div className="grid gap-5 rounded-[20px] bg-ash-whisper/55 px-4 py-4 md:grid-cols-[minmax(0,1fr)_260px]">
+            <div className="min-w-0">
+              <p className="font-bold text-deep-forest">Category</p>
+              <div className="mt-3 grid max-h-[200px] gap-2 overflow-y-auto scroll-smooth pr-2 scrollbar-thin scrollbar-thumb-foudre-pink/35 scrollbar-track-pale-canvas">
                 {categories.map((c) => {
                   const active = selectedCategories.includes(c);
                   return (
                     <label
                       key={c}
-                      className={`flex items-center gap-3 bg-gray-100${
-                        active ? "" : "bg-white"
-                      }`}
+                      className={`flex items-center gap-3 rounded-[10px] border px-3 py-2 text-sm font-bold capitalize transition ${active ? "border-deep-forest bg-deep-forest text-pale-canvas" : "border-deep-forest/10 bg-pale-canvas text-deep-forest hover:bg-ash-whisper"}`}
                     >
                       <input
                         type="checkbox"
                         value={c}
                         onChange={(e) => toggleCategory(e.target.value)}
                         checked={active}
-                        className=""
+                        className="h-[16px] w-[16px] accent-foudre-pink"
                       />
-                      <span className="text-gray-600">{c}</span>
+                      <span className={active ? "text-pale-canvas" : "text-deep-forest/70"}>{c}</span>
                     </label>
                   );
                 })}
               </div>
             </div>
-            <div className="basis-1/2 max-md:basis-1/4 pl-10 max-md:pl-0">
-              <p className="font-bold mb-2">Sort By</p>
+            <div className="min-w-0">
+              <p className="mb-2 font-bold text-deep-forest">Sort By</p>
               <DropdownSelect
                 className="w-full mb-3"
                 value={sortBy}
@@ -156,7 +154,7 @@ export default function FilterHorizontal({
                   { value: "Capacity", label: "Capacity" },
                 ]}
               />
-              <p className="font-bold mb-2">Order</p>
+              <p className="mb-2 font-bold text-deep-forest">Order</p>
               <DropdownSelect
                 className="w-full"
                 value={order}

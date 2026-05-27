@@ -5,6 +5,8 @@ import TrendingScrollList from "../../components/TrendingEvent/TrendingScrollLis
 import { useEventPagination, useSearchEventByName } from "../../hook/useEvent";
 import { Pagination, Skeleton } from "@mui/material";
 
+import { SearchX } from "lucide-react";
+
 const categories = [
   "education",
   "health",
@@ -198,9 +200,9 @@ function OpportunitiesEvent() {
 
   if (isError) {
     return (
-      <div className="bg-white p-6 rounded-xl shadow-sm">
-        <div className="flex items-center justify-center h-64">
-          <div className="text-red-500">
+      <div className="rounded-[20px] border border-deep-forest/15 bg-pale-canvas p-6 text-deep-forest">
+        <div className="flex h-64 items-center justify-center">
+          <div className="font-bold text-foudre-pink">
             Error loading opportunities: {error?.message || "Unknown error"}
           </div>
         </div>
@@ -240,10 +242,12 @@ function OpportunitiesEvent() {
   };
 
   return (
-    <div className="flex flex-col gap-2 p-5 sm:mb-20">
-      <div className="flex flex-col gap-2">
-        <p className="text-3xl font-bold text-md">Volunteer Opportunities</p>
-        <p className="text-sm text-gray-600 mb-4">
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 py-8 text-deep-forest sm:mb-20 sm:px-6 lg:px-8">
+      <div className="flex flex-col gap-3">
+        <p className="font-beni text-[64px] font-black uppercase leading-[0.72] text-deep-forest sm:text-[88px]">
+          Volunteer Opportunities
+        </p>
+        <p className="max-w-2xl text-base font-medium leading-[1.2] text-deep-forest/70">
           Discover meaningful ways to make a difference
         </p>
       </div>
@@ -276,24 +280,24 @@ function OpportunitiesEvent() {
         </div>
       )}
 
-      <div className="flex justify-between items-center px-4 mb-4">
-        <div className="text-xl font-bold">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+        <div className="font-beni text-[46px] font-black uppercase leading-[0.72] text-deep-forest">
           {isSearchMode ? `Search results for "${query}"` : "All Opportunities"}
         </div>
-        <div className="text-sm text-gray-600 flex items-center gap-2">
+        <div className="flex items-center gap-2 text-sm font-bold text-deep-forest/60">
           {isFetching && (
-            <div className="w-4 h-4 border-2 border-red-400 border-t-transparent rounded-full animate-spin" />
+            <div className="h-[18px] w-[18px] animate-spin rounded-full border-2 border-foudre-pink border-t-transparent" />
           )}
           {isLoading ? "Loading..." : `${totalElements} events found`}
         </div>
       </div>
 
       {isLoading && !data && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr">
+        <div className="grid auto-rows-fr grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {[...Array(pageSize)].map((_, index) => (
             <div
               key={index}
-              className="bg-white rounded-xl shadow-sm overflow-hidden"
+              className="overflow-hidden rounded-[20px] border border-deep-forest/15 bg-pale-canvas"
             >
               <Skeleton variant="rectangular" height={180} animation="wave" />
               <div className="p-4">
@@ -323,13 +327,15 @@ function OpportunitiesEvent() {
 
       {/* Empty State */}
       {!isLoading && events.length === 0 && (
-        <div className="flex items-center justify-center h-64 transition-opacity duration-300">
-          <div className="text-center">
-            <div className="text-gray-400 text-5xl mb-4">🔍</div>
-            <p className="text-gray-500">No opportunities found</p>
+        <div className="flex h-64 items-center justify-center rounded-[20px] border border-deep-forest/15 bg-pale-canvas transition-opacity duration-300">
+          <div className="flex flex-col items-center text-center">
+            <div className="mb-4 flex h-[80px] w-[80px] items-center justify-center rounded-full bg-deep-forest/5">
+              <SearchX className="h-[38px] w-[38px] text-deep-forest/45" />
+            </div>
+            <p className="font-bold text-deep-forest/65">No opportunities found</p>
             <button
               onClick={resetFilters}
-              className="mt-4 text-blue-600 hover:underline"
+              className="mt-4 rounded-[10px] bg-bubblegum-blush px-5 py-3 text-sm font-bold text-pale-canvas transition hover:bg-foudre-pink"
             >
               Clear filters
             </button>
@@ -340,7 +346,7 @@ function OpportunitiesEvent() {
       {(events.length > 0 || isPlaceholderData) && (
         <>
           <div
-            className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr transition-opacity duration-300 ease-in-out ${
+            className={`grid auto-rows-fr grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 transition-opacity duration-300 ease-in-out ${
               isFetching ? "opacity-60" : "opacity-100"
             }`}
             style={{ pointerEvents: isFetching ? "none" : "auto" }}
@@ -360,7 +366,7 @@ function OpportunitiesEvent() {
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex justify-center mt-8">
+            <div className="mt-8 flex justify-center">
               <Pagination
                 count={totalPages}
                 page={pageNum + 1}
@@ -371,11 +377,14 @@ function OpportunitiesEvent() {
                 showLastButton
                 sx={{
                   "& .MuiPaginationItem-root": {
+                    color: "#00522d",
+                    fontFamily: "Clash Grotesk, sans-serif",
+                    fontWeight: 700,
                     "&.Mui-selected": {
-                      backgroundColor: "#f87171",
-                      color: "white",
+                      backgroundColor: "#00522d",
+                      color: "#fff8f6",
                       "&:hover": {
-                        backgroundColor: "#ef4444",
+                        backgroundColor: "#db3c8a",
                       },
                     },
                   },

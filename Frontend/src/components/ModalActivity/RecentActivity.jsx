@@ -111,20 +111,20 @@ function RecentActivity() {
         )}
         {isError && (
           <div className="text-center py-8 flex flex-col gap-4 items-center">
-            <div className="w-16 h-16 mx-auto bg-gray-100 rounded-full flex items-center justify-center">
-              <BellOff className="w-8 h-8 text-gray-400" />
+            <div className="mx-auto flex h-[80px] w-[80px] items-center justify-center rounded-full bg-deep-forest/5">
+              <BellOff className="h-[36px] w-[36px] text-deep-forest/45" />
             </div>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-deep-forest/60">
               Failed to load recent activities.
             </p>
           </div>
         )}
         {!isLoading && !isFetching && !isError && cards.length === 0 && (
           <div className="text-center py-8 flex flex-col gap-4 items-center">
-            <div className="w-16 h-16 mx-auto bg-gray-100 rounded-full flex items-center justify-center">
-              <BellOff className="w-8 h-8 text-gray-400" />
+            <div className="mx-auto flex h-[80px] w-[80px] items-center justify-center rounded-full bg-deep-forest/5">
+              <BellOff className="h-[36px] w-[36px] text-deep-forest/45" />
             </div>
-            <p className="text-sm text-gray-500">No pending activities.</p>
+            <p className="text-sm text-deep-forest/60">No pending activities.</p>
           </div>
         )}
         {!isLoading &&
