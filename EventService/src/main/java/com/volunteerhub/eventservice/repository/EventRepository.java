@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface EventRepository extends JpaRepository<Event, Long>, JpaSpecificationExecutor<Event> {
@@ -55,6 +56,9 @@ public interface EventRepository extends JpaRepository<Event, Long>, JpaSpecific
 
     @Query("SELECT COUNT(e) FROM Event e WHERE e.ownerId = :ownerId")
     Long countEventsByOwnerId(@Param("ownerId") String ownerId);
+
+    @Query("SELECT e.ownerId, COUNT(e) FROM Event e WHERE e.ownerId IN :ownerIds GROUP BY e.ownerId")
+    List<Object[]> countEventsByOwnerIds(@Param("ownerIds") Collection<String> ownerIds);
 
     @Query("SELECT COUNT(e) FROM Event e WHERE e.ownerId = :ownerId AND e.status = :status")
     Long countByOwnerIdAndStatus(@Param("ownerId") String ownerId, @Param("status") EventStatus status);

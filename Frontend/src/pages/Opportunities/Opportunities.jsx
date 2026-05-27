@@ -384,7 +384,7 @@ function OpportunitiesEvent() {
                       backgroundColor: "#00522d",
                       color: "#fff8f6",
                       "&:hover": {
-                        backgroundColor: "#db3c8a",
+                        backgroundColor: "#00522d",
                       },
                     },
                   },

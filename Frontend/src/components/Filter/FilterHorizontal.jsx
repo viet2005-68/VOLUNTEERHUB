@@ -45,7 +45,7 @@ export default function FilterHorizontal({
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search opportunities..."
-            className="w-full rounded-[10px] border border-deep-forest/15 bg-pale-canvas px-4 py-3 pl-10 text-sm font-bold text-deep-forest caret-foudre-pink outline-none transition placeholder:text-deep-forest/45 focus:border-foudre-pink focus:ring-4 focus:ring-foudre-pink/15"
+            className="w-full rounded-[10px] border border-deep-forest/15 bg-pale-canvas px-4 py-3 pl-[42px] text-sm font-bold text-deep-forest caret-foudre-pink outline-none transition placeholder:text-deep-forest/45 focus:border-foudre-pink focus:ring-4 focus:ring-foudre-pink/15"
           />
         </div>
 

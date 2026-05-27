@@ -71,22 +71,22 @@ export default function RegistrationPage() {
 
   if (showFullLoading) {
     return (
-      <div className="rounded-2xl border border-deep-forest/15 bg-pale-canvas p-6">
+      <div className="rounded-[25px] border-2 border-ash-whisper bg-pale-canvas p-8">
         <div className="flex h-64 items-center justify-center">
-          <div className="text-deep-forest/65">Loading registrations...</div>
+          <div className="text-sm font-bold leading-[1.2] text-deep-forest/70">Loading registrations...</div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="rounded-2xl border border-deep-forest/15 bg-pale-canvas p-6 text-deep-forest">
-      <div className={`${selectedReg ? "blur" : ""} flex flex-col gap-5`}>
-        <div className="flex flex-col gap-2">
-          <h3 className="text-2xl font-bold text-deep-forest">
-            Register manager
-          </h3>
-          <p className="text-deep-forest/65">
+    <div className="flex flex-col gap-6 rounded-[25px] border border-ash-whisper bg-pale-canvas/90 p-5 text-deep-forest sm:gap-8 sm:border-2 sm:p-6 md:p-8">
+      <div className={`${selectedReg ? "blur" : ""} flex flex-col gap-6 sm:gap-8`}>
+        <div className="flex flex-col gap-3">
+          <h2 className="font-beni text-[56px] font-black uppercase leading-[0.75] text-deep-forest md:text-[80px]">
+            Register Manager
+          </h2>
+          <p className="text-base font-medium leading-[1.2] text-deep-forest/70">
             Manage all your volunteer registration
           </p>
         </div>
@@ -100,7 +100,7 @@ export default function RegistrationPage() {
         </div>
 
         {/* Desktop Table View */}
-        <div className="hidden md:block overflow-x-auto">
+        <div className="hidden md:block">
           <RegistrationTable
             data={data?.items || []}
             isFetching={isFetching}
@@ -115,10 +115,10 @@ export default function RegistrationPage() {
               return (
                 <div
                   key={reg.registrationId}
-                  className="rounded-2xl border border-deep-forest/15 bg-pale-canvas p-4 transition-colors hover:bg-ash-whisper"
+                  className="overflow-hidden rounded-[20px] border border-deep-forest/10 bg-pale-canvas shadow-lg shadow-deep-forest/10"
                 >
                   {/* Header: Avatar, Name and Status */}
-                  <div className="flex items-start gap-3 mb-3">
+                  <div className="flex items-start gap-3 p-4">
                     {/* Avatar */}
                     <div className="flex-shrink-0">
                       {reg.avatarUrl ? (
@@ -157,7 +157,7 @@ export default function RegistrationPage() {
                   </div>
 
                   {/* Info Grid */}
-                  <div className="space-y-2 mb-3">
+                  <div className="space-y-2 border-t border-deep-forest/10 px-4 py-3">
                     {/* Registration Date */}
                     <div className="flex items-center gap-2 text-sm text-deep-forest/65">
                       <svg
@@ -202,7 +202,7 @@ export default function RegistrationPage() {
                   {/* View Details Button */}
                   <button
                     onClick={() => setSelectedReg(reg)}
-                    className="w-full px-4 py-2 rounded-lg bg-foudre-pink hover:bg-deep-forest text-pale-canvas text-sm font-bold transition-colors"
+                    className="mx-4 mb-4 w-[calc(100%-2rem)] rounded-[10px] bg-deep-forest px-4 py-3 text-sm font-bold text-pale-canvas transition-colors hover:bg-foudre-pink"
                   >
                     View details
                   </button>
@@ -210,7 +210,7 @@ export default function RegistrationPage() {
               );
             })
           ) : (
-            <div className="text-center py-8 text-deep-forest/65 text-sm">
+            <div className="rounded-[20px] border border-deep-forest/10 bg-pale-canvas/70 px-6 py-12 text-center text-sm font-medium leading-[1.2] text-deep-forest/65">
               No registrations found
             </div>
           )}
@@ -218,8 +218,8 @@ export default function RegistrationPage() {
 
         {/* Pagination */}
         {data?.items && data.items.length > 0 && (
-          <div className="flex flex-col sm:flex-row items-center justify-between pt-4 border-t border-deep-forest/15 gap-4">
-            <p className="text-sm text-deep-forest/65">
+          <div className="flex flex-col items-center justify-between gap-4 border-t border-deep-forest/10 pt-5 sm:flex-row">
+            <p className="text-sm font-medium leading-[1.2] text-deep-forest/70">
               Showing {data.items.length} of {data.totalItems} registrations
             </p>
             {data.totalPages > 0 && (
@@ -232,7 +232,7 @@ export default function RegistrationPage() {
                     color: "#00522d",
                     fontFamily: "Clash Grotesk, sans-serif",
                     "&.Mui-selected": {
-                      backgroundColor: "#db3c8a",
+                      backgroundColor: "#00522d",
                       color: "#fff8f6",
                       "&:hover": {
                         backgroundColor: "#00522d",

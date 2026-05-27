@@ -205,7 +205,7 @@ export default function Opportunities() {
                       color: "#00522d",
                       fontFamily: "Clash Grotesk, sans-serif",
                       "&.Mui-selected": {
-                        backgroundColor: "#db3c8a",
+                        backgroundColor: "#00522d",
                         color: "#fff8f6",
                         "&:hover": {
                           backgroundColor: "#00522d",

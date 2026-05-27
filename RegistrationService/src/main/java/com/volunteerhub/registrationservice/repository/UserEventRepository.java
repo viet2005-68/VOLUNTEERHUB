@@ -108,6 +108,10 @@ public interface UserEventRepository extends JpaRepository<UserEvent, Long> {
 """)
     Long countApprovedByOwnerId(@Param("ownerId") String ownerId);
 
+    @Query("SELECT es.ownerId, COUNT(DISTINCT ue.userId) FROM UserEvent ue JOIN ue.eventSnapshot es WHERE es.ownerId IN :ownerIds AND ue.status IN :statuses GROUP BY es.ownerId")
+    List<Object[]> countUniqueVolunteersByOwnerIds(@Param("ownerIds") Collection<String> ownerIds,
+                                                   @Param("statuses") Collection<UserEventStatus> statuses);
+
     @Query("SELECT COUNT(u) FROM UserEvent u WHERE u.userId = :userId AND u.status IN :statuses")
     Long countUserEventsByStatuses(@Param("userId") String userId, @Param("statuses") Collection<UserEventStatus> statuses);
 

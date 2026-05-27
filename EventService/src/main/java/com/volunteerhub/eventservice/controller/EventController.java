@@ -147,6 +147,11 @@ public class EventController {
         return ResponseEntity.ok(eventService.countEventsByOwnerId(authentication.getName()));
     }
 
+    @GetMapping("/stats/owner-counts")
+    public ResponseEntity<Map<String, Long>> countEventsByOwnerIds(@RequestParam List<String> ownerIds) {
+        return ResponseEntity.ok(eventService.countEventsByOwnerIds(ownerIds));
+    }
+
     @GetMapping("/stats/active-events-by-manager")
     @PreAuthorize("hasRole('MANAGER')")
     public ResponseEntity<Long> countActiveEventsByOwnerId() {

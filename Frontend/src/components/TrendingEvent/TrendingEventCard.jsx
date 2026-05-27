@@ -200,8 +200,8 @@ function TrendingEventCard({
             className={`w-full ${
               !isApproved || registered === capacity
                 ? "cursor-not-allowed bg-gray-500/80"
-                : "cursor-pointer bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600"
-            } text-white rounded-xl py-2.5 font-bold text-sm transition-all duration-300 ease-in-out hover:scale-105 font-jost border-none active:scale-95 shadow-lg`}
+                : "cursor-pointer bg-deep-forest hover:bg-foudre-pink"
+            } text-pale-canvas rounded-xl py-2.5 font-bold text-sm transition-all duration-300 ease-in-out hover:scale-105 font-jost border-none active:scale-95 shadow-lg`}
             onClick={handleViewDetails}
             disabled={!isApproved}
           >

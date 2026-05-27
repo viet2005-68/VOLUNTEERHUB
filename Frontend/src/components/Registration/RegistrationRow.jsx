@@ -4,20 +4,20 @@ import { formatDateTime } from "../../utils/date";
 
 export default function RegistrationRow({ reg, onSelect }) {
   return (
-    <tr className="border-b border-b-gray-600/20 hover:bg-gray-50 max-sm:text-sm">
-      <td className="p-4 font-medium">{reg.fullName}</td>
-      <td className="p-4">{reg.eventName}</td>
-      <td className="p-4 inline-flex gap-2 items-center">
-        <span>
-          <Calendar className="w-4 h-4 text-blue-400" />
-        </span>
-        <span>{formatDateTime(reg.registeredAt)}</span>
+    <tr className="border-b-2 border-ash-whisper text-sm font-medium text-deep-forest transition-colors hover:bg-ash-whisper/30">
+      <td className="px-6 py-5 font-bold">{reg.fullName}</td>
+      <td className="px-6 py-5 font-medium">{reg.eventName}</td>
+      <td className="px-6 py-5">
+        <div className="flex items-center gap-2 font-bold">
+          <Calendar className="h-4 w-4 text-foudre-pink" />
+          <span>{formatDateTime(reg.registeredAt)}</span>
+        </div>
       </td>
-      <td className="p-4">
+      <td className="px-6 py-5">
         <RegistrationStatusBadge status={reg.status} />
       </td>
-      <td className="p-4">
-        <button className="text-blue-600 hover:underline" onClick={onSelect}>
+      <td className="px-6 py-5">
+        <button className="rounded-[10px] bg-deep-forest px-4 py-3 text-sm font-bold leading-[0.85] text-pale-canvas transition-colors hover:bg-foudre-pink" onClick={onSelect}>
           View details
         </button>
       </td>

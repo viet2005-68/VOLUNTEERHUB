@@ -346,6 +346,27 @@ public class UserEventService {
         return (long) ((double) approvedCount / totalApps * 100);
     }
 
+    public Map<String, Long> countUniqueVolunteersByOwnerIds(List<String> ownerIds) {
+        if (ownerIds == null || ownerIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        Map<String, Long> counts = ownerIds.stream()
+                .filter(Objects::nonNull)
+                .distinct()
+                .collect(Collectors.toMap(id -> id, id -> 0L, (left, right) -> left, LinkedHashMap::new));
+
+        if (counts.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        List<UserEventStatus> participantStatuses = List.of(UserEventStatus.APPROVED, UserEventStatus.COMPLETED);
+        userEventRepository.countUniqueVolunteersByOwnerIds(counts.keySet(), participantStatuses)
+                .forEach(row -> counts.put((String) row[0], ((Number) row[1]).longValue()));
+
+        return counts;
+    }
+
     public List<UserEventExport> getAllForExport() {
         return userEventRepository.findAll().stream()
                 .map(userEventMapper::toExportDto)

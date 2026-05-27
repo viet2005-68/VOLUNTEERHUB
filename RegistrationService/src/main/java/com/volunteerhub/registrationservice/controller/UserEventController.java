@@ -148,6 +148,11 @@ public class UserEventController {
         return ResponseEntity.ok(userEventService.getRegistrationsByEventIdsInternal(ownerId, eventId, status, pageNum, pageSize));
     }
 
+    @GetMapping("/internal/owner-volunteer-counts")
+    public ResponseEntity<Map<String, Long>> countUniqueVolunteersByOwnerIds(@RequestParam List<String> ownerIds) {
+        return ResponseEntity.ok(userEventService.countUniqueVolunteersByOwnerIds(ownerIds));
+    }
+
     @GetMapping("/application_rate")
     @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     public ResponseEntity<Long> getApplicationRate() {

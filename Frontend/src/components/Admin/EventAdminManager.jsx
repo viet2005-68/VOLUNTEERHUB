@@ -158,7 +158,7 @@ function EventAdminManager() {
           placeholder="Search events by name..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full pl-[42px] pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         {/* Loading indicator for search */}
         {isSearchMode && isFetching && (
@@ -279,10 +279,10 @@ function EventAdminManager() {
             sx={{
               "& .MuiPaginationItem-root": {
                 "&.Mui-selected": {
-                  backgroundColor: "#f87171",
-                  color: "white",
+                  backgroundColor: "#00522d",
+                  color: "#fff8f6",
                   "&:hover": {
-                    backgroundColor: "#ef4444",
+                    backgroundColor: "#00522d",
                   },
                 },
               },

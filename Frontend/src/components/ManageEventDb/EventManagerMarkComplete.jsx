@@ -150,16 +150,16 @@ function EventManagerMarkComplete() {
 
   if (isLoading) {
     return (
-      <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm">
-        <div className="text-center py-8 text-gray-500">Loading...</div>
+      <div className="rounded-[25px] border-2 border-ash-whisper bg-pale-canvas p-8">
+        <div className="text-center py-8 text-sm font-bold leading-[1.2] text-deep-forest/70">Loading...</div>
       </div>
     );
   }
 
   if (isError) {
     return (
-      <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm">
-        <div className="text-center py-8 text-red-500">
+      <div className="rounded-[25px] border-2 border-ash-whisper bg-pale-canvas p-8">
+        <div className="text-center py-8 text-sm font-bold leading-[1.2] text-foudre-pink">
           Failed to load volunteers
         </div>
       </div>
@@ -167,38 +167,38 @@ function EventManagerMarkComplete() {
   }
 
   return (
-    <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm gap-4 sm:gap-6 flex flex-col">
+    <div className="flex flex-col gap-6 rounded-[25px] border border-ash-whisper bg-pale-canvas/90 p-5 text-deep-forest sm:gap-8 sm:border-2 sm:p-6 md:p-8">
       {/* Header */}
-      <div className="mb-2">
-        <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-1 sm:mb-2">
+      <div className="flex flex-col gap-3">
+        <h2 className="font-beni text-[56px] font-black uppercase leading-[0.7] text-deep-forest md:text-[80px]">
           Volunteer Completion Management
         </h2>
-        <p className="text-sm sm:text-base text-gray-600">
+        <p className="text-base font-medium leading-[1.2] text-deep-forest/70">
           Đánh dấu hoàn thành và chỉnh sửa ghi chú cho tình nguyện viên
         </p>
       </div>
 
       {/* Search and Action Buttons */}
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 sm:gap-4 mb-3">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         {/* Search Bar */}
-        <div className="relative w-full lg:flex-1 lg:min-w-[300px]">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
+        <div className="relative w-full lg:min-w-[300px] lg:flex-1">
+          <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-deep-forest/45" />
           <input
             type="text"
             placeholder="Tìm kiếm tình nguyện viên..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 sm:pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50 text-sm sm:text-base"
+            className="w-full rounded-[10px] border-2 border-ash-whisper bg-pale-canvas/80 px-4 py-4 pl-[48px] pr-4 text-sm font-medium leading-[1.2] text-deep-forest placeholder:text-deep-forest/55 focus:border-foudre-pink focus:outline-none"
           />
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center gap-2 sm:gap-3 pb-1 max-md:self-end relative">
+        <div className="relative flex flex-wrap items-center justify-end gap-3">
           <button
             onClick={() => {}}
-            className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors whitespace-nowrap text-xs sm:text-sm"
+            className="inline-flex items-center justify-center gap-2 rounded-[10px] bg-foudre-pink px-4 py-3 text-sm font-bold leading-[0.85] text-pale-canvas transition hover:bg-deep-forest whitespace-nowrap"
           >
-            <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+            <CheckCircle className="h-5 w-5 flex-shrink-0" />
             <span className="sm:hidden">Mark All</span>
             <span className="hidden sm:inline">
               Mark All Attended as Completed
@@ -206,9 +206,9 @@ function EventManagerMarkComplete() {
           </button>
           <button
             onClick={() => {}}
-            className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors whitespace-nowrap text-xs sm:text-sm"
+            className="inline-flex items-center justify-center gap-2 rounded-[10px] border border-deep-forest/20 bg-pale-canvas px-4 py-3 text-sm font-bold leading-[0.85] text-deep-forest transition hover:border-foudre-pink hover:bg-ash-whisper hover:text-foudre-pink whitespace-nowrap"
           >
-            <Send className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+            <Send className="h-5 w-5 flex-shrink-0" />
             <span className="hidden xs:inline">Send Certificates</span>
             <span className="xs:hidden">Send</span>
           </button>
@@ -229,8 +229,8 @@ function EventManagerMarkComplete() {
       </div>
 
       {/* Tip Box */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6">
-        <p className="text-xs sm:text-sm text-gray-700">
+      <div className="rounded-[20px] border border-foudre-pink/20 bg-ash-whisper/60 p-4">
+        <p className="text-sm font-medium leading-[1.2] text-deep-forest/75">
           <span className="font-semibold">Mẹo:</span> Lọc theo "Attended" để xem
           danh sách đã duyệt, sau đó đánh dấu "Completed" và thêm ghi chú để cấp
           chứng nhận.
@@ -254,7 +254,7 @@ function EventManagerMarkComplete() {
             />
           ))
         ) : (
-          <div className="text-center py-8 sm:py-12 text-gray-500 text-sm sm:text-base">
+          <div className="rounded-[20px] border border-deep-forest/10 bg-pale-canvas/70 px-6 py-12 text-center text-sm font-medium leading-[1.2] text-deep-forest/65">
             Không tìm thấy tình nguyện viên phù hợp "{searchQuery}"
           </div>
         )}
@@ -262,15 +262,15 @@ function EventManagerMarkComplete() {
 
       {/* Completion Note Modal */}
       {selectedReg && (
-        <div className="fixed inset-0 bg-gray-900/60 bg-opacity-40 flex items-center justify-center p-4 z-50">
-          <div className="bg-white w-full max-w-[500px] p-6 rounded-xl shadow-lg">
-            <h3 className="text-xl font-semibold mb-6 text-center">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-deep-forest/65 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-[500px] rounded-[20px] border border-foudre-pink/25 bg-pale-canvas p-6 text-deep-forest">
+            <h3 className="font-beni text-[46px] font-black uppercase leading-[0.7] text-foudre-pink">
               {isEditingNote ? "Chỉnh sửa ghi chú" : "Đánh dấu hoàn thành"}
             </h3>
 
             <div className="space-y-4">
               <div>
-                <p className="text-sm text-gray-600 mb-2">
+                <p className="mb-2 text-sm font-bold leading-[1.2] text-deep-forest">
                   Ghi chú (tùy chọn):
                 </p>
                 <textarea
@@ -278,14 +278,14 @@ function EventManagerMarkComplete() {
                   onChange={(e) => setNote(e.target.value)}
                   placeholder="Nhập ghi chú cho việc hoàn thành..."
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                  className="w-full rounded-[10px] border-2 border-ash-whisper bg-pale-canvas px-4 py-3 text-sm font-medium leading-[1.2] text-deep-forest placeholder:text-deep-forest/45 focus:border-foudre-pink focus:outline-none"
                   disabled={reviewMutation.isPending}
                 />
               </div>
 
               <div className="flex justify-end gap-3 mt-4">
                 <button
-                  className="px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded transition"
+                  className="rounded-[10px] border border-deep-forest bg-transparent px-4 py-3 text-sm font-bold text-deep-forest transition hover:border-foudre-pink hover:bg-ash-whisper hover:text-foudre-pink"
                   onClick={() => {
                     setSelectedReg(null);
                     setNote("");
@@ -298,7 +298,7 @@ function EventManagerMarkComplete() {
                 <button
                   onClick={handleComplete}
                   disabled={reviewMutation.isPending}
-                  className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="rounded-[10px] bg-foudre-pink px-4 py-3 text-sm font-bold text-pale-canvas transition hover:bg-deep-forest disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {reviewMutation.isPending
                     ? "Đang xử lý..."

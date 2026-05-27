@@ -491,10 +491,10 @@ function VolunteerList() {
             sx={{
               "& .MuiPaginationItem-root": {
                 "&.Mui-selected": {
-                  backgroundColor: "#3b82f6",
-                  color: "white",
+                  backgroundColor: "#00522d",
+                  color: "#fff8f6",
                   "&:hover": {
-                    backgroundColor: "#2563eb",
+                    backgroundColor: "#00522d",
                   },
                 },
               },

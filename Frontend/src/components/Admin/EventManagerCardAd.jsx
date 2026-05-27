@@ -260,10 +260,10 @@ function EventManagerCardAd({ data }) {
             <button
               onClick={() => navigate(`/dashboard/eventmanager/${id}`)}
               disabled={isUpdating || isDeleting}
-              className="p-2 border-gray-500/20 border hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="rounded-lg border border-deep-forest/20 p-2 text-deep-forest transition-colors hover:bg-deep-forest hover:text-pale-canvas disabled:cursor-not-allowed disabled:opacity-50"
               title="View Details"
             >
-              <Eye className="w-4 h-4 text-gray-600" />
+              <Eye className="h-4 w-4 text-current" />
             </button>
 
             {/* Export button - only for APPROVED */}

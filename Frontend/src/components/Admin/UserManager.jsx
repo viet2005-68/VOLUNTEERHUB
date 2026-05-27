@@ -164,7 +164,7 @@ function UserManager() {
             placeholder="Search users..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full rounded-[10px] border-2 border-ash-whisper bg-pale-canvas py-4 pl-12 pr-4 text-sm font-bold text-deep-forest outline-none transition-colors placeholder:text-deep-forest/40 focus:border-deep-forest"
+            className="w-full rounded-[10px] border-2 border-ash-whisper bg-pale-canvas py-4 pl-[48px] pr-4 text-sm font-bold text-deep-forest outline-none transition-colors placeholder:text-deep-forest/40 focus:border-deep-forest"
           />
         </div>
       </div>
@@ -297,7 +297,7 @@ function UserManager() {
                   backgroundColor: "#00522d",
                   color: "#fff8f6",
                   "&:hover": {
-                    backgroundColor: "#006b3b",
+                    backgroundColor: "#00522d",
                   },
                 },
               },

@@ -28,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -298,6 +299,26 @@ public class EventService {
 
     public Long countEventsByOwnerId(String ownerId) {
         return eventRepository.countEventsByOwnerId(ownerId);
+    }
+
+    public Map<String, Long> countEventsByOwnerIds(List<String> ownerIds) {
+        if (ownerIds == null || ownerIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        Map<String, Long> counts = ownerIds.stream()
+                .filter(Objects::nonNull)
+                .distinct()
+                .collect(Collectors.toMap(Function.identity(), id -> 0L, (left, right) -> left, LinkedHashMap::new));
+
+        if (counts.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        eventRepository.countEventsByOwnerIds(counts.keySet())
+                .forEach(row -> counts.put((String) row[0], ((Number) row[1]).longValue()));
+
+        return counts;
     }
 
     public Long countActiveEventsByOwnerId(String ownerId) {
