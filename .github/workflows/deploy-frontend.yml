@@ -1,0 +1,162 @@
+name: Deploy Frontend Only
+
+on:
+  push:
+    branches:
+      - cicd
+    paths:
+      - "Frontend/**"
+      - ".github/workflows/deploy-frontend.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  REGISTRY: ghcr.io
+  OWNER: viet2005-68
+  IMAGE: volunteerhub-frontend
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+concurrency:
+  group: volunteerhub-frontend-deploy-${{ github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  changes:
+    name: Detect frontend-only changes
+    runs-on: ubuntu-latest
+    outputs:
+      frontend_only: ${{ steps.detect.outputs.frontend_only }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GHCR_TOKEN }}
+          fetch-depth: 0
+
+      - name: Detect changed paths
+        id: detect
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "frontend_only=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          changed_files="$(git diff --name-only "${{ github.event.before }}" "${{ github.sha }}")"
+          echo "$changed_files"
+
+          non_frontend_files="$(
+            printf '%s\n' "$changed_files" \
+              | grep -Ev '^(Frontend/|\.github/workflows/deploy-frontend\.yml$|README_CICD\.md$|.*\.md$)' \
+              || true
+          )"
+
+          if [ -z "$non_frontend_files" ]; then
+            echo "frontend_only=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Found non-frontend changes; full deploy should handle this push:"
+            printf '%s\n' "$non_frontend_files"
+            echo "frontend_only=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  build-and-deploy-frontend:
+    name: Build and deploy frontend
+    runs-on: ubuntu-latest
+    environment: staging
+    needs: changes
+    if: needs.changes.outputs.frontend_only == 'true'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GHCR_TOKEN }}
+
+      - name: Resolve deploy metadata
+        shell: bash
+        run: |
+          echo "DEPLOY_SHA=${{ github.sha }}" >> "$GITHUB_ENV"
+
+      - name: Log in to GHCR
+        shell: bash
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login "${{ env.REGISTRY }}" -u "${{ github.actor }}" --password-stdin
+
+      - name: Resolve public URL
+        id: public-url
+        shell: bash
+        run: |
+          if [ -n "${{ vars.PUBLIC_BASE_URL }}" ]; then
+            echo "value=${{ vars.PUBLIC_BASE_URL }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "value=http://${{ secrets.VM_HOST }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build and push frontend image
+        shell: bash
+        run: |
+          IMAGE="${{ env.REGISTRY }}/${{ env.OWNER }}/${{ env.IMAGE }}"
+          docker build \
+            --platform linux/amd64 \
+            -f Frontend/Dockerfile \
+            --build-arg VITE_API_URL=/api \
+            --build-arg "VITE_API_LOGIN=${{ steps.public-url.outputs.value }}" \
+            --build-arg VITE_AUTH_BASE_URL= \
+            --build-arg "VITE_PUBLIC_BASE_URL=${{ steps.public-url.outputs.value }}" \
+            --build-arg VITE_OAUTH_RESPONSE_TYPE=code \
+            --build-arg "VITE_OAUTH_CLIENT_ID=${{ secrets.CLIENT_ID }}" \
+            --build-arg "VITE_OAUTH_CLIENT_SECRET=${{ secrets.CLIENT_SECRET }}" \
+            --build-arg VITE_OAUTH_SCOPE=openid \
+            --build-arg "VITE_OAUTH_REDIRECT_URI=${{ steps.public-url.outputs.value }}/login/oauth2/code/volunteerhub" \
+            --build-arg "VITE_GG_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" \
+            --build-arg "VITE_GG_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" \
+            --build-arg "VITE_GOOGLE_REDIRECT_URI=${{ steps.public-url.outputs.value }}/login/oauth2/code/google" \
+            -t "${IMAGE}:${DEPLOY_SHA}" \
+            -t "${IMAGE}:latest" \
+            Frontend
+          docker push "${IMAGE}:${DEPLOY_SHA}"
+          docker push "${IMAGE}:latest"
+
+      - name: Install kubectl
+        shell: bash
+        run: |
+          set -euo pipefail
+          KUBECTL_VERSION="$(curl -fsSL https://dl.k8s.io/release/stable.txt)"
+          curl -fsSLo kubectl "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
+          chmod +x kubectl
+          sudo mv kubectl /usr/local/bin/kubectl
+          kubectl version --client
+
+      - name: Prepare kubeconfig and SSH tunnel
+        shell: bash
+        run: |
+          mkdir -p ~/.kube ~/.ssh
+          printf '%s' "${{ secrets.KUBE_CONFIG }}" > ~/.kube/config
+          printf '%s\n' "${{ secrets.VM_SSH_KEY }}" | tr -d '\r' > ~/.ssh/vm_key
+          chmod 600 ~/.ssh/vm_key
+          ssh-keyscan -H "${{ secrets.VM_HOST }}" >> ~/.ssh/known_hosts
+          ssh -i ~/.ssh/vm_key -fN \
+            -o ExitOnForwardFailure=yes \
+            -o ServerAliveInterval=30 \
+            -L 6443:127.0.0.1:6443 \
+            "${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}"
+          kubectl get nodes
+
+      - name: Deploy frontend image
+        shell: bash
+        run: |
+          IMAGE="${{ env.REGISTRY }}/${{ env.OWNER }}/${{ env.IMAGE }}:${DEPLOY_SHA}"
+          kubectl set image deployment/frontend frontend="${IMAGE}" -n volunteerhub
+          kubectl rollout status deployment/frontend -n volunteerhub --timeout=300s
+
+      - name: Smoke test
+        shell: bash
+        run: |
+          PUBLIC_BASE_URL="${{ vars.PUBLIC_BASE_URL }}"
+          if [ -z "$PUBLIC_BASE_URL" ]; then
+            PUBLIC_BASE_URL="http://${{ secrets.VM_HOST }}"
+          fi
+          curl -fsSI --retry 8 --retry-delay 10 --retry-all-errors "$PUBLIC_BASE_URL"
