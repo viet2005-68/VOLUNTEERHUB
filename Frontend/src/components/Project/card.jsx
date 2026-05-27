@@ -65,8 +65,8 @@ function ProjectCard({
           </p>
         )}
       </div>
-      <div className="p-4 flex flex-col gap-2 flex-grow justify-between">
-        <div className="line-clamp-2 text-xl font-bold leading-[1.05] text-deep-forest max-sm:text-lg">
+      <div className="flex flex-grow flex-col justify-between gap-2 p-4">
+        <div className="line-clamp-2 text-lg font-bold leading-[1.1] text-deep-forest sm:text-xl">
           {title}
         </div>
         <div className="flex flex-row gap-2 items-center text-deep-forest/60 ">
@@ -94,7 +94,7 @@ function ProjectCard({
           </div>
           <p>Available {availableSlots}</p>
         </div>
-        <div className="mb-8 h-3 w-full rounded-full bg-ash-whisper">
+        <div className="mb-5 h-3 w-full rounded-full bg-ash-whisper">
           <div
             className={`${
               !isApproved || registered === capacity
@@ -113,7 +113,7 @@ function ProjectCard({
               !isApproved || registered === capacity
                 ? "cursor-not-allowed bg-deep-forest/35"
                 : "cursor-pointer bg-deep-forest hover:bg-foudre-pink"
-            } rounded-[10px] py-3 text-sm font-bold text-pale-canvas transition-colors duration-200 font-clash-grotesk border-none active:scale-95`}
+            } rounded-[10px] py-3 text-sm font-bold leading-[1] text-pale-canvas transition-colors duration-200 font-clash-grotesk border-none active:scale-95`}
             onClick={handleViewDetails}
             disabled={!isApproved}
           >

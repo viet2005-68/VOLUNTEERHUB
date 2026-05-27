@@ -242,12 +242,12 @@ function OpportunitiesEvent() {
   };
 
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 py-8 text-deep-forest sm:mb-20 sm:px-6 lg:px-8">
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-6 text-deep-forest sm:mb-20 sm:px-6 lg:px-8">
       <div className="flex flex-col gap-3">
-        <p className="font-beni text-[64px] font-black uppercase leading-[0.72] text-deep-forest sm:text-[88px]">
+        <p className="font-beni text-[46px] font-black uppercase leading-[0.76] text-deep-forest sm:text-[62px]">
           Volunteer Opportunities
         </p>
-        <p className="max-w-2xl text-base font-medium leading-[1.2] text-deep-forest/70">
+        <p className="max-w-2xl text-sm font-medium leading-[1.2] text-deep-forest/70 sm:text-base">
           Discover meaningful ways to make a difference
         </p>
       </div>
@@ -281,7 +281,7 @@ function OpportunitiesEvent() {
       )}
 
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-        <div className="font-beni text-[46px] font-black uppercase leading-[0.72] text-deep-forest">
+        <div className="font-beni text-[34px] font-black uppercase leading-[0.76] text-deep-forest sm:text-[42px]">
           {isSearchMode ? `Search results for "${query}"` : "All Opportunities"}
         </div>
         <div className="flex items-center gap-2 text-sm font-bold text-deep-forest/60">

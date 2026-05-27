@@ -31,10 +31,10 @@ function TrendingCardHorizontal({
   return (
     <div
       onClick={handleClick}
-      className="flex min-w-[280px] cursor-pointer snap-start flex-col rounded-[20px] border border-pale-canvas/25 bg-pale-canvas p-4 text-deep-forest transition-colors duration-300 hover:border-bubblegum-blush sm:min-w-[400px] sm:flex-row sm:space-x-5 sm:space-y-0 md:min-w-[450px]"
+      className="flex min-w-[280px] cursor-pointer snap-start flex-col rounded-[20px] border border-pale-canvas/25 bg-pale-canvas p-4 text-deep-forest transition-colors duration-300 hover:border-bubblegum-blush sm:min-w-[420px] sm:max-w-[520px] sm:flex-row sm:space-x-4 sm:space-y-0"
       ref={ref}
     >
-      <div className="flex h-48 w-full flex-shrink-0 items-center justify-center self-center overflow-hidden rounded-[10px] sm:h-[128px] sm:w-[128px]">
+      <div className="flex h-44 w-full flex-shrink-0 items-center justify-center self-center overflow-hidden rounded-[10px] sm:h-[118px] sm:w-[118px]">
         <img
           src={thumbnail || futureVolunteer}
           alt={name}
@@ -43,10 +43,10 @@ function TrendingCardHorizontal({
       </div>
       <div className="flex flex-col justify-between flex-1 py-1">
         <div className="space-y-1">
-          <p className="line-clamp-1 text-center text-lg font-bold leading-[1.05] text-deep-forest sm:text-left">
+          <p className="line-clamp-1 text-center text-base font-bold leading-[1.1] text-deep-forest sm:text-left">
             {name}
           </p>
-          <div className="flex flex-col justify-start text-sm font-medium text-deep-forest/70 sm:gap-4">
+          <div className="flex flex-col justify-start gap-1 text-sm font-medium text-deep-forest/70">
             <p className="flex items-center justify-center sm:justify-start gap-1">
               <span className="inline-flex h-[18px] w-[18px] text-foudre-pink">
                 <MapPin className="h-full w-full" />
@@ -61,7 +61,7 @@ function TrendingCardHorizontal({
             </p>
           </div>
         </div>
-        <div className="flex flex-row mt-3 sm:mt-2 justify-around gap-2">
+        <div className="mt-3 grid grid-cols-2 gap-2">
           <div className="flex min-w-0 basis-1/2 items-center gap-2 rounded-[10px] border border-deep-forest/10 bg-ash-whisper/55 px-3 py-2">
             <TrendingUp className="h-[18px] w-[18px] text-foudre-pink" />
             <div className="flex flex-col">
