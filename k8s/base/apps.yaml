@@ -789,6 +789,12 @@ spec:
               value: redis
             - name: SPRING_DATA_REDIS_HOST
               value: redis
+            - name: SERVICES_USER_URL
+              value: "http://user-service:8081/api/v1/users"
+            - name: SERVICES_EVENT_URL
+              value: "http://event-service:8082/api/v1/events"
+            - name: SERVICES_REGISTRATION_URL
+              value: "http://registration-service:8084/api/v1/registrations"
           readinessProbe:
             httpGet:
               path: /actuator/health/readiness

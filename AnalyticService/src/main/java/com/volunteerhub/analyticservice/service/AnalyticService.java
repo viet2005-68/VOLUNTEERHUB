@@ -122,7 +122,7 @@ public class AnalyticService {
     public Long countUsers() {
         return getCached("", ":total_users", () ->
                 userClient.get()
-                .uri("/total_users")
+                .uri("/users/total_users")
                 .retrieve()
                 .body(Long.class)
         );
@@ -131,7 +131,7 @@ public class AnalyticService {
     public Long countManagers() {
         return getCached("", ":total_managers", () ->
                 userClient.get()
-                        .uri("/total_managers")
+                        .uri("/users/total_managers")
                         .retrieve()
                         .body(Long.class)
         );
@@ -173,8 +173,8 @@ public class AnalyticService {
         RegistrationAnalyticsSummary registration = fetchRegistrationSummary("/analytics/platform");
         Map<String, Long> eventStatusBreakdown = fetchStatusMap("/stats/by-status");
         return baseDashboard("ADMIN", registration)
-                .totalUsers(fetchLongFrom(userClient, "/total_users", 0L))
-                .totalManagers(fetchLongFrom(userClient, "/total_managers", 0L))
+                .totalUsers(fetchLongFrom(userClient, "/users/total_users", 0L))
+                .totalManagers(fetchLongFrom(userClient, "/users/total_managers", 0L))
                 .totalEvents(sumValues(eventStatusBreakdown))
                 .activeEvents(eventStatusBreakdown.getOrDefault("approved", 0L))
                 .pendingEvents(eventStatusBreakdown.getOrDefault("pending", 0L))
