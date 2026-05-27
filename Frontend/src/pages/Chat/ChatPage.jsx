@@ -446,7 +446,7 @@ export default function ChatPage() {
   const activeOtherName = conversationLabel(activeConversation, user);
 
   return (
-    <div className="relative h-full min-h-0 overflow-hidden bg-white text-deep-forest md:h-[min(720px,calc(100vh-190px))] md:min-h-[620px] md:rounded-[20px] lg:grid lg:grid-cols-[330px_minmax(0,1fr)]">
+    <div className="relative h-full min-h-0 overflow-hidden bg-white text-deep-forest md:rounded-[20px] lg:grid lg:grid-cols-[330px_minmax(0,1fr)]">
       {isConversationListOpen && (
         <button
           type="button"

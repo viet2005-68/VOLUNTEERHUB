@@ -148,7 +148,7 @@ export default function MainLayout() {
       <main
         className={`flex-1 ${
           isMessagesPage
-            ? "mt-16 h-[calc(100dvh-136px)] overflow-hidden px-0 pb-0 pt-0 md:mt-0 md:h-auto md:px-6 md:pb-30 md:pt-22 lg:px-8"
+            ? "mt-16 h-[calc(100dvh-136px)] overflow-hidden px-0 pb-0 pt-0 md:h-[calc(100dvh-64px)]"
             : `px-4 pb-30 sm:px-6 lg:px-8 ${
                 shouldShowBanner ? "pt-36" : "pt-22"
               }`
@@ -158,7 +158,7 @@ export default function MainLayout() {
         <div
           className={
             isMessagesPage
-              ? "mx-auto w-full max-w-none md:max-w-7xl"
+              ? "mx-auto h-full min-h-0 w-full max-w-none md:max-w-7xl"
               : "max-w-7xl mx-auto relative"
           }
         >
