@@ -37,14 +37,29 @@ export const listMessages = async ({ conversationId, before, limit = 50 }) => {
   });
 };
 
-export const sendMessage = async ({ conversationId, body, attachments = [] }) => {
+export const uploadChatMedia = async (file) => {
+  const formData = new FormData();
+  formData.append("file", file);
+  return axiosClient.post(`${CHAT_BASE_URL}/media`, formData);
+};
+
+const createClientMessageId = () => {
+  if (typeof crypto !== "undefined" && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+};
+
+export const sendMessage = async ({
+  conversationId,
+  body,
+  attachments = [],
+  clientMessageId,
+}) => {
   return axiosClient.post(`${CHAT_BASE_URL}/conversations/${conversationId}/messages`, {
-    body,
+    body: body || "",
     attachments,
-    clientMessageId:
-      typeof crypto !== "undefined" && crypto.randomUUID
-        ? crypto.randomUUID()
-        : `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+    clientMessageId: clientMessageId || createClientMessageId(),
   });
 };
 
@@ -54,7 +69,7 @@ export const markConversationRead = async ({ conversationId, lastReadMessageId }
   });
 };
 
-export const createChatClient = ({ onConversationMessage, onUserMessage }) => {
+export const createChatClient = ({ onConnect, onConversationMessage, onUserMessage }) => {
   const token = localStorage.getItem("token");
   const baseUrl = resolveWsUrl();
   const brokerURL = token
@@ -72,6 +87,7 @@ export const createChatClient = ({ onConversationMessage, onUserMessage }) => {
           onUserMessage(JSON.parse(frame.body));
         });
       }
+      onConnect?.(client);
     },
   });
 

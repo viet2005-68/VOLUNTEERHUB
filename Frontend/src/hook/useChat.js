@@ -6,9 +6,21 @@ import {
   markConversationRead,
   openConversation,
   sendMessage,
+  uploadChatMedia,
 } from "../services/chatService";
 
 const CHAT_QUERY_KEY = ["chats"];
+
+export const mergeChatMessages = (old = [], incoming = []) => {
+  const next = new Map();
+  [...old, ...incoming].forEach((message) => {
+    if (!message) return;
+    next.set(message.id || message.clientMessageId, message);
+  });
+  return Array.from(next.values()).sort(
+    (a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0)
+  );
+};
 
 export const useConversations = () => {
   return useQuery({
@@ -41,6 +53,24 @@ export const useConversationMessages = (conversationId) => {
   });
 };
 
+export const useLoadOlderMessages = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: listMessages,
+    onSuccess: (messages, variables) => {
+      queryClient.setQueryData(
+        [...CHAT_QUERY_KEY, "messages", variables.conversationId],
+        (old = []) => mergeChatMessages(old, messages)
+      );
+    },
+    onError: (error) => {
+      const message =
+        error?.response?.data?.message || error.message || "Could not load older messages";
+      toast.error(message);
+    },
+  });
+};
+
 export const useSendChatMessage = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -48,15 +78,22 @@ export const useSendChatMessage = () => {
     onSuccess: (message) => {
       queryClient.setQueryData(
         [...CHAT_QUERY_KEY, "messages", message.conversationId],
-        (old = []) => {
-          if (old.some((item) => item.id === message.id)) return old;
-          return [...old, message];
-        }
+        (old = []) => mergeChatMessages(old, [message])
       );
       queryClient.invalidateQueries({ queryKey: [...CHAT_QUERY_KEY, "conversations"] });
     },
     onError: (error) => {
       const message = error?.response?.data?.message || error.message || "Could not send message";
+      toast.error(message);
+    },
+  });
+};
+
+export const useUploadChatMedia = () => {
+  return useMutation({
+    mutationFn: uploadChatMedia,
+    onError: (error) => {
+      const message = error?.response?.data?.message || error.message || "Could not upload image";
       toast.error(message);
     },
   });

@@ -6,13 +6,14 @@ import {
   ChevronUp,
   Trash,
   Download,
+  MessageSquare,
 } from "lucide-react";
 import Pagination from "@mui/material/Pagination";
 import {
   useListUserOfAnEventApproveAndCompleted,
   useRemoveParticipant,
 } from "../../hook/useRegistration";
-import { useOutletContext } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import AnalysisService from "../../services/analysisService";
 import { confirmDelete } from "../../utils/confirmDialog";
 
@@ -20,6 +21,7 @@ const PAGE_SIZE = 10; // giống cách đặt PAGE_SIZE trong EventManager
 
 function VolunteerList() {
   const { eventId } = useOutletContext();
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedIds, setExpandedIds] = useState(new Set());
   const [page, setPage] = useState(0);
@@ -114,6 +116,16 @@ function VolunteerList() {
 
   const handleView = (registration) => {
     console.log("View registration:", registration);
+  };
+
+  const handleMessage = (registration) => {
+    const volunteerId = registration.userId || registration.user?.id;
+    if (!eventId || !volunteerId) return;
+    navigate(
+      `/dashboard/messages?eventId=${encodeURIComponent(eventId)}&volunteerId=${encodeURIComponent(
+        volunteerId
+      )}`
+    );
   };
 
   const handleDelete = async (registration) => {
@@ -329,6 +341,13 @@ function VolunteerList() {
                           View
                         </button>
                         <button
+                          onClick={() => handleMessage(registration)}
+                          className="inline-flex items-center gap-1 rounded-lg border border-deep-forest px-3 py-1.5 text-xs font-medium bg-deep-forest text-white hover:bg-green-800 transition"
+                        >
+                          <MessageSquare className="h-4 w-4" />
+                          Message
+                        </button>
+                        <button
                           onClick={() => handleDelete(registration)}
                           disabled={isRemoving}
                           className="inline-flex items-center gap-1 rounded-lg border border-red-300 px-3 py-1.5 text-xs font-medium bg-red-500 hover:bg-red-600 text-white transition disabled:opacity-50 disabled:cursor-not-allowed"
@@ -429,6 +448,13 @@ function VolunteerList() {
                       >
                         <Eye className="h-4 w-4" />
                         View
+                      </button>
+                      <button
+                        onClick={() => handleMessage(registration)}
+                        className="flex-1 inline-flex items-center justify-center gap-1 rounded-lg border border-deep-forest px-3 py-2 text-xs font-medium bg-deep-forest text-white hover:bg-green-800 transition"
+                      >
+                        <MessageSquare className="h-4 w-4" />
+                        Message
                       </button>
                       <button
                         onClick={() => handleDelete(registration)}

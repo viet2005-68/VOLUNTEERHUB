@@ -1,6 +1,6 @@
 import RegistrationRowSingle from "./RegistrationRowSingle";
 
-export default function RegistrationTableForAd({ registrations, filters, onSelect }) {
+export default function RegistrationTableForAd({ registrations, filters, onSelect, onMessage }) {
   return (
     <div className="bg-white rounded-xl border border-gray-200">
       {/* Header */}
@@ -15,7 +15,7 @@ export default function RegistrationTableForAd({ registrations, filters, onSelec
           <p className="text-sm font-medium text-gray-600">Registered at</p>
         </div>
         <div className="col-span-2">
-          <p className="text-sm font-medium text-gray-600">Status</p>
+          <p className="text-sm font-medium text-gray-600">Status / Actions</p>
         </div>
       </div>
 
@@ -29,6 +29,7 @@ export default function RegistrationTableForAd({ registrations, filters, onSelec
               key={reg.registrationId}
               reg={reg}
               onSelect={() => onSelect(reg)}
+              onMessage={onMessage ? () => onMessage(reg) : undefined}
             />
           ))
         )}

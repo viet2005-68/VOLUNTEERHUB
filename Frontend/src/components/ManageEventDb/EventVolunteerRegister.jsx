@@ -4,11 +4,12 @@ import RegistrationFilters from "../Registration/RegistrationFilters";
 import RegistrationTableForAd from "./RegistrationTableForAd";
 import RegistrationDetailModal from "../Registration/RegistrationDetailModal";
 import EventVolunteerRegisterFilter from "./EventVolunteerRegisterFilter";
-import { useOutletContext } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import { useListUserOfAnEvent } from "../../hook/useRegistration";
 
 export default function EventVolunteerRegister() {
   const { eventId } = useOutletContext();
+  const navigate = useNavigate();
   const [filters, setFilters] = useState({
     event: "all",
     status: "pending",
@@ -100,6 +101,15 @@ export default function EventVolunteerRegister() {
     setPage(value);
   };
 
+  const handleMessage = (registration) => {
+    if (!eventId || !registration?.userId) return;
+    navigate(
+      `/dashboard/messages?eventId=${encodeURIComponent(eventId)}&volunteerId=${encodeURIComponent(
+        registration.userId
+      )}`
+    );
+  };
+
   return (
     <div className="bg-white p-6 rounded-xl shadow-sm ">
       <div className={`${selectedReg ? "blur" : ""} flex flex-col gap-5`}>
@@ -134,6 +144,7 @@ export default function EventVolunteerRegister() {
                 registrations={pagedRegistrations}
                 filters={filters}
                 onSelect={(reg) => setSelectedReg(reg)}
+                onMessage={handleMessage}
               />
             </div>
 

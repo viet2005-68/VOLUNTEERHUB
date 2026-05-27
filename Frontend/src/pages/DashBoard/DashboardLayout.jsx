@@ -73,20 +73,25 @@ const roleSpecificItems = {
 const getHeaderItems = (userRole) => {
   const baseItems = [...baseHeaderItems];
   const specificItems = roleSpecificItems[userRole] || [];
-  return [
+  const items = [
     ...baseItems,
     ...specificItems,
-    {
-      key: "messages",
-      label: "Messages",
-      to: "/dashboard/messages",
-    },
     {
       key: "notifications",
       label: "Notifications",
       to: "/dashboard/notifications",
     },
   ];
+
+  if (userRole !== ROLES.ADMIN) {
+    items.splice(items.length - 1, 0, {
+      key: "messages",
+      label: "Messages",
+      to: "/dashboard/messages",
+    });
+  }
+
+  return items;
 };
 
 export default function DashboardLayout() {

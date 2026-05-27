@@ -42,7 +42,7 @@ export default function BottomNav() {
       icon: User,
       to: "/Setting",
     },
-  ];
+  ].filter((item) => user?.role !== "ADMIN" || item.key !== "messages");
 
   const isActive = (path) => location.pathname.startsWith(path);
 

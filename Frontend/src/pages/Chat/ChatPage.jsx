@@ -1,26 +1,47 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Loader2, MessageSquare, Plus, Send, Users } from "lucide-react";
+import {
+  ImagePlus,
+  Loader2,
+  MessageSquare,
+  Send,
+  Users,
+  X,
+} from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
-import { useSearchParams } from "react-router-dom";
+import { Navigate, useSearchParams } from "react-router-dom";
 import {
   chatQueryKey,
+  mergeChatMessages,
   useConversationMessages,
   useConversations,
+  useLoadOlderMessages,
   useMarkConversationRead,
   useOpenConversation,
   useSendChatMessage,
+  useUploadChatMedia,
 } from "../../hook/useChat";
 import { createChatClient } from "../../services/chatService";
 import { useAuth } from "../../hook/useAuth";
+import { ROLES } from "../../constant/role";
+
+const IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+const MAX_IMAGES = 5;
+const MESSAGE_PAGE_SIZE = 50;
 
 const formatDateTime = (value) => {
   if (!value) return "";
-  return new Intl.DateTimeFormat("en-US", {
-    month: "short",
+  return new Intl.DateTimeFormat("vi-VN", {
     day: "2-digit",
+    month: "2-digit",
     hour: "2-digit",
     minute: "2-digit",
   }).format(new Date(value));
+};
+
+const shortId = (value) => {
+  if (!value) return "Unknown";
+  const text = String(value);
+  return text.length > 12 ? `${text.slice(0, 8)}...${text.slice(-4)}` : text;
 };
 
 const conversationLabel = (conversation, userId) => {
@@ -32,28 +53,56 @@ const conversationLabel = (conversation, userId) => {
       : userId === conversation.volunteerId
       ? "Manager"
       : "Member";
-  return `${role} ${String(other || "").slice(0, 8)}`;
+  return `${role} ${shortId(other)}`;
 };
+
+const getImageAttachments = (message) =>
+  (message.attachments || []).filter((attachment) => attachment.type === "IMAGE" && attachment.url);
 
 export default function ChatPage() {
   const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const queryClient = useQueryClient();
   const { data: conversations = [], isLoading } = useConversations();
-  const openConversation = useOpenConversation();
+  const { mutate: openChatConversation } = useOpenConversation();
   const sendMessage = useSendChatMessage();
-  const markRead = useMarkConversationRead();
+  const uploadMedia = useUploadChatMedia();
+  const loadOlderMessages = useLoadOlderMessages();
+  const { mutate: markConversationRead } = useMarkConversationRead();
   const [selectedId, setSelectedId] = useState(null);
   const [draft, setDraft] = useState("");
-  const [manualEventId, setManualEventId] = useState(searchParams.get("eventId") || "");
-  const [manualVolunteerId, setManualVolunteerId] = useState(searchParams.get("volunteerId") || "");
+  const [selectedImages, setSelectedImages] = useState([]);
+  const [hasMoreOlder, setHasMoreOlder] = useState(true);
+  const [openingFromQuery, setOpeningFromQuery] = useState(false);
+  const bottomRef = useRef(null);
+  const fileInputRef = useRef(null);
+  const openedQueryRef = useRef("");
+  const clientRef = useRef(null);
+  const selectedRef = useRef(null);
+  const selectedImagesRef = useRef([]);
+  const conversationSubscriptionRef = useRef(null);
+
   const activeConversation = useMemo(
     () => conversations.find((item) => item.id === selectedId) || null,
     [conversations, selectedId]
   );
   const { data: messages = [], isLoading: isLoadingMessages } =
     useConversationMessages(selectedId);
-  const bottomRef = useRef(null);
+  const orderedMessages = useMemo(
+    () =>
+      [...messages].sort(
+        (a, b) => new Date(a.createdAt || 0) - new Date(b.createdAt || 0)
+      ),
+    [messages]
+  );
+
+  useEffect(() => {
+    selectedRef.current = selectedId;
+  }, [selectedId]);
+
+  useEffect(() => {
+    selectedImagesRef.current = selectedImages;
+  }, [selectedImages]);
 
   useEffect(() => {
     if (!selectedId && conversations.length > 0) {
@@ -64,131 +113,206 @@ export default function ChatPage() {
   useEffect(() => {
     const eventId = searchParams.get("eventId");
     if (!eventId) return;
+    const volunteerId = searchParams.get("volunteerId") || undefined;
+    const queryKey = `${eventId}:${volunteerId || ""}`;
+    if (openedQueryRef.current === queryKey) return;
 
-    openConversation.mutate(
-      { eventId, volunteerId: searchParams.get("volunteerId") || undefined },
+    openedQueryRef.current = queryKey;
+    setOpeningFromQuery(true);
+    openChatConversation(
+      { eventId, volunteerId },
       {
         onSuccess: (conversation) => {
           setSelectedId(conversation.id);
-          setSearchParams({});
+          setHasMoreOlder(true);
+          setSearchParams(
+            (current) => {
+              const next = new URLSearchParams(current);
+              next.delete("eventId");
+              next.delete("volunteerId");
+              return next;
+            },
+            { replace: true }
+          );
         },
+        onSettled: () => setOpeningFromQuery(false),
       }
     );
-  }, [openConversation, searchParams, setSearchParams]);
+  }, [openChatConversation, searchParams, setSearchParams]);
 
   useEffect(() => {
+    const addMessageToCache = (message) => {
+      queryClient.setQueryData(
+        [...chatQueryKey, "messages", message.conversationId],
+        (old = []) => mergeChatMessages(old, [message])
+      );
+      queryClient.invalidateQueries({ queryKey: [...chatQueryKey, "conversations"] });
+    };
+
     const client = createChatClient({
-      onConversationMessage: (message) => {
-        queryClient.setQueryData(
-          [...chatQueryKey, "messages", message.conversationId],
-          (old = []) => {
-            if (old.some((item) => item.id === message.id)) return old;
-            return [...old, message];
-          }
-        );
-        queryClient.invalidateQueries({ queryKey: [...chatQueryKey, "conversations"] });
+      onConnect: (connectedClient) => {
+        if (selectedRef.current) {
+          conversationSubscriptionRef.current?.unsubscribe();
+          conversationSubscriptionRef.current =
+            connectedClient.subscribeToConversation(selectedRef.current);
+        }
       },
-      onUserMessage: (message) => {
-        queryClient.invalidateQueries({ queryKey: [...chatQueryKey, "conversations"] });
-        queryClient.setQueryData(
-          [...chatQueryKey, "messages", message.conversationId],
-          (old = []) => {
-            if (old.some((item) => item.id === message.id)) return old;
-            return [...old, message];
-          }
-        );
-      },
+      onConversationMessage: addMessageToCache,
+      onUserMessage: addMessageToCache,
     });
 
+    clientRef.current = client;
     client.activate();
-    return () => client.deactivate();
+    return () => {
+      conversationSubscriptionRef.current?.unsubscribe();
+      conversationSubscriptionRef.current = null;
+      clientRef.current = null;
+      client.deactivate();
+    };
   }, [queryClient]);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
-  }, [messages, selectedId]);
+    const client = clientRef.current;
+    conversationSubscriptionRef.current?.unsubscribe();
+    conversationSubscriptionRef.current = null;
+    if (client?.connected && selectedId) {
+      conversationSubscriptionRef.current = client.subscribeToConversation(selectedId);
+    }
+    setHasMoreOlder(true);
+  }, [selectedId]);
 
   useEffect(() => {
-    if (!selectedId || messages.length === 0) return;
-    const lastMessage = messages[messages.length - 1];
-    markRead.mutate({ conversationId: selectedId, lastReadMessageId: lastMessage.id });
-  }, [markRead, messages, selectedId]);
+    bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+  }, [orderedMessages.length, selectedId]);
 
-  const handleOpenManualConversation = () => {
-    if (!manualEventId) return;
-    openConversation.mutate(
+  useEffect(() => {
+    if (!selectedId || orderedMessages.length === 0) return;
+    const newestMessage = orderedMessages[orderedMessages.length - 1];
+    markConversationRead({ conversationId: selectedId, lastReadMessageId: newestMessage.id });
+  }, [markConversationRead, orderedMessages, selectedId]);
+
+  useEffect(() => {
+    return () => {
+      selectedImagesRef.current.forEach((image) => URL.revokeObjectURL(image.previewUrl));
+    };
+  }, []);
+
+  const handleSelectImages = (event) => {
+    const files = Array.from(event.target.files || []);
+    if (files.length === 0) return;
+
+    const remaining = MAX_IMAGES - selectedImages.length;
+    const accepted = files
+      .filter((file) => IMAGE_TYPES.includes(file.type))
+      .slice(0, Math.max(remaining, 0));
+
+    const nextImages = accepted.map((file) => ({
+      id:
+        typeof crypto !== "undefined" && crypto.randomUUID
+          ? crypto.randomUUID()
+          : `${file.name}-${Date.now()}-${Math.random()}`,
+      file,
+      previewUrl: URL.createObjectURL(file),
+    }));
+
+    setSelectedImages((current) => [...current, ...nextImages].slice(0, MAX_IMAGES));
+    event.target.value = "";
+  };
+
+  const removeSelectedImage = (imageId) => {
+    setSelectedImages((current) => {
+      const removed = current.find((image) => image.id === imageId);
+      if (removed) URL.revokeObjectURL(removed.previewUrl);
+      return current.filter((image) => image.id !== imageId);
+    });
+  };
+
+  const handleLoadOlder = () => {
+    if (!selectedId || orderedMessages.length === 0) return;
+    const oldestMessage = orderedMessages[0];
+    loadOlderMessages.mutate(
       {
-        eventId: manualEventId,
-        volunteerId: manualVolunteerId || undefined,
+        conversationId: selectedId,
+        before: oldestMessage.createdAt,
+        limit: MESSAGE_PAGE_SIZE,
       },
       {
-        onSuccess: (conversation) => {
-          setSelectedId(conversation.id);
-          setManualEventId("");
-          setManualVolunteerId("");
+        onSuccess: (olderMessages) => {
+          setHasMoreOlder(olderMessages.length >= MESSAGE_PAGE_SIZE);
         },
       }
     );
   };
 
-  const handleSend = (event) => {
+  const handleSend = async (event) => {
     event.preventDefault();
-    if (!selectedId || !draft.trim()) return;
-    sendMessage.mutate(
-      { conversationId: selectedId, body: draft.trim() },
-      {
-        onSuccess: () => setDraft(""),
-      }
-    );
+    if (!selectedId || isSending || (!draft.trim() && selectedImages.length === 0)) return;
+
+    const clientMessageId =
+      typeof crypto !== "undefined" && crypto.randomUUID
+        ? crypto.randomUUID()
+        : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+
+    const imagesToSend = selectedImages;
+    const bodyToSend = draft.trim();
+
+    try {
+      const attachments = await Promise.all(
+        imagesToSend.map((image) => uploadMedia.mutateAsync(image.file))
+      );
+      sendMessage.mutate(
+        {
+          conversationId: selectedId,
+          body: bodyToSend,
+          attachments,
+          clientMessageId,
+        },
+        {
+          onSuccess: () => {
+            setDraft("");
+            setSelectedImages((current) => {
+              current.forEach((image) => URL.revokeObjectURL(image.previewUrl));
+              return [];
+            });
+          },
+        }
+      );
+    } catch {
+      // Upload hook already shows the backend error message.
+    }
   };
 
+  if (user?.role === ROLES.ADMIN) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
   const isReadOnly = activeConversation?.status === "READ_ONLY";
+  const isSending = sendMessage.isPending || uploadMedia.isPending;
+  const canSend = !!selectedId && !isReadOnly && (draft.trim() || selectedImages.length > 0);
 
   return (
-    <div className="grid min-h-[680px] overflow-hidden rounded-[25px] border-2 border-ash-whisper bg-white text-deep-forest lg:grid-cols-[340px_minmax(0,1fr)]">
-      <aside className="border-b border-ash-whisper bg-pale-canvas p-4 lg:border-b-0 lg:border-r">
-        <div className="mb-4 flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-deep-forest text-pale-canvas">
+    <div className="grid min-h-[720px] overflow-hidden rounded-[20px] border border-deep-forest/15 bg-white text-deep-forest lg:grid-cols-[330px_minmax(0,1fr)]">
+      <aside className="border-b border-deep-forest/10 bg-pale-canvas p-4 lg:border-b-0 lg:border-r">
+        <div className="mb-5 flex items-center gap-3">
+          <div className="flex h-11 w-11 items-center justify-center rounded-[10px] bg-deep-forest text-pale-canvas">
             <MessageSquare className="h-5 w-5" />
           </div>
-          <div>
-            <h1 className="text-lg font-black">Messages</h1>
-            <p className="text-xs font-medium text-deep-forest/65">
-              Event chat for web
+          <div className="min-w-0">
+            <h1 className="font-beni text-[58px] leading-[0.72] text-deep-forest">
+              Messages
+            </h1>
+            <p className="text-xs font-bold text-deep-forest/60">
+              Event conversations
             </p>
           </div>
         </div>
 
-        <div className="mb-4 rounded-xl border border-ash-whisper bg-white p-3">
-          <p className="mb-2 text-xs font-bold uppercase text-deep-forest/60">
-            Open event chat
-          </p>
-          <input
-            value={manualEventId}
-            onChange={(event) => setManualEventId(event.target.value)}
-            placeholder="Event ID"
-            className="mb-2 w-full rounded-lg border border-ash-whisper px-3 py-2 text-sm outline-none focus:border-foudre-pink"
-          />
-          <input
-            value={manualVolunteerId}
-            onChange={(event) => setManualVolunteerId(event.target.value)}
-            placeholder="Volunteer ID (manager only)"
-            className="mb-2 w-full rounded-lg border border-ash-whisper px-3 py-2 text-sm outline-none focus:border-foudre-pink"
-          />
-          <button
-            type="button"
-            onClick={handleOpenManualConversation}
-            disabled={!manualEventId || openConversation.isPending}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-deep-forest px-3 py-2 text-sm font-bold text-pale-canvas transition hover:bg-foudre-pink disabled:opacity-60"
-          >
-            {openConversation.isPending ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Plus className="h-4 w-4" />
-            )}
-            Open chat
-          </button>
-        </div>
+        {openingFromQuery && (
+          <div className="mb-3 flex items-center gap-2 rounded-[10px] border border-deep-forest/15 bg-white px-3 py-2 text-sm font-bold text-deep-forest/70">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            Opening event chat...
+          </div>
+        )}
 
         <div className="space-y-2">
           {isLoading ? (
@@ -197,7 +321,7 @@ export default function ChatPage() {
               Loading conversations...
             </div>
           ) : conversations.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-ash-whisper bg-white p-4 text-sm text-deep-forest/65">
+            <div className="rounded-[10px] border border-dashed border-deep-forest/20 bg-white p-4 text-sm text-deep-forest/65">
               No conversations yet.
             </div>
           ) : (
@@ -206,26 +330,44 @@ export default function ChatPage() {
                 type="button"
                 key={conversation.id}
                 onClick={() => setSelectedId(conversation.id)}
-                className={`w-full rounded-xl border p-3 text-left transition ${
+                className={`w-full rounded-[10px] border p-3 text-left transition ${
                   selectedId === conversation.id
-                    ? "border-foudre-pink bg-bubblegum-blush/40"
-                    : "border-ash-whisper bg-white hover:bg-ash-whisper/40"
+                    ? "border-deep-forest bg-deep-forest text-pale-canvas"
+                    : "border-deep-forest/12 bg-white hover:border-deep-forest/30 hover:bg-deep-forest/5"
                 }`}
               >
                 <div className="flex items-center justify-between gap-2">
-                  <span className="truncate text-sm font-bold">
+                  <span className="truncate text-sm font-black">
                     Event #{conversation.eventId}
                   </span>
                   {conversation.unreadCount > 0 && (
-                    <span className="rounded-full bg-foudre-pink px-2 py-0.5 text-xs font-bold text-pale-canvas">
+                    <span
+                      className={`rounded-[10px] px-2 py-0.5 text-xs font-black ${
+                        selectedId === conversation.id
+                          ? "bg-pale-canvas text-deep-forest"
+                          : "bg-deep-forest text-pale-canvas"
+                      }`}
+                    >
                       {conversation.unreadCount}
                     </span>
                   )}
                 </div>
-                <p className="mt-1 truncate text-xs text-deep-forest/65">
+                <p
+                  className={`mt-1 truncate text-xs ${
+                    selectedId === conversation.id
+                      ? "text-pale-canvas/80"
+                      : "text-deep-forest/65"
+                  }`}
+                >
                   {conversationLabel(conversation, user?.id)}
                 </p>
-                <p className="mt-1 text-[11px] text-deep-forest/50">
+                <p
+                  className={`mt-2 text-[11px] ${
+                    selectedId === conversation.id
+                      ? "text-pale-canvas/65"
+                      : "text-deep-forest/45"
+                  }`}
+                >
                   {formatDateTime(conversation.lastMessageAt || conversation.updatedAt)}
                 </p>
               </button>
@@ -234,51 +376,91 @@ export default function ChatPage() {
         </div>
       </aside>
 
-      <section className="flex min-h-[620px] flex-col">
+      <section className="flex min-h-[680px] flex-col">
         {activeConversation ? (
           <>
-            <header className="flex items-center justify-between border-b border-ash-whisper bg-white px-5 py-4">
-              <div>
-                <h2 className="text-base font-black">
+            <header className="flex items-center justify-between border-b border-deep-forest/10 bg-white px-5 py-4">
+              <div className="min-w-0">
+                <h2 className="font-clash-grotesk text-lg font-black leading-[1.1] text-deep-forest">
                   Event #{activeConversation.eventId}
                 </h2>
-                <p className="mt-1 flex items-center gap-2 text-xs font-medium text-deep-forest/65">
+                <p className="mt-1 flex items-center gap-2 text-xs font-bold text-deep-forest/65">
                   <Users className="h-3.5 w-3.5" />
                   {conversationLabel(activeConversation, user?.id)}
                 </p>
               </div>
-              <span className="rounded-full border border-ash-whisper px-3 py-1 text-xs font-bold">
+              <span className="rounded-[10px] border border-deep-forest/15 bg-deep-forest/5 px-3 py-1 text-xs font-black">
                 {activeConversation.status}
               </span>
             </header>
 
-            <div className="flex-1 overflow-y-auto bg-slate-50 px-4 py-5">
+            <div className="flex-1 overflow-y-auto bg-pale-canvas/55 px-4 py-5">
               {isLoadingMessages ? (
                 <div className="flex items-center justify-center gap-2 text-sm text-deep-forest/65">
                   <Loader2 className="h-4 w-4 animate-spin" />
                   Loading messages...
                 </div>
-              ) : messages.length === 0 ? (
-                <div className="rounded-xl border border-dashed border-ash-whisper bg-white p-6 text-center text-sm text-deep-forest/65">
+              ) : orderedMessages.length === 0 ? (
+                <div className="rounded-[10px] border border-dashed border-deep-forest/20 bg-white p-6 text-center text-sm text-deep-forest/65">
                   Start the conversation when you are ready.
                 </div>
               ) : (
-                <div className="space-y-3">
-                  {messages.map((message) => {
+                <div className="space-y-4">
+                  {hasMoreOlder && (
+                    <div className="text-center">
+                      <button
+                        type="button"
+                        onClick={handleLoadOlder}
+                        disabled={loadOlderMessages.isPending}
+                        className="inline-flex items-center gap-2 rounded-[10px] border border-deep-forest/15 bg-white px-3 py-2 text-xs font-black text-deep-forest hover:bg-deep-forest hover:text-pale-canvas disabled:opacity-60"
+                      >
+                        {loadOlderMessages.isPending && (
+                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        )}
+                        Load older
+                      </button>
+                    </div>
+                  )}
+
+                  {orderedMessages.map((message) => {
                     const mine = message.senderId === user?.id;
+                    const images = getImageAttachments(message);
                     return (
                       <div
-                        key={message.id}
+                        key={message.id || message.clientMessageId}
                         className={`flex ${mine ? "justify-end" : "justify-start"}`}
                       >
                         <div
-                          className={`max-w-[78%] rounded-2xl px-4 py-3 text-sm shadow-sm ${
+                          className={`max-w-[82%] rounded-[18px] px-4 py-3 text-sm ${
                             mine
                               ? "bg-deep-forest text-pale-canvas"
-                              : "bg-white text-deep-forest"
+                              : "border border-deep-forest/10 bg-white text-deep-forest"
                           }`}
                         >
-                          <p className="whitespace-pre-wrap break-words">{message.body}</p>
+                          {images.length > 0 && (
+                            <div className="mb-2 grid max-w-[320px] grid-cols-2 gap-2">
+                              {images.map((attachment) => (
+                                <a
+                                  key={attachment.id || attachment.url}
+                                  href={attachment.url}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="block overflow-hidden rounded-[10px] border border-white/25 bg-white"
+                                >
+                                  <img
+                                    src={attachment.url}
+                                    alt={attachment.fileName || "Chat image"}
+                                    className="h-32 w-full object-cover"
+                                  />
+                                </a>
+                              ))}
+                            </div>
+                          )}
+                          {message.body && (
+                            <p className="whitespace-pre-wrap break-words leading-[1.25]">
+                              {message.body}
+                            </p>
+                          )}
                           <p
                             className={`mt-2 text-[11px] ${
                               mine ? "text-pale-canvas/65" : "text-deep-forest/45"
@@ -295,13 +477,57 @@ export default function ChatPage() {
               )}
             </div>
 
-            <form onSubmit={handleSend} className="border-t border-ash-whisper bg-white p-4">
+            <form onSubmit={handleSend} className="border-t border-deep-forest/10 bg-white p-4">
               {isReadOnly && (
-                <p className="mb-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+                <p className="mb-3 rounded-[10px] border border-deep-forest/15 bg-deep-forest/5 px-3 py-2 text-sm font-bold text-deep-forest">
                   This conversation is read-only for the current registration state.
                 </p>
               )}
+
+              {selectedImages.length > 0 && (
+                <div className="mb-3 flex flex-wrap gap-2">
+                  {selectedImages.map((image) => (
+                    <div
+                      key={image.id}
+                      className="relative h-20 w-20 overflow-hidden rounded-[10px] border border-deep-forest/15"
+                    >
+                      <img
+                        src={image.previewUrl}
+                        alt={image.file.name}
+                        className="h-full w-full object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeSelectedImage(image.id)}
+                        className="absolute right-1 top-1 inline-flex h-6 w-6 items-center justify-center rounded-full bg-deep-forest text-pale-canvas"
+                        aria-label="Remove image"
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
               <div className="flex gap-3">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept={IMAGE_TYPES.join(",")}
+                  multiple
+                  className="hidden"
+                  onChange={handleSelectImages}
+                />
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isReadOnly || isSending || selectedImages.length >= MAX_IMAGES}
+                  className="inline-flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-[10px] border border-deep-forest/15 text-deep-forest transition hover:bg-deep-forest hover:text-pale-canvas disabled:opacity-50"
+                  aria-label="Attach image"
+                  title="Attach image"
+                >
+                  <ImagePlus className="h-5 w-5" />
+                </button>
                 <textarea
                   value={draft}
                   onChange={(event) => setDraft(event.target.value)}
@@ -311,18 +537,18 @@ export default function ChatPage() {
                       handleSend(event);
                     }
                   }}
-                  disabled={isReadOnly || sendMessage.isPending}
+                  disabled={isReadOnly || isSending}
                   placeholder="Write a message..."
                   rows={2}
-                  className="min-h-[52px] flex-1 resize-none rounded-xl border border-ash-whisper px-3 py-2 text-sm outline-none focus:border-foudre-pink disabled:bg-slate-100"
+                  className="min-h-[52px] flex-1 resize-none rounded-[10px] border border-deep-forest/15 px-3 py-2 text-sm leading-[1.25] outline-none focus:border-deep-forest disabled:bg-deep-forest/5"
                 />
                 <button
                   type="submit"
-                  disabled={!draft.trim() || isReadOnly || sendMessage.isPending}
-                  className="inline-flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-xl bg-foudre-pink text-pale-canvas transition hover:bg-deep-forest disabled:opacity-50"
+                  disabled={!canSend || isSending}
+                  className="inline-flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-[10px] bg-deep-forest text-pale-canvas transition hover:bg-foudre-pink disabled:opacity-50"
                   aria-label="Send message"
                 >
-                  {sendMessage.isPending ? (
+                  {isSending ? (
                     <Loader2 className="h-5 w-5 animate-spin" />
                   ) : (
                     <Send className="h-5 w-5" />
@@ -335,9 +561,11 @@ export default function ChatPage() {
           <div className="flex flex-1 items-center justify-center p-8 text-center">
             <div>
               <MessageSquare className="mx-auto h-12 w-12 text-deep-forest/35" />
-              <h2 className="mt-4 text-lg font-black">No chat selected</h2>
+              <h2 className="mt-4 font-beni text-[64px] leading-[0.72] text-deep-forest">
+                No Chat Selected
+              </h2>
               <p className="mt-2 max-w-sm text-sm text-deep-forest/65">
-                Open a conversation from an event page or enter an event ID to start.
+                Open a conversation from an event page or choose one from the list.
               </p>
             </div>
           </div>

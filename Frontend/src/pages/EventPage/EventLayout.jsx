@@ -423,7 +423,7 @@ export default function EventLayout() {
           isCheckingStatus={isCheckingStatus}
           onAction={() => {}}
         />
-        {isApproved && (
+        {isApproved && user?.role !== "ADMIN" && (
           <button
             type="button"
             onClick={() => navigate(`/dashboard/messages?eventId=${id}`)}

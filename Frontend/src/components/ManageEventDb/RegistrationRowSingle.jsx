@@ -1,7 +1,10 @@
-import { Calendar } from "lucide-react";
+import { MessageSquare } from "lucide-react";
 import RegistrationStatusBadge from "../Registration/RegistrationStatusBadge";
 
-export default function RegistrationRowSingle({ reg, onSelect }) {
+export default function RegistrationRowSingle({ reg, onSelect, onMessage }) {
+  const canMessage =
+    reg.registrationStatus === "APPROVED" || reg.registrationStatus === "COMPLETED";
+
   return (
     <div className="grid grid-cols-12 gap-4 p-4 hover:bg-gray-50">
       {/* Volunteer info */}
@@ -32,14 +35,24 @@ export default function RegistrationRowSingle({ reg, onSelect }) {
       </div>
 
       {/* Status */}
-      <div className="col-span-2 flex items-center justify-between">
+      <div className="col-span-2 flex flex-wrap items-center justify-end gap-2">
         <RegistrationStatusBadge status={reg.registrationStatus} />
         <button
-          className="px-3 py-1 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded"
+          className="px-3 py-1 text-sm bg-deep-forest hover:bg-green-800 text-white rounded"
           onClick={() => onSelect(reg)}
         >
           View
         </button>
+        {canMessage && onMessage && (
+          <button
+            type="button"
+            className="inline-flex items-center gap-1 rounded bg-deep-forest/10 px-3 py-1 text-sm font-bold text-deep-forest hover:bg-deep-forest hover:text-white"
+            onClick={onMessage}
+          >
+            <MessageSquare className="h-4 w-4" />
+            Message
+          </button>
+        )}
       </div>
     </div>
   );

@@ -29,6 +29,7 @@ export default function NavBar() {
 
   const displayName = user?.name ?? "Guest";
   const roleLabel = user?.role ? normalizeRole(user.role) : "Guest";
+  const canUseChat = user?.role !== ROLES.ADMIN;
   return (
     <div className="flex flex-row justify-between w-full text-deep-forest">
       <div className="flex items-center -space-x-1">
@@ -68,26 +69,30 @@ export default function NavBar() {
             Opportunities
           </li>
 
-          <li
-            onClick={() => {
-              navigate("/dashboard/messages");
-              setNavChoice("Messages");
-            }}
-            className={`cursor-pointer rounded-[10px] px-4 py-3 transition-colors hover:bg-ash-whisper ${
-              navChoice === "Messages"
-                ? "bg-deep-forest text-pale-canvas"
-                : "text-deep-forest"
-            }`}
-          >
-            Messages
-          </li>
+          {canUseChat && (
+            <li
+              onClick={() => {
+                navigate("/dashboard/messages");
+                setNavChoice("Messages");
+              }}
+              className={`cursor-pointer rounded-[10px] px-4 py-3 transition-colors hover:bg-ash-whisper ${
+                navChoice === "Messages"
+                  ? "bg-deep-forest text-pale-canvas"
+                  : "text-deep-forest"
+              }`}
+            >
+              Messages
+            </li>
+          )}
         </ul>
       </div>
       <div className="flex items-center gap-8">
-        <MessageSquare
-          className="cursor-pointer text-deep-forest transition-colors hover:text-foudre-pink"
-          onClick={() => navigate("/dashboard/messages")}
-        />
+        {canUseChat && (
+          <MessageSquare
+            className="cursor-pointer text-deep-forest transition-colors hover:text-foudre-pink"
+            onClick={() => navigate("/dashboard/messages")}
+          />
+        )}
         <BellDot
           className="cursor-pointer text-deep-forest transition-colors hover:text-foudre-pink"
           onClick={() => navigate("/dashboard/notifications")}
