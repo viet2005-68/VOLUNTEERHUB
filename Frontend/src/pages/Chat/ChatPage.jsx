@@ -322,8 +322,8 @@ export default function ChatPage() {
 
   return (
     <div className="grid h-[min(720px,calc(100vh-190px))] min-h-[620px] overflow-hidden rounded-[20px] bg-white text-deep-forest lg:grid-cols-[330px_minmax(0,1fr)]">
-      <aside className="flex min-h-0 flex-col bg-pale-canvas p-4 lg:border-r lg:border-deep-forest/10">
-        <div className="mb-5 flex items-center gap-3">
+      <aside className="flex min-h-0 flex-col bg-pale-canvas lg:border-r lg:border-deep-forest/10">
+        <div className="flex items-center gap-3 px-4 pb-5 pt-4">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-deep-forest text-pale-canvas">
             <MessageSquare className="h-5 w-5" />
           </div>
@@ -338,20 +338,20 @@ export default function ChatPage() {
         </div>
 
         {openingFromQuery && (
-          <div className="mb-3 flex items-center gap-2 rounded-[10px] bg-deep-forest/5 px-3 py-2 text-sm font-bold text-deep-forest/70">
+          <div className="mx-4 mb-3 flex items-center gap-2 rounded-[10px] bg-deep-forest/5 px-3 py-2 text-sm font-bold text-deep-forest/70">
             <Loader2 className="h-4 w-4 animate-spin" />
             Opening event chat...
           </div>
         )}
 
-        <div className="min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
+        <div className="min-h-0 flex-1 space-y-1 overflow-y-auto pl-3">
           {isLoading ? (
             <div className="flex items-center gap-2 text-sm text-deep-forest/65">
               <Loader2 className="h-4 w-4 animate-spin" />
               Loading conversations...
             </div>
           ) : conversations.length === 0 ? (
-            <div className="rounded-[10px] bg-white/70 p-4 text-sm text-deep-forest/65">
+            <div className="mr-3 rounded-[10px] bg-white/70 p-4 text-sm text-deep-forest/65">
               No conversations yet.
             </div>
           ) : (
@@ -360,10 +360,10 @@ export default function ChatPage() {
                 type="button"
                 key={conversation.id}
                 onClick={() => setSelectedId(conversation.id)}
-                className={`w-full rounded-[10px] p-3 text-left transition ${
+                className={`w-full p-3 text-left transition ${
                   selectedId === conversation.id
-                    ? "bg-deep-forest text-pale-canvas"
-                    : "bg-white/70 hover:bg-deep-forest/5"
+                    ? "rounded-l-[12px] bg-deep-forest text-pale-canvas"
+                    : "mr-3 rounded-[12px] bg-white/70 hover:bg-deep-forest/5"
                 }`}
               >
                 <div className="flex items-center justify-between gap-2">
