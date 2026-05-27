@@ -105,19 +105,72 @@ function ChatAvatar({ user, name, size = "message" }) {
   );
 }
 
-const conversationLabel = (conversation, userId) => {
-  if (!conversation) return "Select a conversation";
-  if (conversation.otherUser) {
-    return displayUserName(conversation.otherUser);
+const userIdentity = (value) =>
+  value?.id || value?.userId || value?.user_id || value?.sub || value;
+
+const sameUser = (left, right) => {
+  const leftId = userIdentity(left);
+  const rightId = userIdentity(right);
+  return !!leftId && !!rightId && String(leftId) === String(rightId);
+};
+
+const conversationPeer = (conversation, currentUser) => {
+  if (!conversation) return { id: null, role: "Member", user: null };
+
+  if (sameUser(currentUser, conversation.managerId)) {
+    return {
+      id: conversation.volunteerId,
+      role: "Volunteer",
+      user: conversation.volunteer || null,
+    };
   }
-  const other = conversation.otherUserId || conversation.volunteerId || conversation.managerId;
-  const role =
-    userId === conversation.managerId
-      ? "Volunteer"
-      : userId === conversation.volunteerId
-      ? "Manager"
-      : "Member";
-  return `${role} ${shortId(other)}`;
+
+  if (sameUser(currentUser, conversation.volunteerId)) {
+    return {
+      id: conversation.managerId,
+      role: "Manager",
+      user: conversation.manager || null,
+    };
+  }
+
+  if (currentUser?.role === ROLES.MANAGER && conversation.volunteerId) {
+    return {
+      id: conversation.volunteerId,
+      role: "Volunteer",
+      user: conversation.volunteer || null,
+    };
+  }
+
+  if (currentUser?.role === ROLES.USER && conversation.managerId) {
+    return {
+      id: conversation.managerId,
+      role: "Manager",
+      user: conversation.manager || null,
+    };
+  }
+
+  if (conversation.otherUser && !sameUser(currentUser, conversation.otherUser)) {
+    return {
+      id: conversation.otherUserId || userIdentity(conversation.otherUser),
+      role: "Member",
+      user: conversation.otherUser,
+    };
+  }
+
+  const fallbackId = [
+    conversation.otherUserId,
+    conversation.volunteerId,
+    conversation.managerId,
+  ].find((id) => id && !sameUser(currentUser, id));
+
+  return { id: fallbackId, role: "Member", user: null };
+};
+
+const conversationLabel = (conversation, currentUser) => {
+  if (!conversation) return "Select a conversation";
+  const peer = conversationPeer(conversation, currentUser);
+  if (peer.user) return displayUserName(peer.user);
+  return `${peer.role} ${shortId(peer.id)}`;
 };
 
 const eventTitle = (conversation) =>
@@ -389,7 +442,8 @@ export default function ChatPage() {
   const isReadOnly = activeConversation?.status === "READ_ONLY";
   const isSending = sendMessage.isPending || uploadMedia.isPending;
   const canSend = !!selectedId && !isReadOnly && (draft.trim() || selectedImages.length > 0);
-  const activeOtherName = conversationLabel(activeConversation, user?.id);
+  const activePeer = conversationPeer(activeConversation, user);
+  const activeOtherName = conversationLabel(activeConversation, user);
 
   return (
     <div className="relative h-full min-h-0 overflow-hidden bg-white text-deep-forest md:h-[min(720px,calc(100vh-190px))] md:min-h-[620px] md:rounded-[20px] lg:grid lg:grid-cols-[330px_minmax(0,1fr)]">
@@ -462,13 +516,13 @@ export default function ChatPage() {
               >
                 <div className="flex min-w-0 items-center gap-3">
                   <ChatAvatar
-                    user={conversation.otherUser}
-                    name={conversationLabel(conversation, user?.id)}
+                    user={conversationPeer(conversation, user).user}
+                    name={conversationLabel(conversation, user)}
                   />
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center justify-between gap-2">
                       <span className="truncate text-sm font-black">
-                        {conversationLabel(conversation, user?.id)}
+                        {conversationLabel(conversation, user)}
                       </span>
                       {conversation.unreadCount > 0 && (
                         <span
@@ -523,7 +577,7 @@ export default function ChatPage() {
                   <Menu className="h-[20px] w-[20px]" />
                 </button>
                 <ChatAvatar
-                  user={activeConversation.otherUser}
+                  user={activePeer.user}
                   name={activeOtherName}
                   size="header"
                 />

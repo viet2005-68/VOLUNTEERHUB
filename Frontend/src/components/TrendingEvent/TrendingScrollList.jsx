@@ -53,30 +53,30 @@ export default function TrendingCardList() {
   }
 
   return (
-    <div className="w-full rounded-[25px] border border-deep-forest/10 bg-ash-whisper px-5 py-5 text-deep-forest md:px-6">
+    <div className="w-full rounded-[25px] bg-deep-forest px-5 py-5 text-pale-canvas md:px-6">
       <div className="mb-5 flex flex-col items-start justify-between gap-4 font-clash-grotesk sm:flex-row sm:items-center">
         <div className="flex flex-row gap-3 items-center">
-          <div className="flex h-[42px] w-[42px] items-center justify-center rounded-full bg-foudre-pink text-pale-canvas">
-            <FlameKindling className="h-[22px] w-[22px] text-pale-canvas" />
+          <div className="flex h-[42px] w-[42px] items-center justify-center rounded-full bg-bubblegum-blush text-deep-forest">
+            <FlameKindling className="h-[22px] w-[22px] text-deep-forest" />
           </div>
           <div>
-            <p className="font-beni text-[40px] font-black uppercase leading-[0.72] text-deep-forest sm:text-[52px]">
+            <p className="font-beni text-[40px] font-black uppercase leading-[0.72] text-pale-canvas sm:text-[52px]">
               Trending Events
             </p>
-            <p className="mt-1 text-sm font-bold leading-[1.2] text-deep-forest/70">
+            <p className="mt-1 text-sm font-bold leading-[1.2] text-pale-canvas/80">
               Hottest volunteer opportunities right now
             </p>
           </div>
         </div>
         <button
           onClick={handleShowMore}
-          className="cursor-pointer rounded-[10px] bg-deep-forest px-4 py-3 text-sm font-bold text-pale-canvas transition hover:bg-foudre-pink active:scale-95 whitespace-nowrap"
+          className="cursor-pointer rounded-[10px] bg-bubblegum-blush px-4 py-3 text-sm font-bold text-deep-forest transition hover:bg-pale-canvas active:scale-95 whitespace-nowrap"
         >
           Show more →
         </button>
       </div>
 
-      <div className="relative flex items-center gap-3 rounded-[20px] bg-pale-canvas/70 p-3">
+      <div className="relative flex items-center gap-3 rounded-[20px] bg-pale-canvas p-3">
         {/* Left button */}
         <button
           onClick={scrollLeft}
