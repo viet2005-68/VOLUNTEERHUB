@@ -321,8 +321,8 @@ export default function ChatPage() {
   const activeOtherName = conversationLabel(activeConversation, user?.id);
 
   return (
-    <div className="grid h-[min(720px,calc(100vh-190px))] min-h-[620px] overflow-hidden rounded-[20px] border border-deep-forest/15 bg-white text-deep-forest lg:grid-cols-[330px_minmax(0,1fr)]">
-      <aside className="flex min-h-0 flex-col border-b border-deep-forest/10 bg-pale-canvas p-4 lg:border-b-0 lg:border-r">
+    <div className="grid h-[min(720px,calc(100vh-190px))] min-h-[620px] overflow-hidden rounded-[20px] bg-white text-deep-forest lg:grid-cols-[330px_minmax(0,1fr)]">
+      <aside className="flex min-h-0 flex-col bg-pale-canvas p-4 lg:border-r lg:border-deep-forest/10">
         <div className="mb-5 flex items-center gap-3">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-deep-forest text-pale-canvas">
             <MessageSquare className="h-5 w-5" />
@@ -338,7 +338,7 @@ export default function ChatPage() {
         </div>
 
         {openingFromQuery && (
-          <div className="mb-3 flex items-center gap-2 rounded-[10px] border border-deep-forest/15 bg-white px-3 py-2 text-sm font-bold text-deep-forest/70">
+          <div className="mb-3 flex items-center gap-2 rounded-[10px] bg-deep-forest/5 px-3 py-2 text-sm font-bold text-deep-forest/70">
             <Loader2 className="h-4 w-4 animate-spin" />
             Opening event chat...
           </div>
@@ -351,7 +351,7 @@ export default function ChatPage() {
               Loading conversations...
             </div>
           ) : conversations.length === 0 ? (
-            <div className="rounded-[10px] border border-dashed border-deep-forest/20 bg-white p-4 text-sm text-deep-forest/65">
+            <div className="rounded-[10px] bg-white/70 p-4 text-sm text-deep-forest/65">
               No conversations yet.
             </div>
           ) : (
@@ -360,10 +360,10 @@ export default function ChatPage() {
                 type="button"
                 key={conversation.id}
                 onClick={() => setSelectedId(conversation.id)}
-                className={`w-full rounded-[10px] border p-3 text-left transition ${
+                className={`w-full rounded-[10px] p-3 text-left transition ${
                   selectedId === conversation.id
-                    ? "border-deep-forest bg-deep-forest text-pale-canvas"
-                    : "border-deep-forest/12 bg-white hover:border-deep-forest/30 hover:bg-deep-forest/5"
+                    ? "bg-deep-forest text-pale-canvas"
+                    : "bg-white/70 hover:bg-deep-forest/5"
                 }`}
               >
                 <div className="flex items-center justify-between gap-2">
@@ -409,7 +409,7 @@ export default function ChatPage() {
       <section className="flex min-h-0 flex-col">
         {activeConversation ? (
           <>
-            <header className="flex items-center justify-between gap-4 border-b border-deep-forest/10 bg-white px-5 py-4">
+            <header className="flex items-center justify-between gap-4 bg-white px-5 py-4">
               <div className="flex min-w-0 items-center gap-3">
                 <img
                   src={
@@ -417,7 +417,7 @@ export default function ChatPage() {
                     `https://api.dicebear.com/7.x/avataaars/svg?seed=${activeOtherName}`
                   }
                   alt={activeOtherName}
-                  className="h-11 w-11 shrink-0 rounded-full border border-deep-forest/10 object-cover"
+                  className="h-11 w-11 shrink-0 rounded-full object-cover"
                 />
                 <div className="min-w-0">
                 <div className="truncate text-xl font-black leading-[1.1] text-deep-forest">
@@ -428,14 +428,14 @@ export default function ChatPage() {
                 </p>
                 </div>
               </div>
-              <span className="rounded-[10px] border border-deep-forest/15 bg-deep-forest/5 px-3 py-1 text-xs font-black">
+              <span className="rounded-[10px] bg-deep-forest/8 px-3 py-1 text-xs font-black">
                 {activeConversation.status}
               </span>
             </header>
 
             <div
               ref={messagePaneRef}
-              className="min-h-0 flex-1 overflow-y-auto overscroll-contain bg-pale-canvas/55 px-4 py-5"
+              className="min-h-0 flex-1 overflow-y-auto overscroll-contain bg-pale-canvas/35 px-4 py-5"
             >
               {isLoadingMessages ? (
                 <div className="flex items-center justify-center gap-2 text-sm text-deep-forest/65">
@@ -443,7 +443,7 @@ export default function ChatPage() {
                   Loading messages...
                 </div>
               ) : orderedMessages.length === 0 ? (
-                <div className="rounded-[10px] border border-dashed border-deep-forest/20 bg-white p-6 text-center text-sm text-deep-forest/65">
+                <div className="rounded-[10px] bg-white/75 p-6 text-center text-sm text-deep-forest/65">
                   Start the conversation when you are ready.
                 </div>
               ) : (
@@ -454,7 +454,7 @@ export default function ChatPage() {
                         type="button"
                         onClick={handleLoadOlder}
                         disabled={loadOlderMessages.isPending}
-                        className="inline-flex items-center gap-2 rounded-[10px] border border-deep-forest/15 bg-white px-3 py-2 text-xs font-black text-deep-forest hover:bg-deep-forest hover:text-pale-canvas disabled:opacity-60"
+                        className="inline-flex items-center gap-2 rounded-[10px] bg-white px-3 py-2 text-xs font-black text-deep-forest hover:bg-deep-forest hover:text-pale-canvas disabled:opacity-60"
                       >
                         {loadOlderMessages.isPending && (
                           <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -481,14 +481,14 @@ export default function ChatPage() {
                               `https://api.dicebear.com/7.x/avataaars/svg?seed=${senderName}`
                             }
                             alt={senderName}
-                            className="h-8 w-8 rounded-full border border-deep-forest/10 object-cover"
+                            className="h-8 w-8 rounded-full object-cover"
                           />
                         )}
                         <div
                           className={`max-w-[82%] rounded-[18px] px-4 py-3 text-sm ${
                             mine
                               ? "bg-deep-forest text-pale-canvas"
-                              : "border border-deep-forest/10 bg-white text-deep-forest"
+                              : "bg-white text-deep-forest"
                           }`}
                         >
                           {!mine && (
@@ -504,7 +504,7 @@ export default function ChatPage() {
                                   href={attachment.url}
                                   target="_blank"
                                   rel="noreferrer"
-                                  className="block overflow-hidden rounded-[10px] border border-white/25 bg-white"
+                                  className="block overflow-hidden rounded-[10px] bg-white"
                                 >
                                   <img
                                     src={attachment.url}
@@ -537,7 +537,7 @@ export default function ChatPage() {
 
             <form onSubmit={handleSend} className="border-t border-deep-forest/10 bg-white p-4">
               {isReadOnly && (
-                <p className="mb-3 rounded-[10px] border border-deep-forest/15 bg-deep-forest/5 px-3 py-2 text-sm font-bold text-deep-forest">
+                <p className="mb-3 rounded-[10px] bg-deep-forest/5 px-3 py-2 text-sm font-bold text-deep-forest">
                   This conversation is read-only for the current registration state.
                 </p>
               )}
@@ -547,7 +547,7 @@ export default function ChatPage() {
                   {selectedImages.map((image) => (
                     <div
                       key={image.id}
-                      className="relative h-20 w-20 overflow-hidden rounded-[10px] border border-deep-forest/15"
+                      className="relative h-20 w-20 overflow-hidden rounded-[10px]"
                     >
                       <img
                         src={image.previewUrl}
@@ -580,7 +580,7 @@ export default function ChatPage() {
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
                   disabled={isReadOnly || isSending || selectedImages.length >= MAX_IMAGES}
-                  className="inline-flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-[10px] border border-deep-forest/15 text-deep-forest transition hover:bg-deep-forest hover:text-pale-canvas disabled:opacity-50"
+                  className="inline-flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-[10px] bg-deep-forest/5 text-deep-forest transition hover:bg-deep-forest hover:text-pale-canvas disabled:opacity-50"
                   aria-label="Attach image"
                   title="Attach image"
                 >
