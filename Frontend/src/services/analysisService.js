@@ -144,7 +144,7 @@ const AnalysisService = {
         console.log("eventId", eventId);
         try {
             const response = await axiosClient.get(
-                `/v1/aggregated/registrations/export/participants?eventId=${eventId}`,
+                `/v1/analytics/export/registrations?eventId=${eventId}`,
                 {
                     responseType: 'blob',
                 }
@@ -155,8 +155,6 @@ const AnalysisService = {
             throw error;
         }
     },
-
-
 
     // Export all events (JSON format)
     exportAllEventsJson: async () => {
@@ -175,7 +173,7 @@ const AnalysisService = {
     exportAllEventsCsv: async () => {
         try {
             const response = await axiosClient.get(
-                `/v1/aggregated/events/export`,
+                `/v1/analytics/export/events`,
                 {
                     responseType: 'blob',
                 }
@@ -205,8 +203,9 @@ const AnalysisService = {
     // Export all users (CSV format)
     exportAllUsersCsv: async () => {
         try {
-            const response = await axiosClient.get(
-                `/v1/aggregated/export/users`,
+            const response = await axiosClient.post(
+                `/v1/analytics/export/users`,
+                null,
                 {
                     responseType: 'blob',
                 }
