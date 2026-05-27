@@ -46,6 +46,64 @@ const shortId = (value) => {
 const displayUserName = (user, fallback) =>
   user?.fullName || user?.username || user?.email || fallback || "Unknown user";
 
+const initialsFor = (name) => {
+  const text = String(name || "?").trim();
+  if (!text) return "?";
+  return text
+    .split(/\s+/)
+    .map((part) => part[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+};
+
+const avatarSizes = {
+  header: "h-[44px] w-[44px] text-base",
+  message: "h-[34px] w-[34px] text-xs",
+};
+
+function ChatAvatar({ user, name, size = "message" }) {
+  const [failedPrimary, setFailedPrimary] = useState(false);
+  const [failedFallback, setFailedFallback] = useState(false);
+  const label = name || displayUserName(user);
+  const fallbackSrc = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(
+    label || "VolunteerHub"
+  )}`;
+  const primarySrc = user?.avatarUrl;
+  const src = primarySrc && !failedPrimary ? primarySrc : fallbackSrc;
+  const showImage = src && !(src === fallbackSrc && failedFallback);
+
+  useEffect(() => {
+    setFailedPrimary(false);
+    setFailedFallback(false);
+  }, [primarySrc, label]);
+
+  return (
+    <div
+      className={`flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-deep-forest/10 font-black text-deep-forest ${avatarSizes[size] || avatarSizes.message}`}
+      aria-label={label}
+      title={label}
+    >
+      {showImage ? (
+        <img
+          src={src}
+          alt={label}
+          className="h-full w-full object-cover"
+          onError={() => {
+            if (src === primarySrc) {
+              setFailedPrimary(true);
+            } else {
+              setFailedFallback(true);
+            }
+          }}
+        />
+      ) : (
+        <span>{initialsFor(label)}</span>
+      )}
+    </div>
+  );
+}
+
 const conversationLabel = (conversation, userId) => {
   if (!conversation) return "Select a conversation";
   if (conversation.otherUser) {
@@ -339,7 +397,7 @@ export default function ChatPage() {
 
         {openingFromQuery && (
           <div className="mx-4 mb-3 flex items-center gap-2 rounded-[10px] bg-deep-forest/5 px-3 py-2 text-sm font-bold text-deep-forest/70">
-            <Loader2 className="h-4 w-4 animate-spin" />
+            <Loader2 className="h-[16px] w-[16px] animate-spin" />
             Opening event chat...
           </div>
         )}
@@ -347,7 +405,7 @@ export default function ChatPage() {
         <div className="min-h-0 flex-1 space-y-1 overflow-y-auto pl-3">
           {isLoading ? (
             <div className="flex items-center gap-2 text-sm text-deep-forest/65">
-              <Loader2 className="h-4 w-4 animate-spin" />
+              <Loader2 className="h-[16px] w-[16px] animate-spin" />
               Loading conversations...
             </div>
           ) : conversations.length === 0 ? (
@@ -411,13 +469,10 @@ export default function ChatPage() {
           <>
             <header className="flex items-center justify-between gap-4 bg-white px-5 py-4">
               <div className="flex min-w-0 items-center gap-3">
-                <img
-                  src={
-                    activeConversation.otherUser?.avatarUrl ||
-                    `https://api.dicebear.com/7.x/avataaars/svg?seed=${activeOtherName}`
-                  }
-                  alt={activeOtherName}
-                  className="h-[44px] w-[44px] shrink-0 rounded-full object-cover"
+                <ChatAvatar
+                  user={activeConversation.otherUser}
+                  name={activeOtherName}
+                  size="header"
                 />
                 <div className="min-w-0">
                 <div className="truncate text-xl font-black leading-[1.1] text-deep-forest">
@@ -439,7 +494,7 @@ export default function ChatPage() {
             >
               {isLoadingMessages ? (
                 <div className="flex items-center justify-center gap-2 text-sm text-deep-forest/65">
-                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <Loader2 className="h-[16px] w-[16px] animate-spin" />
                   Loading messages...
                 </div>
               ) : orderedMessages.length === 0 ? (
@@ -457,7 +512,7 @@ export default function ChatPage() {
                         className="inline-flex items-center gap-2 rounded-[10px] bg-white px-3 py-2 text-xs font-black text-deep-forest hover:bg-deep-forest hover:text-pale-canvas disabled:opacity-60"
                       >
                         {loadOlderMessages.isPending && (
-                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                          <Loader2 className="h-[14px] w-[14px] animate-spin" />
                         )}
                         Load older
                       </button>
@@ -475,14 +530,7 @@ export default function ChatPage() {
                         className={`flex items-end gap-2 ${mine ? "justify-end" : "justify-start"}`}
                       >
                         {!mine && (
-                          <img
-                            src={
-                              sender?.avatarUrl ||
-                              `https://api.dicebear.com/7.x/avataaars/svg?seed=${senderName}`
-                            }
-                            alt={senderName}
-                            className="h-[34px] w-[34px] rounded-full object-cover"
-                          />
+                          <ChatAvatar user={sender} name={senderName} />
                         )}
                         <div
                           className={`max-w-[82%] rounded-[18px] px-4 py-3 text-sm ${
@@ -509,7 +557,7 @@ export default function ChatPage() {
                                   <img
                                     src={attachment.url}
                                     alt={attachment.fileName || "Chat image"}
-                                    className="h-32 w-full object-cover"
+                                    className="h-[128px] w-full object-cover"
                                   />
                                 </a>
                               ))}
@@ -547,7 +595,7 @@ export default function ChatPage() {
                   {selectedImages.map((image) => (
                     <div
                       key={image.id}
-                      className="relative h-20 w-20 overflow-hidden rounded-[10px]"
+                      className="relative h-[80px] w-[80px] overflow-hidden rounded-[10px]"
                     >
                       <img
                         src={image.previewUrl}
@@ -557,10 +605,10 @@ export default function ChatPage() {
                       <button
                         type="button"
                         onClick={() => removeSelectedImage(image.id)}
-                        className="absolute right-1 top-1 inline-flex h-6 w-6 items-center justify-center rounded-full bg-deep-forest text-pale-canvas"
+                        className="absolute right-1 top-1 inline-flex h-[24px] w-[24px] items-center justify-center rounded-full bg-deep-forest text-pale-canvas"
                         aria-label="Remove image"
                       >
-                        <X className="h-3.5 w-3.5" />
+                        <X className="h-[14px] w-[14px]" />
                       </button>
                     </div>
                   ))}
@@ -618,7 +666,7 @@ export default function ChatPage() {
         ) : (
           <div className="flex flex-1 items-center justify-center p-8 text-center">
             <div>
-              <MessageSquare className="mx-auto h-12 w-12 text-deep-forest/35" />
+              <MessageSquare className="mx-auto h-[48px] w-[48px] text-deep-forest/35" />
               <h2 className="mt-4 font-beni text-[64px] leading-[0.72] text-deep-forest">
                 No Chat Selected
               </h2>

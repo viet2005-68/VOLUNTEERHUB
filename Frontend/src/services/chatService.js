@@ -4,6 +4,11 @@ import axiosClient from "./axiosClient";
 const CHAT_BASE_URL = "/v1/chats";
 const AGGREGATED_CHAT_BASE_URL = "/v1/aggregated/chats";
 
+const shouldFallbackToChatService = (error) => {
+  const status = error?.response?.status;
+  return status === 404 || status === 503 || (status >= 500 && status < 600);
+};
+
 const resolveWsUrl = () => {
   const explicit = import.meta.env.VITE_CHAT_WS_URL;
   if (explicit) return explicit;
@@ -22,7 +27,14 @@ const resolveWsUrl = () => {
 };
 
 export const listConversations = async () => {
-  return axiosClient.get(`${AGGREGATED_CHAT_BASE_URL}/conversations`);
+  try {
+    return await axiosClient.get(`${AGGREGATED_CHAT_BASE_URL}/conversations`);
+  } catch (error) {
+    if (shouldFallbackToChatService(error)) {
+      return axiosClient.get(`${CHAT_BASE_URL}/conversations`);
+    }
+    throw error;
+  }
 };
 
 export const openConversation = async ({ eventId, volunteerId }) => {
@@ -33,9 +45,18 @@ export const openConversation = async ({ eventId, volunteerId }) => {
 };
 
 export const listMessages = async ({ conversationId, before, limit = 50 }) => {
-  return axiosClient.get(`${AGGREGATED_CHAT_BASE_URL}/conversations/${conversationId}/messages`, {
-    params: { before, limit },
-  });
+  try {
+    return await axiosClient.get(`${AGGREGATED_CHAT_BASE_URL}/conversations/${conversationId}/messages`, {
+      params: { before, limit },
+    });
+  } catch (error) {
+    if (shouldFallbackToChatService(error)) {
+      return axiosClient.get(`${CHAT_BASE_URL}/conversations/${conversationId}/messages`, {
+        params: { before, limit },
+      });
+    }
+    throw error;
+  }
 };
 
 export const uploadChatMedia = async (file) => {
