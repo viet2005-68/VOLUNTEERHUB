@@ -1,18 +1,34 @@
 import { useState, useEffect } from "react";
+import {
+  BadgeCheck,
+  CalendarClock,
+  CheckCircle2,
+  ClipboardList,
+  Mail,
+  MapPin,
+  Phone,
+  StickyNote,
+  UserRound,
+  X,
+  XCircle,
+} from "lucide-react";
 import { useReviewRegistration } from "../../hook/useRegistration";
 
 export default function RegistrationDetailModal({ registration, onClose }) {
   const [note, setNote] = useState("");
-
   const reviewMutation = useReviewRegistration();
 
-  // Disable body scroll when modal is open
   useEffect(() => {
+    const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
+
     return () => {
-      document.body.style.overflow = "unset";
+      document.body.style.overflow = previousOverflow;
     };
   }, []);
+
+  const status = registration.registrationStatus || "UNKNOWN";
+  const isPending = status === "PENDING";
 
   const formatDate = (dateString) => {
     if (!dateString) return "Chưa có";
@@ -24,6 +40,28 @@ export default function RegistrationDetailModal({ registration, onClose }) {
       minute: "2-digit",
     });
   };
+
+  const formatAddress = (address) => {
+    if (!address) return "Chưa có";
+    if (typeof address !== "object") return address;
+
+    return (
+      [address.street, address.district, address.province]
+        .filter(Boolean)
+        .join(", ") || "Chưa có"
+    );
+  };
+
+  const getInitial = () =>
+    registration.fullName?.trim()?.charAt(0)?.toUpperCase() || "V";
+
+  const statusClass =
+    {
+      PENDING: "bg-amber-100 text-amber-800 border-amber-200",
+      APPROVED: "bg-emerald-100 text-emerald-800 border-emerald-200",
+      COMPLETED: "bg-deep-forest text-pale-canvas border-deep-forest",
+      REJECTED: "bg-red-100 text-red-700 border-red-200",
+    }[status] || "bg-deep-forest/10 text-deep-forest border-deep-forest/15";
 
   const handleReject = () => {
     reviewMutation.mutate(
@@ -57,132 +95,134 @@ export default function RegistrationDetailModal({ registration, onClose }) {
     );
   };
 
+  const InfoItem = ({ icon, label, value, className = "" }) => (
+    <div
+      className={`flex min-w-0 gap-3 rounded-lg border border-deep-forest/10 bg-white/80 p-3 ${className}`}
+    >
+      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-deep-forest/10 text-deep-forest">
+        {icon}
+      </div>
+      <div className="min-w-0">
+        <p className="text-xs font-bold uppercase leading-[1] text-deep-forest/55">
+          {label}
+        </p>
+        <p className="mt-1 break-words text-sm font-bold leading-[1.25] text-deep-forest">
+          {value || (
+            <span className="font-medium italic text-deep-forest/45">
+              Chưa có
+            </span>
+          )}
+        </p>
+      </div>
+    </div>
+  );
+
   return (
-    <div className="fixed inset-0 bg-gray-900/60 bg-opacity-40 flex items-center justify-center p-0 sm:p-4 z-50 font-ibm-plex-sans">
-      <div className="bg-white w-full h-full sm:h-auto sm:max-w-[500px] sm:rounded-xl shadow-lg flex flex-col sm:max-h-[90vh]">
-        {/* Header with Close Button */}
-        <div className="relative px-6 pt-6 pb-4 border-b border-gray-200 flex-shrink-0">
-          <h3 className="text-xl font-semibold text-center font-jost pr-8">
-            Registration Details
-          </h3>
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-deep-forest/65 p-0 font-clash-grotesk backdrop-blur-sm sm:items-center sm:p-4">
+      <div className="flex max-h-[100dvh] w-full flex-col overflow-hidden rounded-t-[24px] border border-deep-forest/15 bg-pale-canvas shadow-2xl sm:max-h-[90dvh] sm:max-w-2xl sm:rounded-2xl">
+        <div className="relative border-b border-deep-forest/10 bg-gradient-to-br from-pale-canvas to-deep-forest/5 px-5 py-5 sm:px-6">
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 transition-colors"
+            className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full text-deep-forest/65 transition hover:bg-deep-forest hover:text-pale-canvas"
             aria-label="Close modal"
           >
-            <svg
-              className="w-5 h-5 text-gray-500 hover:text-gray-700"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
+            <X className="h-5 w-5" />
           </button>
+
+          <div className="flex items-start gap-4 pr-10">
+            {registration.avatarUrl ? (
+              <img
+                src={registration.avatarUrl}
+                alt={registration.fullName || "User"}
+                className="h-16 w-16 shrink-0 rounded-full border-2 border-deep-forest/15 object-cover shadow-sm"
+              />
+            ) : (
+              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border-2 border-deep-forest/15 bg-deep-forest text-2xl font-bold text-pale-canvas shadow-sm">
+                {getInitial()}
+              </div>
+            )}
+
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-center gap-2">
+                <h3 className="font-beni text-5xl uppercase leading-[0.75] text-deep-forest sm:text-6xl">
+                  Registration Details
+                </h3>
+                <span
+                  className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-bold uppercase leading-none ${statusClass}`}
+                >
+                  {status}
+                </span>
+              </div>
+              <p className="mt-2 truncate text-lg font-bold text-deep-forest">
+                {registration.fullName || "Unknown volunteer"}
+              </p>
+              <p className="truncate text-sm font-medium text-deep-forest/65">
+                {registration.email || "No email provided"}
+              </p>
+            </div>
+          </div>
         </div>
 
-        {/* Scrollable Content */}
-        <div className="overflow-y-auto px-6 py-4 flex-1">
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 py-5 sm:px-6">
           <div className="space-y-4">
-            <div className="flex flex-row gap-5">
-              <div className="flex items-center">
-                {registration.avatarUrl ? (
-                  <img
-                    src={registration.avatarUrl}
-                    alt={registration.fullName || "User"}
-                    className="w-16 h-16 rounded-full object-cover"
-                  />
-                ) : (
-                  <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center text-gray-700 font-semibold">
-                    {registration.fullName?.charAt(0)?.toUpperCase() || "NA"}
-                  </div>
-                )}
-              </div>
-              <div className="flex-1">
-                <p className="mb-1">
-                  <b>Name:</b>{" "}
-                  {registration.fullName || (
-                    <span className="text-gray-500 italic">Chưa có</span>
-                  )}
-                </p>
-                <p className="mb-1">
-                  <b>Email:</b>{" "}
-                  {registration.email || (
-                    <span className="text-gray-500 italic">Chưa có</span>
-                  )}
-                </p>
-              </div>
+            <div className="rounded-lg border border-deep-forest/10 bg-white/80 p-4">
+              <p className="text-xs font-bold uppercase leading-[1] text-deep-forest/55">
+                Event
+              </p>
+              <p className="mt-2 text-base font-bold leading-[1.25] text-deep-forest">
+                {registration.eventName || "Unknown Event"}
+              </p>
             </div>
 
-            <div className="border-t pt-4">
-              <p className="mb-2">
-                <b>Event:</b>{" "}
-                {registration.eventName || (
-                  <span className="text-gray-500 italic">Unknown Event</span>
-                )}
-              </p>
-              <p className="mb-2">
-                <b>Registration ID:</b> #{registration.registrationId}
-              </p>
-              <p className="mb-2">
-                <b>Status:</b>{" "}
-                <span
-                  className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    registration.registrationStatus === "PENDING"
-                      ? "bg-yellow-100 text-yellow-800"
-                      : registration.registrationStatus === "APPROVED"
-                      ? "bg-green-100 text-green-800"
-                      : registration.registrationStatus === "REJECTED"
-                      ? "bg-red-100 text-red-800"
-                      : "bg-gray-100 text-gray-800"
-                  }`}
-                >
-                  {registration.registrationStatus}
-                </span>
-              </p>
-              <p className="mb-2">
-                <b>Registered At:</b> {formatDate(registration.registeredAt)}
-              </p>
-              {registration.phoneNumber && (
-                <p className="mb-2">
-                  <b>Phone:</b> {registration.phoneNumber}
-                </p>
-              )}
-              {registration.address && (
-                <p className="mb-2">
-                  <b>Address:</b>{" "}
-                  {typeof registration.address === "object"
-                    ? `${registration.address.street || ""}, ${
-                        registration.address.district || ""
-                      }, ${registration.address.province || ""}`.replace(
-                        /^[,\s]+|[,\s]+$/g,
-                        ""
-                      )
-                    : registration.address}
-                </p>
-              )}
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <InfoItem
+                icon={<ClipboardList className="h-5 w-5" />}
+                label="Registration ID"
+                value={`#${registration.registrationId || "N/A"}`}
+              />
+              <InfoItem
+                icon={<CalendarClock className="h-5 w-5" />}
+                label="Registered At"
+                value={formatDate(registration.registeredAt)}
+              />
+              <InfoItem
+                icon={<Mail className="h-5 w-5" />}
+                label="Email"
+                value={registration.email}
+              />
+              <InfoItem
+                icon={<Phone className="h-5 w-5" />}
+                label="Phone"
+                value={registration.phoneNumber}
+              />
+              <InfoItem
+                icon={<MapPin className="h-5 w-5" />}
+                label="Address"
+                value={formatAddress(registration.address)}
+                className="sm:col-span-2"
+              />
             </div>
 
             {registration.skills && (
-              <div className="flex flex-col gap-2 border-t pt-4">
-                <b>Skills:</b>
-                <div className="flex flex-row gap-2 flex-wrap">
+              <div className="rounded-lg border border-deep-forest/10 bg-white/80 p-4">
+                <div className="mb-3 flex items-center gap-2 text-deep-forest">
+                  <BadgeCheck className="h-5 w-5" />
+                  <p className="text-sm font-bold uppercase leading-[1]">
+                    Skills
+                  </p>
+                </div>
+                <div className="flex flex-wrap gap-2">
                   {registration.skills.length > 0 ? (
                     registration.skills.map((skill, index) => (
-                      <div
-                        key={index}
-                        className="text-sm border-gray-600 border w-fit rounded-2xl px-3 py-1"
+                      <span
+                        key={`${skill}-${index}`}
+                        className="rounded-full border border-deep-forest/15 bg-deep-forest/5 px-3 py-1 text-sm font-bold text-deep-forest"
                       >
                         {skill}
-                      </div>
+                      </span>
                     ))
                   ) : (
-                    <span className="text-gray-500 italic text-sm">
+                    <span className="text-sm italic text-deep-forest/45">
                       No skills listed
                     </span>
                   )}
@@ -191,37 +231,44 @@ export default function RegistrationDetailModal({ registration, onClose }) {
             )}
 
             {registration.bio && (
-              <div className="flex flex-col gap-2 border-t pt-4">
-                <b>Bio:</b>
-                <div className="bg-gray-100 p-3 rounded-lg text-sm">
-                  {registration.bio}
+              <div className="rounded-lg border border-deep-forest/10 bg-white/80 p-4">
+                <div className="mb-3 flex items-center gap-2 text-deep-forest">
+                  <UserRound className="h-5 w-5" />
+                  <p className="text-sm font-bold uppercase leading-[1]">Bio</p>
                 </div>
+                <p className="text-sm font-medium leading-[1.45] text-deep-forest/75">
+                  {registration.bio}
+                </p>
               </div>
             )}
 
-            <div className="flex flex-col gap-2 border-t pt-4">
-              <p>
-                <b>Note:</b>
-              </p>
-              <div className="bg-gray-100 p-3 rounded-lg text-sm">
+            <div className="rounded-lg border border-deep-forest/10 bg-white/80 p-4">
+              <div className="mb-3 flex items-center gap-2 text-deep-forest">
+                <StickyNote className="h-5 w-5" />
+                <p className="text-sm font-bold uppercase leading-[1]">Note</p>
+              </div>
+              <div className="rounded-lg bg-deep-forest/5 px-4 py-3 text-sm font-medium leading-[1.45] text-deep-forest/75">
                 {registration.note || (
-                  <span className="text-gray-500 italic">Chưa có</span>
+                  <span className="italic text-deep-forest/45">Chưa có</span>
                 )}
               </div>
             </div>
 
-            {/* Review Note Input - Only show for PENDING status */}
-            {registration.registrationStatus === "PENDING" && (
-              <div className="flex flex-col gap-2 border-t pt-4">
-                <p>
-                  <b>Review Note (Optional):</b>
-                </p>
+            {isPending && (
+              <div className="rounded-lg border border-deep-forest/10 bg-white/80 p-4">
+                <label
+                  htmlFor="review-note"
+                  className="text-sm font-bold uppercase leading-[1] text-deep-forest"
+                >
+                  Review Note
+                </label>
                 <textarea
+                  id="review-note"
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
-                  placeholder="Enter note for approval or rejection (optional)..."
+                  placeholder="Enter note for approval or rejection..."
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                  className="mt-3 w-full resize-none rounded-lg border border-deep-forest/15 bg-pale-canvas px-4 py-3 text-sm font-medium text-deep-forest placeholder:text-deep-forest/40 transition focus:border-deep-forest focus:outline-none focus:ring-2 focus:ring-deep-forest/15"
                   disabled={reviewMutation.isPending}
                 />
               </div>
@@ -229,12 +276,11 @@ export default function RegistrationDetailModal({ registration, onClose }) {
           </div>
         </div>
 
-        {/* Footer with Action Buttons */}
-        <div className="px-6 py-4 pb-20 sm:pb-4 border-t border-gray-200 flex-shrink-0">
-          {registration.registrationStatus === "PENDING" ? (
-            <div className="flex flex-col sm:flex-row justify-end gap-3">
+        <div className="shrink-0 border-t border-deep-forest/10 bg-white/85 px-5 py-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] sm:px-6 sm:pb-4">
+          {isPending ? (
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_1fr_1fr]">
               <button
-                className="px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded transition order-3 sm:order-1"
+                className="rounded-lg border border-deep-forest/20 px-5 py-3 text-base font-bold text-deep-forest transition hover:bg-deep-forest/5 disabled:cursor-not-allowed disabled:opacity-50"
                 onClick={onClose}
                 disabled={reviewMutation.isPending}
               >
@@ -243,22 +289,24 @@ export default function RegistrationDetailModal({ registration, onClose }) {
               <button
                 onClick={handleReject}
                 disabled={reviewMutation.isPending}
-                className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded transition disabled:opacity-50 disabled:cursor-not-allowed order-2"
+                className="inline-flex items-center justify-center gap-2 rounded-lg bg-red-600 px-5 py-3 text-base font-bold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
               >
+                <XCircle className="h-5 w-5" />
                 {reviewMutation.isPending ? "Processing..." : "Reject"}
               </button>
               <button
                 onClick={handleApprove}
                 disabled={reviewMutation.isPending}
-                className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded transition disabled:opacity-50 disabled:cursor-not-allowed order-1 sm:order-3"
+                className="inline-flex items-center justify-center gap-2 rounded-lg bg-deep-forest px-5 py-3 text-base font-bold text-pale-canvas transition hover:bg-deep-forest/90 disabled:cursor-not-allowed disabled:opacity-50"
               >
+                <CheckCircle2 className="h-5 w-5" />
                 {reviewMutation.isPending ? "Processing..." : "Accept"}
               </button>
             </div>
           ) : (
-            <div className="flex justify-center sm:justify-end">
+            <div className="flex justify-end">
               <button
-                className="w-full sm:w-auto px-6 py-3 bg-gray-300 hover:bg-gray-400 rounded-lg transition text-base font-medium"
+                className="w-full rounded-lg bg-deep-forest px-6 py-3 text-base font-bold text-pale-canvas transition hover:bg-deep-forest/90 sm:w-auto"
                 onClick={onClose}
               >
                 Close
