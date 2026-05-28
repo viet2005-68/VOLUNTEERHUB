@@ -5,8 +5,11 @@ import { useNavigate } from "react-router-dom";
 import VolunteerHero from "./VolunteerHero";
 import { useConstUserApprovedList } from "../../hook/useRegistration";
 
-const VIETNAMESE_TITLE_FONT_FAMILY =
-  '"Noto Sans", "Be Vietnam Pro", Inter, "Segoe UI", Roboto, Arial, sans-serif';
+const VIETNAMESE_TITLE_STYLE = {
+  fontFamily: '"Be Vietnam Pro", "Segoe UI", Arial, sans-serif',
+  fontWeight: 800,
+  letterSpacing: "-0.025em",
+};
 
 function EventHero({ id, imgURL, organizerName, eventName }) {
   const navigate = useNavigate();
@@ -50,7 +53,7 @@ function EventHero({ id, imgURL, organizerName, eventName }) {
       <div className="mb-6 text-deep-forest">
         <p
           className="mb-2 text-3xl font-bold leading-[1.2] max-sm:px-3"
-          style={{ fontFamily: VIETNAMESE_TITLE_FONT_FAMILY }}
+          style={VIETNAMESE_TITLE_STYLE}
         >
           {eventName}
         </p>

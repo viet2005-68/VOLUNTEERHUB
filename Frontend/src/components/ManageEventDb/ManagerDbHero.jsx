@@ -1,8 +1,11 @@
 import { ArrowLeft, CircleCheckBig, ClockFading, Image as ImageIcon, Pencil } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-const VIETNAMESE_TITLE_FONT_FAMILY =
-  '"Noto Sans", "Be Vietnam Pro", Inter, "Segoe UI", Roboto, Arial, sans-serif';
+const VIETNAMESE_TITLE_STYLE = {
+  fontFamily: '"Be Vietnam Pro", "Segoe UI", Arial, sans-serif',
+  fontWeight: 800,
+  letterSpacing: "-0.03em",
+};
 
 function ManagerDbHero({ thumbnail, title, status = "pending", onEditImage }) {
   const navigate = useNavigate();
@@ -54,7 +57,7 @@ function ManagerDbHero({ thumbnail, title, status = "pending", onEditImage }) {
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <h1
               className="max-w-4xl break-words text-5xl uppercase leading-[0.82] !text-pale-canvas drop-shadow-sm sm:text-6xl md:text-7xl lg:text-8xl"
-              style={{ fontFamily: VIETNAMESE_TITLE_FONT_FAMILY }}
+              style={VIETNAMESE_TITLE_STYLE}
             >
               {title}
             </h1>

@@ -3,8 +3,17 @@ import { FaArrowTrendUp } from "react-icons/fa6";
 import { Eye, Users, MessageSquare, ThumbsUp, FileText } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-const VIETNAMESE_TEXT_FONT_FAMILY =
-  '"Noto Sans", "Be Vietnam Pro", Inter, "Segoe UI", Roboto, Arial, sans-serif';
+const VIETNAMESE_TITLE_STYLE = {
+  fontFamily: '"Be Vietnam Pro", "Segoe UI", Arial, sans-serif',
+  fontWeight: 800,
+  letterSpacing: "-0.02em",
+};
+
+const VIETNAMESE_META_STYLE = {
+  fontFamily: '"Be Vietnam Pro", "Segoe UI", Arial, sans-serif',
+  fontWeight: 700,
+  letterSpacing: "-0.01em",
+};
 
 function TrendingCard({ items }) {
   const navigate = useNavigate();
@@ -63,13 +72,13 @@ function TrendingCard({ items }) {
               <div className="min-w-0">
                 <p
                   className="text-base font-bold leading-[1.15] text-deep-forest line-clamp-2"
-                  style={{ fontFamily: VIETNAMESE_TEXT_FONT_FAMILY }}
+                  style={VIETNAMESE_TITLE_STYLE}
                 >
                   {name}
                 </p>
                 <div
                   className="mt-1 text-sm font-bold leading-[1.15] text-deep-forest/60"
-                  style={{ fontFamily: VIETNAMESE_TEXT_FONT_FAMILY }}
+                  style={VIETNAMESE_META_STYLE}
                 >
                   {category?.name || "Uncategorized"}
                 </div>
