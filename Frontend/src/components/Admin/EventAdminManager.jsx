@@ -128,9 +128,11 @@ function EventAdminManager() {
 
   if (showFullLoading) {
     return (
-      <div className="bg-white p-6 rounded-xl shadow-sm">
-        <div className="flex items-center justify-center h-64">
-          <div className="text-gray-500">Loading events...</div>
+      <div className="rounded-[25px] border-2 border-ash-whisper bg-pale-canvas p-8">
+        <div className="flex h-64 items-center justify-center">
+          <div className="text-sm font-bold leading-[1.2] text-deep-forest/70">
+            Loading events...
+          </div>
         </div>
       </div>
     );
@@ -138,9 +140,9 @@ function EventAdminManager() {
 
   if (isError) {
     return (
-      <div className="bg-white p-6 rounded-xl shadow-sm">
-        <div className="flex items-center justify-center h-64">
-          <div className="text-red-500">
+      <div className="rounded-[25px] border-2 border-ash-whisper bg-pale-canvas p-8">
+        <div className="flex h-64 items-center justify-center">
+          <div className="rounded-[10px] bg-ash-whisper px-5 py-3 text-sm font-bold leading-[1.2] text-foudre-pink">
             Error loading events: {error.message}
           </div>
         </div>
@@ -149,107 +151,113 @@ function EventAdminManager() {
   }
 
   return (
-    <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm gap-5 sm:gap-6 flex flex-col">
+    <div className="flex flex-col gap-6 rounded-[25px] border border-ash-whisper bg-pale-canvas/90 px-7 pb-7 pt-10 text-deep-forest sm:gap-8 sm:border-2 sm:px-8 sm:pb-8 sm:pt-12 md:px-10 md:pb-10 md:pt-14">
       {/* Header */}
-      <div className="flex flex-col gap-2">
-        <h2 className="text-2xl font-semibold text-gray-900">
+      <div className="flex flex-col gap-3 pl-1">
+        <h2 className="font-beni text-[56px] font-black uppercase leading-[0.75] text-deep-forest md:text-[80px]">
           {isSearchMode ? `Search: "${searchTerm}"` : "Event Manager"}
         </h2>
-        <p className="text-gray-500">
+        <p className="text-base font-medium leading-[1.2] text-deep-forest/70">
           {isSearchMode
             ? `Found ${data?.meta?.totalElements || 0} events`
             : "Manage all events"}
         </p>
       </div>
+
       {/* Toolbar */}
-      <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center relative">
+      <div className="flex flex-col gap-3 rounded-[20px] border-2 border-ash-whisper bg-white p-4 lg:flex-row lg:items-center lg:justify-between">
         {/* Search */}
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-        <input
-          type="text"
-          placeholder="Search events by name..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full pl-[42px] pr-10 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-deep-forest/15 focus:border-deep-forest"
-        />
-        {/* Loading indicator for search */}
-        {isSearchMode && isFetching && (
-          <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-            <div className="w-4 h-4 border-2 border-red-400 border-t-transparent rounded-full animate-spin" />
-          </div>
-        )}
-      </div>
-      {/* Filter & Export */}
-      <div className="flex flex-row gap-3 items-center justify-end flex-wrap">
-        <DropdownSelect
-          value={filterStatus}
-          onChange={setFilterStatus}
-          options={[
-            { value: "all", label: "All Status" },
-            { value: "pending", label: "Pending" },
-            { value: "approved", label: "Approved" },
-            { value: "rejected", label: "Rejected" },
-          ]}
-        />
-
-        {/* Export Dropdown */}
-        <div className="relative">
-          <button
-            onClick={() => setShowExportMenu(!showExportMenu)}
-            disabled={isExporting}
-            className="flex items-center justify-center gap-2 whitespace-nowrap rounded-[10px] bg-deep-forest px-4 py-3 font-bold text-pale-canvas transition-colors disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            <Download className="w-5 h-5" />
-            <span className="max-sm:hidden">
-              {isExporting ? "Exporting..." : "Export Events"}
-            </span>
-            <span className="sm:hidden">
-              {isExporting ? "Export..." : "Export"}
-            </span>
-            <ChevronDown className="w-4 h-4" />
-          </button>
-
-          {/* Dropdown Menu */}
-          {showExportMenu && !isExporting && (
-            <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
-              <button
-                onClick={() => handleExport("csv")}
-                className="w-full px-4 py-2 text-left hover:bg-gray-100 transition-colors flex items-center gap-2 rounded-t-lg"
-              >
-                <Download className="w-4 h-4" />
-                <span>Export as CSV</span>
-              </button>
-              <button
-                onClick={() => handleExport("json")}
-                className="w-full px-4 py-2 text-left hover:bg-gray-100 transition-colors flex items-center gap-2 rounded-b-lg"
-              >
-                <Download className="w-4 h-4" />
-                <span>Export as JSON</span>
-              </button>
+        <div className="relative min-w-0 flex-1">
+          <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-deep-forest/45" />
+          <input
+            type="text"
+            placeholder="Search events by name..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full rounded-[10px] border-2 border-ash-whisper bg-pale-canvas/80 px-4 py-4 pl-[48px] pr-10 text-sm font-medium leading-[1.2] text-deep-forest placeholder:text-deep-forest/55 focus:border-foudre-pink focus:outline-none"
+          />
+          {/* Loading indicator for search */}
+          {isSearchMode && isFetching && (
+            <div className="absolute right-3 top-1/2 -translate-y-1/2">
+              <div className="h-4 w-4 animate-spin rounded-full border-2 border-foudre-pink border-t-transparent" />
             </div>
           )}
         </div>
+
+        {/* Filter & Export */}
+        <div className="flex shrink-0 items-center justify-between gap-3 sm:justify-start">
+          <DropdownSelect
+            value={filterStatus}
+            onChange={setFilterStatus}
+            options={[
+              { value: "all", label: "All Status" },
+              { value: "pending", label: "Pending" },
+              { value: "approved", label: "Approved" },
+              { value: "rejected", label: "Rejected" },
+            ]}
+            className="w-[160px]"
+          />
+
+          {/* Export Dropdown */}
+          <div className="relative">
+            <button
+              onClick={() => setShowExportMenu(!showExportMenu)}
+              disabled={isExporting}
+              className="flex items-center justify-center gap-2 whitespace-nowrap rounded-[10px] bg-deep-forest px-5 py-4 text-sm font-bold leading-[0.85] text-pale-canvas transition-colors hover:bg-foudre-pink disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <Download className="h-5 w-5" />
+              <span className="max-sm:hidden">
+                {isExporting ? "Exporting..." : "Export Events"}
+              </span>
+              <span className="sm:hidden">
+                {isExporting ? "Export..." : "Export"}
+              </span>
+              <ChevronDown className="h-4 w-4" />
+            </button>
+
+            {/* Dropdown Menu */}
+            {showExportMenu && !isExporting && (
+              <div className="absolute right-0 z-50 mt-2 w-48 overflow-hidden rounded-[10px] border border-ash-whisper bg-pale-canvas shadow-lg">
+                <button
+                  onClick={() => handleExport("csv")}
+                  className="flex w-full items-center gap-2 px-4 py-3 text-left text-sm font-bold text-deep-forest transition-colors hover:bg-ash-whisper"
+                >
+                  <Download className="h-4 w-4" />
+                  <span>Export as CSV</span>
+                </button>
+                <button
+                  onClick={() => handleExport("json")}
+                  className="flex w-full items-center gap-2 px-4 py-3 text-left text-sm font-bold text-deep-forest transition-colors hover:bg-ash-whisper"
+                >
+                  <Download className="h-4 w-4" />
+                  <span>Export as JSON</span>
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
-      <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white">
+
+      <div className="overflow-x-auto rounded-[20px] border-2 border-ash-whisper bg-white">
         <table className="w-full text-left text-sm">
           <thead className="max-lg:hidden">
-            <tr className="border-b border-gray-200 bg-gray-50">
-              <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
+            <tr className="bg-ash-whisper/70">
+              <th className="px-6 py-4 text-left text-sm font-bold leading-[1.2] text-deep-forest">
                 Event
               </th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
+              <th className="px-6 py-4 text-left text-sm font-bold leading-[1.2] text-deep-forest">
                 Date & Time
               </th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
+              <th className="px-6 py-4 text-left text-sm font-bold leading-[1.2] text-deep-forest">
                 Location
               </th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
+              <th className="px-6 py-4 text-left text-sm font-bold leading-[1.2] text-deep-forest">
                 Volunteers
               </th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
+              <th className="px-6 py-4 text-left text-sm font-bold leading-[1.2] text-deep-forest">
                 Status
               </th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
+              <th className="px-6 py-4 text-left text-sm font-bold leading-[1.2] text-deep-forest">
                 Actions
               </th>
             </tr>
@@ -269,7 +277,9 @@ function EventAdminManager() {
               <tr>
                 <td colSpan="6" className="px-6 py-12 text-center">
                   <div className="flex flex-col items-center gap-2">
-                    <p className="text-sm text-gray-500">No events found</p>
+                    <p className="text-sm font-medium leading-[1.2] text-deep-forest/65">
+                      No events found
+                    </p>
                   </div>
                 </td>
               </tr>
@@ -280,8 +290,8 @@ function EventAdminManager() {
 
       {/* Pagination */}
       {events.length > 0 && (
-        <div className="flex flex-col sm:flex-row items-center justify-between pt-4 border-t border-gray-200 gap-4">
-          <p className="text-sm text-gray-500">
+        <div className="flex flex-col items-center justify-between gap-4 border-t border-deep-forest/10 pt-5 sm:flex-row">
+          <p className="text-sm font-medium leading-[1.2] text-deep-forest/70">
             Showing {showingStart}-{showingEnd}
             {hasExactTotal ? ` of ${totalElements}` : ""} events
           </p>
@@ -292,6 +302,9 @@ function EventAdminManager() {
               onChange={handlePageChange}
               sx={{
                 "& .MuiPaginationItem-root": {
+                  color: "#00522d",
+                  fontFamily: "Clash Grotesk, sans-serif",
+                  fontWeight: 700,
                   "&.Mui-selected": {
                     backgroundColor: "#00522d",
                     color: "#fff8f6",
