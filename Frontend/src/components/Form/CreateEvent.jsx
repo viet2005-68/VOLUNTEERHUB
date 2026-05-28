@@ -149,6 +149,50 @@ function CreateEvent({ onSuccess, onCancel }) {
   const district = watch("district");
   const province = watch("province");
   const imageFile = watch("imageFile");
+  const [
+    eventName,
+    description,
+    categoryName,
+    startTime,
+    endTime,
+    capacity,
+    registrationDeadline,
+  ] = watch([
+    "name",
+    "description",
+    "categoryName",
+    "startTime",
+    "endTime",
+    "capacity",
+    "registrationDeadline",
+  ]);
+
+  const requiredFieldsComplete = useMemo(
+    () =>
+      [
+        eventName,
+        description,
+        categoryName,
+        startTime,
+        endTime,
+        registrationDeadline,
+        street,
+        district,
+        province,
+      ].every((value) => String(value || "").trim()) && Number(capacity) > 0,
+    [
+      eventName,
+      description,
+      categoryName,
+      startTime,
+      endTime,
+      registrationDeadline,
+      street,
+      district,
+      province,
+      capacity,
+    ]
+  );
 
   // use vietnam hook to fetch infommation about province and district
   const {
@@ -449,9 +493,9 @@ function CreateEvent({ onSuccess, onCancel }) {
 
       <div className="flex flex-col gap-2">
         <label className="text-sm font-bold uppercase leading-[0.85] text-deep-forest">Location *</label>
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3 z-50">
+        <div className="z-50 grid grid-cols-1 gap-4 md:grid-cols-3">
           <div className="flex flex-col gap-2">
-            <label htmlFor="province" className="text-sm font-medium leading-[0.85] text-deep-forest/70">
+            <label htmlFor="province" className="text-sm font-bold leading-[1.2] text-deep-forest/70">
               Province
             </label>
             <Controller
@@ -482,7 +526,7 @@ function CreateEvent({ onSuccess, onCancel }) {
             )}
           </div>
           <div className="flex flex-col gap-2">
-            <label htmlFor="district" className="text-sm font-medium leading-[0.85] text-deep-forest/70">
+            <label htmlFor="district" className="text-sm font-bold leading-[1.2] text-deep-forest/70">
               District
             </label>
             <Controller
@@ -522,7 +566,7 @@ function CreateEvent({ onSuccess, onCancel }) {
             )}
           </div>
           <div className="flex flex-col gap-2">
-            <label htmlFor="street" className="text-sm font-medium leading-[0.85] text-deep-forest/70">
+            <label htmlFor="street" className="text-sm font-bold leading-[1.2] text-deep-forest/70">
               Street
             </label>
             <input
@@ -530,7 +574,7 @@ function CreateEvent({ onSuccess, onCancel }) {
               id="street"
               {...register("street")}
               placeholder="123 Beach St"
-              className="w-full rounded-lg border border-deep-forest/20 bg-pale-canvas px-4 py-3 text-deep-forest placeholder:text-deep-forest/45 transition focus:border-foudre-pink focus:outline-none focus:ring-2 focus:ring-foudre-pink/25"
+              className="w-full rounded-[10px] border-2 border-ash-whisper bg-pale-canvas px-4 py-4 text-sm font-bold leading-[0.85] text-deep-forest transition-colors placeholder:text-deep-forest/50 focus:border-foudre-pink focus:outline-none"
               required
             />
             {errors.street && (
@@ -563,7 +607,11 @@ function CreateEvent({ onSuccess, onCancel }) {
         <button
           type="submit"
           disabled={createEventMutation.isPending}
-          className="flex-1 rounded-lg bg-bubblegum-blush px-5 py-3 text-base font-bold uppercase text-pale-canvas transition hover:bg-foudre-pink disabled:cursor-not-allowed disabled:opacity-60"
+          className={`flex-1 rounded-lg px-5 py-3 text-base font-bold uppercase text-pale-canvas transition disabled:cursor-not-allowed disabled:opacity-60 ${
+            requiredFieldsComplete
+              ? "bg-foudre-pink shadow-lg shadow-foudre-pink/20 hover:bg-deep-forest"
+              : "bg-bubblegum-blush hover:bg-foudre-pink"
+          }`}
         >
           {createEventMutation.isPending ? "Creating..." : "Create Event"}
         </button>
