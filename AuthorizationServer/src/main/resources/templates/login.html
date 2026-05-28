@@ -147,6 +147,48 @@
         font-size: 14px;
       }
 
+      .form-alert {
+        margin-top: 18px;
+        border: 2px solid rgba(219, 60, 138, 0.3);
+        border-radius: 10px;
+        background: var(--color-pale-canvas);
+        box-shadow: 0 18px 45px rgba(0, 82, 45, 0.14);
+        color: var(--color-deep-forest);
+        padding: 12px 14px;
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        font-size: 13px;
+        font-weight: 700;
+        line-height: 1.25;
+        pointer-events: none;
+        animation: toast-in 0.18s ease-out;
+      }
+
+      .form-alert i {
+        color: var(--color-foudre-pink);
+        margin-top: 1px;
+      }
+
+      .form-alert.is-hiding {
+        animation: toast-out 0.22s ease-in forwards;
+      }
+
+      @keyframes toast-in {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      @keyframes toast-out {
+        to {
+          opacity: 0;
+        }
+      }
+
       .label {
         display: block;
         margin-bottom: 8px;
@@ -353,6 +395,90 @@
           eyeIcon.classList.add("fa-eye");
         }
       }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        let alertTimer;
+
+        function hideAlert(alert) {
+          if (!alert) return;
+          alert.classList.add("is-hiding");
+          window.setTimeout(function () {
+            alert.remove();
+          }, 240);
+        }
+
+        function scheduleAlertHide(alert) {
+          window.clearTimeout(alertTimer);
+          alertTimer = window.setTimeout(function () {
+            hideAlert(alert);
+          }, 3600);
+        }
+
+        function showLoginAlert(message) {
+          const card = document.querySelector(".login-card");
+          const subtitle = document.querySelector(".subtitle");
+          if (!card || !subtitle) return;
+
+          let alert = document.querySelector("[data-login-alert]");
+          if (!alert) {
+            alert = document.createElement("div");
+            alert.setAttribute("data-login-alert", "");
+            alert.setAttribute("role", "alert");
+            alert.className = "form-alert";
+            alert.innerHTML =
+              '<i class="fas fa-circle-exclamation"></i><span></span>';
+            subtitle.insertAdjacentElement("afterend", alert);
+          }
+
+          alert.classList.remove("is-hiding");
+          alert.querySelector("span").textContent = message;
+          scheduleAlertHide(alert);
+        }
+
+        const initialAlert = document.querySelector("[data-login-alert]");
+        if (initialAlert) {
+          scheduleAlertHide(initialAlert);
+        }
+
+        const loginForm = document.querySelector("[data-login-form]");
+        if (!loginForm) return;
+
+        loginForm.addEventListener("submit", async function (event) {
+          if (!loginForm.checkValidity()) return;
+
+          event.preventDefault();
+
+          const submitButton = loginForm.querySelector('[type="submit"]');
+          if (submitButton) submitButton.disabled = true;
+
+          try {
+            const loginCheckResponse = await fetch("/api/v1/users/login", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              credentials: "same-origin",
+              body: JSON.stringify({
+                username: loginForm.username.value,
+                password: loginForm.password.value,
+              }),
+            });
+
+            if (!loginCheckResponse.ok) {
+              showLoginAlert(
+                "Login failed. Please check your email and password."
+              );
+              return;
+            }
+
+            HTMLFormElement.prototype.submit.call(loginForm);
+          } catch (error) {
+            showLoginAlert("Login failed. Please try again.");
+          } finally {
+            if (submitButton) submitButton.disabled = false;
+          }
+        });
+      });
     </script>
   </head>
   <body>
@@ -371,7 +497,17 @@
         <h2 class="title">Login</h2>
         <p class="subtitle">Sign in to your account</p>
 
-        <form th:action="@{/login}" method="post">
+        <div
+          th:if="${param.error}"
+          data-login-alert
+          class="form-alert"
+          role="alert"
+        >
+          <i class="fas fa-circle-exclamation"></i>
+          <span>Login failed. Please check your email and password.</span>
+        </div>
+
+        <form th:action="@{/login}" method="post" data-login-form>
           <input
             type="hidden"
             th:name="${_csrf.parameterName}"

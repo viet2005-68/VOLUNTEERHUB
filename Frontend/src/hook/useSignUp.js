@@ -1,4 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 import { registerAuthUser } from "../services/authService";
 import { LOGIN_LINK } from "../constant/constNavigate";
 
@@ -14,13 +15,15 @@ const useSignUp = () => {
         },
         onSuccess: (data) => {
             console.log("Sign up successful:", data);
+            toast.success("Account created successfully. Please sign in.");
 
             // User profile is created after OAuth login completes and a token exists.
             window.location.href = LOGIN_LINK;
         },
         onError: (error) => {
-            console.error("Sign up failed:", error.response?.data || error.message);
-            alert("Sign up failed: " + (error.response?.data?.message || error.message));
+            const message = error?.response?.data?.message || error?.message || "Sign up failed. Please try again.";
+            console.error("Sign up failed:", message);
+            toast.error(message);
         },
     });
 };
