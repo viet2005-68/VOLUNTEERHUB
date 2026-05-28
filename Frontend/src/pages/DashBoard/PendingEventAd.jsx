@@ -49,7 +49,7 @@ function PendingEventAd({ className }) {
         title="Pending Events"
         subtile="Awaiting Approval"
         viewMore={true}
-        path="/dashboard/eventmanager"
+        path="https://volunteerhub.duckdns.org/dashboard/eventmanager"
       >
         {isLoading && (
           <>
