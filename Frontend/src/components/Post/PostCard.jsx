@@ -14,6 +14,7 @@ export default function PostCard({
   onEdit,
   onDelete,
   onShare,
+  readOnly = false,
 }) {
   const [showMenu, setShowMenu] = useState(false);
   const [avatarFailed, setAvatarFailed] = useState(false);
@@ -253,6 +254,7 @@ export default function PostCard({
           hiddenComment={true}
           eventId={post?.eventId}
           onShare={onShare}
+          readOnly={readOnly}
         />
       </footer>
     </article>

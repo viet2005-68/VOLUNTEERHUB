@@ -50,6 +50,7 @@ export default function ReactionBar({
   commentLength = 0,
   hiddenComment = false,
   eventId,
+  readOnly = false,
 }) {
   const embeddedCounts = post?.reactionCounts || post?.reactions;
   const hasEmbeddedCounts =
@@ -100,35 +101,37 @@ export default function ReactionBar({
   return (
     <div className="flex flex-wrap items-center gap-x-5 gap-y-3 text-deep-forest">
       <div className="flex flex-row gap-3 items-stretch">
-        <ReactionButton
-          initialReaction={currentReactionKey}
-          onReact={(r) => {
-            onReact?.(post.id, r);
+        {!readOnly && (
+          <ReactionButton
+            initialReaction={currentReactionKey}
+            onReact={(r) => {
+              onReact?.(post.id, r);
 
 
-            // Skip if mutation is already pending to avoid race condition
-            if (isPending) {
-              return;
-            }
+              // Skip if mutation is already pending to avoid race condition
+              if (isPending) {
+                return;
+              }
 
-            if (eventId && post?.id) {
-              if (r === null) {
-                // User wants to remove reaction
+              if (eventId && post?.id) {
+                if (r === null) {
+                  // User wants to remove reaction
 
-                if (currentReactionKey) {
-                  const enumType = toEnumType(currentReactionKey);
+                  if (currentReactionKey) {
+                    const enumType = toEnumType(currentReactionKey);
 
+                    createReaction(enumType);
+                  }
+                } else {
+                  // User selected a reaction -> create/update
+                  const enumType = toEnumType(r);
                   createReaction(enumType);
                 }
-              } else {
-                // User selected a reaction → create/update
-                const enumType = toEnumType(r);
-                createReaction(enumType);
               }
-            }
-          }}
-          small={compact}
-        />
+            }}
+            small={compact}
+          />
+        )}
         {!compact && reactionEntries.length > 0 && (
           <div className="flex min-h-[48px] flex-wrap items-center gap-2.5 rounded-[10px] border border-ash-whisper bg-ash-whisper/70 px-4 py-2">
             {reactionEntries.map(([key, count]) => (
@@ -160,7 +163,7 @@ export default function ReactionBar({
         </button>
       )}
 
-      {onShare && (
+      {onShare && !readOnly && (
         <button
           onClick={() => onShare?.(post.id)}
           className={actionButtonClass}

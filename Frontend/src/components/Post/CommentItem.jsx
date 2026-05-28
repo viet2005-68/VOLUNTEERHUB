@@ -11,6 +11,7 @@ export default function CommentItem({
   currentUserId = "10",
   currentUserName = "You",
   depth = 0,
+  readOnly = false,
 }) {
   // Thêm vào đầu component (sau line 15)
   const [showAllReplies, setShowAllReplies] = useState(false);
@@ -171,7 +172,7 @@ export default function CommentItem({
             </div>
 
             <div className="mt-1 px-3 flex items-center gap-4 text-xs">
-              {!isEditing && (
+              {!readOnly && !isEditing && (
                 <button
                   onClick={() => handleReplyClick(comment)}
                   className="text-deep-forest/70 hover:text-deep-forest hover:underline font-semibold"
@@ -182,7 +183,7 @@ export default function CommentItem({
               <span className="text-deep-forest/55">
                 {formatDate(comment.createdAt)}
               </span>
-              {isOwnComment && !isEditing && (
+              {!readOnly && isOwnComment && !isEditing && (
                 <>
                   <button
                     onClick={handleEditStart}
@@ -262,6 +263,8 @@ export default function CommentItem({
               onReply={(postId, newReply) => onReply(postId, newReply)}
               replies={[]}
               currentUserId={currentUserId}
+              currentUserName={currentUserName}
+              readOnly={readOnly}
               depth={depth + 1}
             />
           ))}

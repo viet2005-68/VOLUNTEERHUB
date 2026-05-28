@@ -13,6 +13,7 @@ import {
 } from "../../hook/useCommunity";
 import { useNavbar } from "../../hook/useNavbar";
 import { useAuth } from "../../hook/useAuth";
+import { ROLES } from "../../constant/role";
 import toast from "react-hot-toast";
 
 /**
@@ -25,6 +26,7 @@ export default function FeedPage() {
   const { id } = useParams();
   const { setShowNavbar } = useNavbar();
   const currentUser = { name: "Bạn" };
+  const isAdmin = user?.role === ROLES.ADMIN;
 
   const [posts, setPosts] = useState([]);
   const [activePost, setActivePost] = useState(null);
@@ -237,6 +239,7 @@ export default function FeedPage() {
   };
 
   const handleShare = (postId) => {
+    if (isAdmin) return;
     sharePost(postId, {
       onSuccess: (updatedPost) => {
         const nextShareCount = Number(updatedPost?.shareCount || 0);
@@ -301,6 +304,7 @@ export default function FeedPage() {
   };
 
   const reactTo = (postId, type) => {
+    if (isAdmin) return;
     setPosts((prev) =>
       prev.map((p) => (p.id === postId ? applyLocalReaction(p, type) : p))
     );
@@ -334,16 +338,18 @@ export default function FeedPage() {
   return (
     <div className="min-h-screen py-4">
       <div className="max-w-3xl mx-auto mb-6 px-2 sm:px-0 mt-2 sm:mt-4 space-y-4">
-        <CreatePost
-          onCreate={(p) =>
-            handleCreate({
-              ...p,
-              author: { name: currentUser.name },
-              createdAt: new Date().toISOString(),
-            })
-          }
-          eventId={id}
-        />
+        {!isAdmin && (
+          <CreatePost
+            onCreate={(p) =>
+              handleCreate({
+                ...p,
+                author: { name: currentUser.name },
+                createdAt: new Date().toISOString(),
+              })
+            }
+            eventId={id}
+          />
+        )}
 
         {status === "loading" && (
           <div className="text-center text-deep-forest/60 mt-4">Loading...</div>
@@ -362,13 +368,14 @@ export default function FeedPage() {
               post={post}
               onOpenPost={openPost}
               onReactLocal={reactTo}
-              canEdit={post?.ownerId === user?.id}
+              canEdit={!isAdmin && post?.ownerId === user?.id}
               postId={post.id}
               hiddenComment={hiddenComment}
               onEdit={handleEditPost}
               onDelete={handleDeletePost}
-              onShare={handleShare}
+              onShare={isAdmin ? undefined : handleShare}
               commentLength={post.commentCount ?? post.comments?.length ?? 0}
+              readOnly={isAdmin}
             />
           )}
           components={{ Footer }}
@@ -386,9 +393,10 @@ export default function FeedPage() {
         onEditComment={editComment}
         onDeleteComment={deleteComment}
         onReact={reactTo}
-        onShare={handleShare}
+        onShare={isAdmin ? undefined : handleShare}
         postId={activePost?.id}
         eventId={id}
+        readOnly={isAdmin}
       />
 
       {/* Edit Post Modal */}

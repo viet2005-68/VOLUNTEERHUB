@@ -27,6 +27,7 @@ export default function PostModal({
   startImageIndex,
   postId,
   eventId,
+  readOnly = false,
 }) {
   const [text, setText] = useState("");
   const [avatarFailed, setAvatarFailed] = useState(false);
@@ -199,6 +200,7 @@ export default function PostModal({
                   onCommentClick={focusComments}
                   commentLength={comments.length}
                   eventId={eventId}
+                  readOnly={readOnly}
                 />
               </div>
 
@@ -221,18 +223,21 @@ export default function PostModal({
                     currentUserName={
                       user?.name || user?.fullName || user?.username || "You"
                     }
+                    readOnly={readOnly}
                   />
                 )}
               </div>
             </div>
-            <div className="border-t border-ash-whisper bg-pale-canvas md:sticky md:-bottom-4 md:px-0 max-md:fixed max-md:bottom-0 max-md:left-0 max-md:right-0 max-md:z-50">
-              <CommentInput
-                value={text}
-                onChange={(e) => setText(e.target.value)}
-                onSubmit={submit}
-                inputRef={inputRef}
-              />
-            </div>
+            {!readOnly && (
+              <div className="border-t border-ash-whisper bg-pale-canvas md:sticky md:-bottom-4 md:px-0 max-md:fixed max-md:bottom-0 max-md:left-0 max-md:right-0 max-md:z-50">
+                <CommentInput
+                  value={text}
+                  onChange={(e) => setText(e.target.value)}
+                  onSubmit={submit}
+                  inputRef={inputRef}
+                />
+              </div>
+            )}
           </div>
         </div>
       </Modal>

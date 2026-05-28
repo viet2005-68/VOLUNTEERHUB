@@ -9,6 +9,7 @@ export default function CommentList({
   onReplyComment,
   currentUserId,
   currentUserName,
+  readOnly = false,
 }) {
   // Build nested comment
   const buildCommentTree = (comments) => {
@@ -54,6 +55,7 @@ export default function CommentList({
           replies={comment.replies}
           currentUserId={currentUserId}
           currentUserName={currentUserName}
+          readOnly={readOnly}
           depth={0}
         />
       ))}
