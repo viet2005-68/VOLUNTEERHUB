@@ -130,7 +130,10 @@ const AnalysisService = {
     getEventParticipantsJson: async (eventId) => {
         try {
             const response = await axiosClient.get(
-                `/v1/aggregated/registrations/export/participants?eventId=${eventId}&format=json`
+                `/v1/aggregated/registrations/export/participants`,
+                {
+                    params: { eventId, format: "json" },
+                }
             );
             return response;
         } catch (error) {
@@ -141,12 +144,12 @@ const AnalysisService = {
 
     // Export participants của một event (CSV format)
     getEventParticipantsCsv: async (eventId) => {
-        console.log("eventId", eventId);
         try {
             const response = await axiosClient.get(
-                `/v1/analytics/export/registrations?eventId=${eventId}`,
+                `/v1/aggregated/registrations/export/participants`,
                 {
-                    responseType: 'blob',
+                    params: { eventId, format: "csv" },
+                    responseType: "blob",
                 }
             );
             return response;

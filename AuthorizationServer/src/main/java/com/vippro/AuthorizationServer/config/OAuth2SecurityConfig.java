@@ -16,6 +16,7 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
@@ -40,6 +41,7 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.time.Duration;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Configuration
@@ -184,7 +186,10 @@ public class OAuth2SecurityConfig {
                     context.getClaims().subject(securityUser.getId().toString());
                     context.getClaims().claim("user_id", securityUser.getId());
                     context.getClaims().claim("email", securityUser.getEmail());
-                    context.getClaims().claim("roles", securityUser.getAuthorities());
+                    context.getClaims().claim("roles", securityUser.getAuthorities().stream()
+                            .map(GrantedAuthority::getAuthority)
+                            .map(role -> Map.of("role", role))
+                            .toList());
                     context.getClaims().claim("name", securityUser.getName());
                 }
             }
