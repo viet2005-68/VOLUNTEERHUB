@@ -14,6 +14,15 @@ const getNumber = (...values) => {
     return undefined;
 };
 
+const getPositiveNumber = (...values) => {
+    for (const value of values) {
+        const numberValue = getNumber(value);
+        if (numberValue !== undefined && numberValue > 0) return numberValue;
+    }
+
+    return undefined;
+};
+
 const getBoolean = (...values) => {
     for (const value of values) {
         if (typeof value === "boolean") return value;
@@ -42,7 +51,7 @@ const normalizePaginatedResponse = (response, params = {}) => {
             payload?.meta === undefined);
 
     const pageSize =
-        getNumber(
+        getPositiveNumber(
             payload?.size,
             payload?.pageSize,
             payload?.pageable?.pageSize,
@@ -51,19 +60,23 @@ const normalizePaginatedResponse = (response, params = {}) => {
             params.pageSize,
             content.length,
             10
-        ) || 10;
+        ) ?? 10;
+    const payloadCurrentPage = getNumber(
+        payload?.number,
+        payload?.pageNum,
+        payload?.currentPage,
+        payload?.pageable?.pageNumber
+    );
     const currentPage =
         getNumber(
-            payload?.number,
-            payload?.pageNum,
-            payload?.currentPage,
-            payload?.pageable?.pageNumber,
             pageMeta?.number,
             pageMeta?.pageNum,
             pageMeta?.currentPage,
+            payloadCurrentPage > 0 ? payloadCurrentPage : undefined,
             params.pageNum,
+            payloadCurrentPage,
             0
-        ) || 0;
+        ) ?? 0;
     const rawTotalElements = getNumber(
         payload?.totalElements,
         payload?.totalElement,
