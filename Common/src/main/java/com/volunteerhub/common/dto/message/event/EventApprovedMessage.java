@@ -24,6 +24,7 @@ public class EventApprovedMessage implements EventMessage{
     private LocalDateTime endTime;
     private LocalDateTime registrationDeadline;
     private QrJoinPolicy qrJoinPolicy;
+    private Long completionBadgeId;
     @Builder.Default
     private LocalDateTime approvedTime = LocalDateTime.now();
 }

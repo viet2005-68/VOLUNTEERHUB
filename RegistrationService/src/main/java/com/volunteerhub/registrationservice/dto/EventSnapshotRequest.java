@@ -21,4 +21,5 @@ public class EventSnapshotRequest {
     private LocalDateTime endTime;
     private LocalDateTime registrationDeadline;
     private QrJoinPolicy qrJoinPolicy;
+    private Long completionBadgeId;
 }

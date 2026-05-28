@@ -46,6 +46,9 @@ public class EventSnapshot {
     @Column(name = "registration_deadline")
     private java.time.LocalDateTime registrationDeadline;
 
+    @Column(name = "completion_badge_id")
+    private Long completionBadgeId;
+
     @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(name = "qr_join_policy", nullable = false)

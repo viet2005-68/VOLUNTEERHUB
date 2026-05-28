@@ -91,6 +91,9 @@ public class UserEventMapper {
                 .status(userEvent.getStatus())
                 .note(userEvent.getNote())
                 .completedAt(userEvent.getCompletedAt())
+                .completionBadgeId(userEvent.getEventSnapshot() == null
+                        ? null
+                        : userEvent.getEventSnapshot().getCompletionBadgeId())
                 .build();
     }
 

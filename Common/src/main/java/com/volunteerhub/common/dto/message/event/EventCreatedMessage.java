@@ -23,4 +23,5 @@ public class EventCreatedMessage implements EventMessage {
     private LocalDateTime registrationDeadline;
     private int capacity;
     private QrJoinPolicy qrJoinPolicy;
+    private Long completionBadgeId;
 }

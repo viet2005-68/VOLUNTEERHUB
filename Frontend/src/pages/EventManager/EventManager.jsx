@@ -29,6 +29,7 @@ import MobileManageCard from "../../components/Project/MobileManageCard";
 import { useNavigate } from "react-router-dom";
 import { useProvinces, useDistricts } from "../../hook/useVietnamLocations";
 import { showSuccess } from "../../utils/confirmDialog";
+import { BADGE_OPTIONS } from "../../constant/badgeCatalog";
 
 const PAGE_SIZE = 6;
 
@@ -203,6 +204,9 @@ function EventManager() {
         street: editEventData.address?.street || "",
         district: editEventData.address?.district || "",
         province: editEventData.address?.province || "",
+        completionBadgeId: editEventData.completionBadgeId
+          ? String(editEventData.completionBadgeId)
+          : "",
         status: editEventData.status || "",
       });
       setIsInitialLoad(true); // Mark as initial load
@@ -276,6 +280,9 @@ function EventManager() {
       startTime: editData.startTime,
       endTime: editData.endTime,
       capacity: parseInt(editData.capacity),
+      completionBadgeId: editData.completionBadgeId
+        ? Number(editData.completionBadgeId)
+        : undefined,
       registrationDeadline: editData.registrationDeadline,
       address: {
         street: editData.street,
@@ -598,6 +605,22 @@ function EventManager() {
                           {editData.status}
                         </span>
                       </div>
+                    </div>
+
+                    {/* Completion Badge */}
+                    <div className="flex flex-col gap-2">
+                      <label className="font-semibold text-gray-900">
+                        Completion Badge
+                      </label>
+                      <DropdownSelect
+                        value={editData.completionBadgeId || ""}
+                        onChange={(value) =>
+                          handleInputChange("completionBadgeId", value)
+                        }
+                        options={BADGE_OPTIONS}
+                        placeholder="Select badge awarded on completion"
+                        className="w-full"
+                      />
                     </div>
 
                     {/* Description */}

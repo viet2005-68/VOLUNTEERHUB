@@ -15,6 +15,7 @@ import { useOutletContext } from "react-router-dom";
 import eventSchema from "../../validation/eventSchema";
 import { useProvinces, useDistricts } from "../../hook/useVietnamLocations";
 import JoinQrPanel from "./JoinQrPanel";
+import { BADGE_CATALOG, BADGE_OPTIONS } from "../../constant/badgeCatalog";
 
 const categoryOptions = [
   { value: "health", label: "Health" },
@@ -102,6 +103,9 @@ function OverviewEventManager() {
         street: eventData.address?.street || "",
         district: eventData.address?.district || "",
         province: eventData.address?.province || "",
+        completionBadgeId: eventData.completionBadgeId
+          ? String(eventData.completionBadgeId)
+          : "",
       });
     }
   }, [eventData, editData]);
@@ -181,6 +185,9 @@ function OverviewEventManager() {
         street: eventData.address?.street || "",
         district: eventData.address?.district || "",
         province: eventData.address?.province || "",
+        completionBadgeId: eventData.completionBadgeId
+          ? String(eventData.completionBadgeId)
+          : "",
       });
     }
   };
@@ -202,6 +209,7 @@ function OverviewEventManager() {
       startTime: editData.startTime ? new Date(editData.startTime) : null,
       endTime: editData.endTime ? new Date(editData.endTime) : null,
       capacity: editData.capacity ? parseInt(editData.capacity) : "",
+      completionBadgeId: editData.completionBadgeId,
       registrationDeadline: editData.registrationDeadline
         ? new Date(editData.registrationDeadline)
         : null,
@@ -235,6 +243,9 @@ function OverviewEventManager() {
       startTime: editData.startTime,
       endTime: editData.endTime,
       capacity: parseInt(editData.capacity),
+      completionBadgeId: editData.completionBadgeId
+        ? Number(editData.completionBadgeId)
+        : undefined,
       registrationDeadline: editData.registrationDeadline,
       address: {
         street: editData.street,
@@ -415,6 +426,30 @@ function OverviewEventManager() {
                       <span className="px-3 py-1 bg-deep-forest/10 text-deep-forest rounded-full text-sm font-semibold">
                         {eventData.category?.name}
                       </span>
+                    </dd>
+                  )}
+                </div>
+
+                {/* Completion Badge */}
+                <div className="rounded-lg border border-deep-forest/10 bg-white p-4 shadow-sm">
+                  <dt className="text-xs font-bold uppercase leading-[1] text-deep-forest/55 mb-2">
+                    Completion Badge
+                  </dt>
+                  {isEditMode ? (
+                    <DropdownSelect
+                      value={editData?.completionBadgeId || ""}
+                      onChange={(value) =>
+                        handleInputChange("completionBadgeId", value)
+                      }
+                      options={BADGE_OPTIONS}
+                      placeholder="Select badge awarded on completion"
+                      className="w-full"
+                    />
+                  ) : (
+                    <dd className="text-base font-medium text-deep-forest">
+                      {BADGE_CATALOG.find(
+                        (badge) => badge.id === Number(eventData.completionBadgeId)
+                      )?.title || "No badge selected"}
                     </dd>
                   )}
                 </div>

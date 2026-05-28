@@ -15,10 +15,18 @@ public class RabbitMQConfig {
 
     public static final String NOTIFICATION_EXCHANGE = "user-notification-exchange";
     public static final String NOTIFICATION_USER_ROUTING_KEY = "user-notification.user";
+    public static final String REGISTRATION_EXCHANGE = "notification-exchange";
+    public static final String REGISTRATION_QUEUE = "user-registration-queue";
+    public static final String REGISTRATION_ROUTING_KEY = "notification.registration";
 
     @Bean
     public TopicExchange notificationExchange() {
         return new TopicExchange(NOTIFICATION_EXCHANGE);
+    }
+
+    @Bean
+    public TopicExchange registrationExchange() {
+        return new TopicExchange(REGISTRATION_EXCHANGE);
     }
 
     @Bean
@@ -27,10 +35,22 @@ public class RabbitMQConfig {
     }
 
     @Bean
+    public Queue registrationQueue() {
+        return new Queue(REGISTRATION_QUEUE);
+    }
+
+    @Bean
     public Binding binding(TopicExchange notificationExchange, Queue notificationQueue) {
         return BindingBuilder.bind(notificationQueue)
                 .to(notificationExchange)
                 .with(NOTIFICATION_USER_ROUTING_KEY);
+    }
+
+    @Bean
+    public Binding registrationBinding(TopicExchange registrationExchange, Queue registrationQueue) {
+        return BindingBuilder.bind(registrationQueue)
+                .to(registrationExchange)
+                .with(REGISTRATION_ROUTING_KEY);
     }
 
     @Bean

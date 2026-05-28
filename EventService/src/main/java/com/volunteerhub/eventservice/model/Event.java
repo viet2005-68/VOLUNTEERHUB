@@ -83,6 +83,9 @@ public class Event {
     @Column(name = "qr_join_policy", nullable = false)
     private QrJoinPolicy qrJoinPolicy = QrJoinPolicy.REQUIRE_APPROVAL;
 
+    @Column(name = "completion_badge_id")
+    private Long completionBadgeId;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;

@@ -34,6 +34,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class EventService {
+    private static final Long DEFAULT_COMPLETION_BADGE_ID = 8L;
 
     private final EventRepository eventRepository;
     private final CategoryService categoryService;
@@ -114,6 +115,9 @@ public class EventService {
                 .qrJoinPolicy(eventRequest.getQrJoinPolicy() == null
                         ? QrJoinPolicy.REQUIRE_APPROVAL
                         : eventRequest.getQrJoinPolicy())
+                .completionBadgeId(eventRequest.getCompletionBadgeId() == null
+                        ? DEFAULT_COMPLETION_BADGE_ID
+                        : eventRequest.getCompletionBadgeId())
                 .build();
 
         Event savedEvent = eventRepository.save(event);
@@ -191,6 +195,10 @@ public class EventService {
         if (eventRequest.getQrJoinPolicy() != null) {
             event.setQrJoinPolicy(eventRequest.getQrJoinPolicy());
             updatedFields.put("qr_join_policy", eventRequest.getQrJoinPolicy().name());
+        }
+        if (eventRequest.getCompletionBadgeId() != null) {
+            event.setCompletionBadgeId(eventRequest.getCompletionBadgeId());
+            updatedFields.put("completion_badge_id", eventRequest.getCompletionBadgeId());
         }
         Event savedEvent = eventRepository.save(event);
         eventPublisher.publishEvent(eventMapper.toUpdatedMessage(savedEvent, updatedFields));

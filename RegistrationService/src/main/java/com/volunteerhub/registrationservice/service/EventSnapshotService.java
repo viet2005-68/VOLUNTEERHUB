@@ -33,6 +33,7 @@ public class EventSnapshotService {
                 .startTime(eventSnapshotRequest.getStartTime())
                 .endTime(eventSnapshotRequest.getEndTime())
                 .registrationDeadline(eventSnapshotRequest.getRegistrationDeadline())
+                .completionBadgeId(eventSnapshotRequest.getCompletionBadgeId())
                 .qrJoinPolicy(eventSnapshotRequest.getQrJoinPolicy() == null
                         ? QrJoinPolicy.REQUIRE_APPROVAL
                         : eventSnapshotRequest.getQrJoinPolicy())
@@ -65,6 +66,9 @@ public class EventSnapshotService {
         }
         if (eventSnapshotRequest.getRegistrationDeadline() != null) {
             eventSnapshot.setRegistrationDeadline(eventSnapshotRequest.getRegistrationDeadline());
+        }
+        if (eventSnapshotRequest.getCompletionBadgeId() != null) {
+            eventSnapshot.setCompletionBadgeId(eventSnapshotRequest.getCompletionBadgeId());
         }
         if (eventSnapshotRequest.getQrJoinPolicy() != null) {
             eventSnapshot.setQrJoinPolicy(eventSnapshotRequest.getQrJoinPolicy());

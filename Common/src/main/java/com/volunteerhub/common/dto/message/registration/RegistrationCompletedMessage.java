@@ -17,4 +17,5 @@ public class RegistrationCompletedMessage implements RegistrationMessage{
     private UserEventStatus status;
     private String note;
     private LocalDateTime completedAt;
+    private Long completionBadgeId;
 }
