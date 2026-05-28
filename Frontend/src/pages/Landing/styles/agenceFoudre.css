@@ -654,8 +654,8 @@
   position: relative;
   z-index: 2;
   min-height: 40px;
-  background: var(--foudre-peach);
-  color: var(--foudre-green);
+  background: var(--foudre-pink);
+  color: var(--foudre-cream);
   font-size: 13px;
 }
 

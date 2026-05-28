@@ -1,5 +1,4 @@
 import React from "react";
-import { FcGoogle } from "react-icons/fc";
 import { FaHeart } from "react-icons/fa6";
 import { bannerlogin } from "../../assets/Login/index";
 import { useState } from "react";
@@ -16,10 +15,10 @@ function Login() {
     }
   };
   return (
-    <div className="bg-linear-to-br from-pink-100 via-white to-amber-50 flex flex-row items-center justify-center min-h-dvh max-md:flex-col relative">
+    <div className="relative flex min-h-dvh flex-row items-center justify-center bg-pale-canvas text-deep-forest max-md:flex-col">
       <div className="flex flex-row items-end justify-center gap-auto max-md:flex-col w-[100%] max-w-5xl max-md:items-center max-md:w-full min-w-[80%] mx-5">
         <div className="flex flex-col items-center justify-center gap-6 flex-2 p-6">
-          <FaHeart className="text-red-300 min-h-20 text-7xl max-md:4xl animate-bounce" />
+          <FaHeart className="min-h-20 animate-bounce text-7xl text-foudre-pink max-md:4xl" />
           <div className="text-center text-2xl font-serif flex flex-col justify-center max-md:text-xl gap-3">
             <p>Wellcome to VolunteerHub</p>
             <p>Connecting Hearts - Spreading Kindness</p>
@@ -32,7 +31,7 @@ function Login() {
             />
           </div>
         </div>
-        <div className="flex flex-col justify-center items-center flex-1 p-8  w-full bg-white/70 backdrop-blur-md rounded-3xl shadow-lg max-md:bg-white/30 max-md:backdrop-blur-xl max-md:shadow-sm max-md:border max-md:border-white/30">
+        <div className="flex w-full flex-1 flex-col items-center justify-center rounded-[20px] border border-deep-forest/10 bg-ash-whisper p-8 shadow-lg backdrop-blur-md max-md:border-ash-whisper max-md:bg-ash-whisper/80 max-md:shadow-sm max-md:backdrop-blur-xl">
           {getStatus()}
         </div>
       </div>
