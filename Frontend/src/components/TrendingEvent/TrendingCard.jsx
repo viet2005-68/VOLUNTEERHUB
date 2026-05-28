@@ -1,4 +1,3 @@
-import React from "react";
 import Card from "../Card.jsx/Card";
 import { FaArrowTrendUp } from "react-icons/fa6";
 import { Eye, Users, MessageSquare, ThumbsUp, FileText } from "lucide-react";
@@ -33,7 +32,7 @@ function TrendingCard({ items }) {
   const trendPercentage = Math.round(maxGrowth);
 
   const handleViewClick = () => {
-    navigate(`opportunities/overview/${id}`);
+    navigate(`/opportunities/overview/${id}`);
   };
 
   const fallbackInitial = name?.charAt(0)?.toUpperCase() || "E";

@@ -263,7 +263,11 @@ function EventManagerCardAd({ data }) {
 
             {/* View button - always visible */}
             <button
-              onClick={() => navigate(`/opportunities/overview/${id}`)}
+              onClick={() => {
+                console.log("Admin navigating to event detail, ID:", id);
+                // Force navigation to bypass potential routing conflicts
+                window.location.href = `/opportunities/overview/${id}`;
+              }}
               disabled={isUpdating || isDeleting}
               className="rounded-[10px] p-2 text-deep-forest transition-colors hover:bg-ash-whisper disabled:cursor-not-allowed disabled:opacity-50"
               title="View Details"
