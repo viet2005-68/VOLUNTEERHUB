@@ -6,23 +6,10 @@ import Skeleton from "@mui/material/Skeleton";
 import Card from "../Card.jsx/Card";
 import { BellOff } from "lucide-react";
 
-function UpcomingEvents() {
+function UpcomingEvents({ className = "" }) {
   const queryParams = { pageSize: 3, sortedBy: "date", order: "desc" };
   const { data, isLoading, isError, isFetching } =
     useUpcomingApprovedRegistrations(queryParams);
-
-  React.useEffect(() => {
-    console.log("[UpcomingEvents] query params:", queryParams);
-    console.log("[UpcomingEvents] raw data:", data);
-    console.log(
-      "[UpcomingEvents] isLoading:",
-      isLoading,
-      "isError:",
-      isError,
-      "isFetching:",
-      isFetching
-    );
-  }, [data, isLoading, isError, isFetching]);
 
   const items = Array.isArray(data)
     ? data
@@ -32,8 +19,6 @@ function UpcomingEvents() {
     ? data.data
     : [];
 
-  console.log("[UpcomingEvents] items:", items);
-
   const cards = items
     .slice()
     .sort((a, b) => {
@@ -42,8 +27,6 @@ function UpcomingEvents() {
       return db - da; // desc
     })
     .slice(0, 3);
-
-  console.log("[UpcomingEvents] cards:", cards);
 
   const SkeletonUpcomingCard = () => (
     <div>
@@ -77,7 +60,7 @@ function UpcomingEvents() {
   );
 
   return (
-    <div className="h-full">
+    <div className={`h-full ${className}`.trim()}>
       <ModalActivity
         title="What's Coming Up"
         subtile="Approved and scheduled to happen soon"

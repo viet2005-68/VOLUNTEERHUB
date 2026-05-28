@@ -13,7 +13,6 @@ function TrendingCard({ items }) {
     name,
     category,
     imageUrl,
-    registrationCount = 0,
     participantCount = 0,
     registrationGrowth = 0,
     participantGrowth = 0,
@@ -42,8 +41,8 @@ function TrendingCard({ items }) {
   return (
     <div className="rounded-2xl">
       <Card className="group border-2 border-ash-whisper bg-pale-canvas shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-bubblegum-blush hover:shadow-md">
-        <div className="flex flex-row gap-4 items-center justify-between">
-          <div className="h-20 w-28 flex-shrink-0 overflow-hidden rounded-2xl border border-ash-whisper bg-ash-whisper">
+        <div className="grid items-center gap-4 md:grid-cols-[112px_minmax(0,1fr)_56px]">
+          <div className="h-[80px] w-full overflow-hidden rounded-2xl border border-ash-whisper bg-ash-whisper max-md:h-[160px]">
             {imageUrl ? (
               <img
                 src={imageUrl}
@@ -57,13 +56,13 @@ function TrendingCard({ items }) {
               </div>
             )}
           </div>
-          <div className="flex min-w-0 flex-1 flex-col gap-2">
+          <div className="flex min-w-0 flex-col gap-2">
             <div className="flex flex-row justify-between gap-3 items-start">
               <div className="min-w-0">
-                <p className="text-sm font-bold text-deep-forest md:text-base line-clamp-2">
+                <p className="text-base font-bold leading-[1.15] text-deep-forest line-clamp-2">
                   {name}
                 </p>
-                <div className="mt-1 text-xs md:text-sm font-semibold text-deep-forest/60">
+                <div className="mt-1 text-sm font-bold leading-[1.15] text-deep-forest/60">
                   {category?.name || "Uncategorized"}
                 </div>
               </div>
@@ -74,11 +73,11 @@ function TrendingCard({ items }) {
                 </div>
               )}
             </div>
-            <div className="grid grid-cols-2 gap-3 md:grid-cols-4 text-xs md:text-sm mt-1">
-              <div className="rounded-xl bg-ash-whisper/70 px-3 py-2 text-deep-forest">
+            <div className="grid grid-cols-1 gap-3 text-sm sm:grid-cols-2 xl:grid-cols-4 mt-1">
+              <div className="min-w-0 rounded-xl bg-ash-whisper/70 px-3 py-2 text-deep-forest">
                 <div className="flex items-center gap-1.5 mb-1 text-deep-forest/65">
                   <Users className="h-3.5 w-3.5" />
-                  <p>Participants</p>
+                  <p className="truncate">Participants</p>
                 </div>
                 <p className="text-deep-forest font-bold">
                   {participantCount}/{capacity || "∞"}
@@ -89,28 +88,28 @@ function TrendingCard({ items }) {
                   )}
                 </p>
               </div>
-              <div className="rounded-xl bg-ash-whisper/70 px-3 py-2 text-deep-forest">
+              <div className="min-w-0 rounded-xl bg-ash-whisper/70 px-3 py-2 text-deep-forest">
                 <div className="flex items-center gap-1.5 mb-1 text-deep-forest/65">
                   <FileText className="h-3.5 w-3.5" />
-                  <p>Posts</p>
+                  <p className="truncate">Posts</p>
                 </div>
                 <p className="text-deep-forest font-bold">
                   {postGrowth > 0 ? `+${postGrowth}` : postGrowth}
                 </p>
               </div>
-              <div className="rounded-xl bg-ash-whisper/70 px-3 py-2 text-deep-forest">
+              <div className="min-w-0 rounded-xl bg-ash-whisper/70 px-3 py-2 text-deep-forest">
                 <div className="flex items-center gap-1.5 mb-1 text-deep-forest/65">
                   <ThumbsUp className="h-3.5 w-3.5" />
-                  <p>Reactions</p>
+                  <p className="truncate">Reactions</p>
                 </div>
                 <p className="text-deep-forest font-bold">
                   {reactionGrowth > 0 ? `+${reactionGrowth}` : reactionGrowth}
                 </p>
               </div>
-              <div className="rounded-xl bg-ash-whisper/70 px-3 py-2 text-deep-forest">
+              <div className="min-w-0 rounded-xl bg-ash-whisper/70 px-3 py-2 text-deep-forest">
                 <div className="flex items-center gap-1.5 mb-1 text-deep-forest/65">
                   <MessageSquare className="h-3.5 w-3.5" />
-                  <p>Comments</p>
+                  <p className="truncate">Comments</p>
                 </div>
                 <p className="text-deep-forest font-bold">
                   {commentGrowth > 0 ? `+${commentGrowth}` : commentGrowth}
@@ -120,7 +119,7 @@ function TrendingCard({ items }) {
           </div>
           <button
             onClick={handleViewClick}
-            className="rounded-xl border border-ash-whisper bg-ash-whisper/70 p-3 md:ml-6 hover:bg-bubblegum-blush transition cursor-pointer"
+            className="flex h-[56px] w-[56px] items-center justify-center rounded-xl border border-ash-whisper bg-ash-whisper/70 hover:bg-bubblegum-blush transition cursor-pointer max-md:justify-self-end"
             aria-label={`View ${name}`}
           >
             <Eye className="w-5 h-5 text-deep-forest" />
