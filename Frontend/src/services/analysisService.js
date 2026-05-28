@@ -194,7 +194,10 @@ const AnalysisService = {
     exportAllUsersJson: async () => {
         try {
             const response = await axiosClient.get(
-                `/v1/aggregated/export/users?format=json`
+                `/v1/aggregated/export/users`,
+                {
+                    params: { format: "json" },
+                }
             );
             return response;
         } catch (error) {
@@ -206,11 +209,11 @@ const AnalysisService = {
     // Export all users (CSV format)
     exportAllUsersCsv: async () => {
         try {
-            const response = await axiosClient.post(
-                `/v1/analytics/export/users`,
-                null,
+            const response = await axiosClient.get(
+                `/v1/aggregated/export/users`,
                 {
-                    responseType: 'blob',
+                    params: { format: "csv" },
+                    responseType: "blob",
                 }
             );
             return response;

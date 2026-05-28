@@ -21,6 +21,7 @@ export default function ReactionButton({
   const [hoverIndex, setHoverIndex] = useState(-1);
   const holderRef = useRef(null);
   const barRef = useRef(null);
+  const popupRef = useRef(null);
   const pressTimer = useRef(null);
   const hideTimer = useRef(null);
 
@@ -124,8 +125,8 @@ export default function ReactionButton({
   const onMouseLeave = (e) => {
     clearTimeout(hoverTimer.current);
     const nextTarget = e.relatedTarget;
-    const barEl = barRef.current;
-    if (barEl && nextTarget && barEl.contains(nextTarget)) {
+    const popupEl = popupRef.current;
+    if (popupEl && nextTarget && popupEl.contains(nextTarget)) {
       return;
     }
     closeBarSoon();
@@ -169,14 +170,21 @@ export default function ReactionButton({
       {/* Reaction popup */}
       {showBar && (
         <div
-          ref={barRef}
-          className="absolute bottom-full mb-3 left-0 select-none z-100"
+          ref={popupRef}
+          className="absolute bottom-[calc(100%+18px)] left-0 z-[100] select-none"
           onPointerEnter={onBarPointerEnter}
-          onPointerMove={onBarPointerMove}
           onPointerLeave={onBarPointerLeave}
-          onPointerUp={onBarPointerUp}
         >
-          <div className="bg-pale-canvas rounded-3xl px-2 py-3 shadow-2xl border border-ash-whisper flex items-center gap-3">
+          <div
+            aria-hidden="true"
+            className="absolute -bottom-[18px] left-0 right-0 h-[18px]"
+          />
+          <div
+            ref={barRef}
+            className="bg-pale-canvas rounded-3xl px-2 py-3 shadow-2xl border border-ash-whisper flex items-center gap-3"
+            onPointerMove={onBarPointerMove}
+            onPointerUp={onBarPointerUp}
+          >
             {REACTIONS.map((r, i) => {
               const isHover = i === hoverIndex;
               return (
@@ -201,7 +209,7 @@ export default function ReactionButton({
         ref={holderRef}
         role="button"
         tabIndex={0}
-        className={`inline-flex items-center gap-3 px-5 py-2.5 rounded-lg transition-all duration-200 ${
+        className={`inline-flex min-h-[48px] items-center gap-3 rounded-[10px] px-5 py-2.5 transition-all duration-200 ${
           current
             ? "bg-ash-whisper text-deep-forest shadow-sm"
             : "bg-pale-canvas hover:bg-ash-whisper text-deep-forest/75 hover:text-deep-forest"

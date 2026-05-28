@@ -1,13 +1,13 @@
 import { useState, useRef } from "react";
-import { Camera, Smile, Tag, Heart, Loader2, X } from "lucide-react";
+import { Camera, Loader2, X } from "lucide-react";
 import { useCreatePost } from "../../hook/useCommunity";
-import toast from "react-hot-toast";
 
 const CreatPost = ({ user, onCreate, eventId }) => {
   const [text, setText] = useState("");
   const [images, setImages] = useState([]); // {file, url}
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef(null);
+  const textareaRef = useRef(null);
 
   const { mutate: createPost, isLoading, isPending } = useCreatePost(eventId);
   const loading = isLoading || isPending;
@@ -56,6 +56,15 @@ const CreatPost = ({ user, onCreate, eventId }) => {
     images.forEach((img) => img?.url && URL.revokeObjectURL(img.url));
     setImages([]);
     if (fileInputRef.current) fileInputRef.current.value = null;
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "";
+    }
+  };
+
+  const handleTextChange = (e) => {
+    setText(e.target.value);
+    e.target.style.height = "auto";
+    e.target.style.height = `${Math.min(e.target.scrollHeight, 260)}px`;
   };
 
   const handleSubmit = () => {
@@ -81,10 +90,6 @@ const CreatPost = ({ user, onCreate, eventId }) => {
           }
           resetForm();
         },
-        onError: () => {
-          // Error and try again
-          toast.error("Error when create post. Please try again.");
-        },
       }
     );
   };
@@ -101,11 +106,12 @@ const CreatPost = ({ user, onCreate, eventId }) => {
       >
         <div className="flex-1 px-5 py-5">
           <textarea
+            ref={textareaRef}
             value={text}
-            onChange={(e) => setText(e.target.value)}
+            onChange={handleTextChange}
             placeholder="Enter your post content..."
-            className="w-full resize-none rounded-xl border-2 border-bubblegum-blush bg-pale-canvas p-3 text-deep-forest placeholder-deep-forest/45 focus:outline-none focus:border-foudre-pink"
-            rows={3}
+            className="max-h-[260px] min-h-[156px] w-full resize-none overflow-y-auto rounded-xl border-2 border-bubblegum-blush bg-pale-canvas px-5 py-4 text-base font-medium leading-[1.45] text-deep-forest placeholder-deep-forest/45 focus:border-foudre-pink focus:outline-none"
+            rows={6}
           />
 
           {images.length > 0 && (
