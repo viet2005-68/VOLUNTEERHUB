@@ -17,25 +17,53 @@ const actionsClass = "mt-6 flex w-full items-center justify-center gap-3";
 const cancelButtonClass =
     "inline-flex min-h-[44px] items-center justify-center rounded-[10px] border-2 border-deep-forest/15 bg-pale-canvas px-5 py-3 text-sm font-bold text-deep-forest transition-colors hover:border-deep-forest hover:bg-ash-whisper focus:outline-none";
 
-const applyCompactDialogStyles = (popup) => {
+const dialogTones = {
+    default: {
+        icon: "#00522d",
+        confirmBg: "#00522d",
+        confirmHover: "#003f23",
+    },
+    approve: {
+        icon: "#00522d",
+        confirmBg: "#00522d",
+        confirmHover: "#003f23",
+    },
+    danger: {
+        icon: "#db3c8a",
+        confirmBg: "#db3c8a",
+        confirmHover: "#00522d",
+    },
+    warning: {
+        icon: "#00522d",
+        confirmBg: "#00522d",
+        confirmHover: "#db3c8a",
+    },
+};
+
+const applyCompactDialogStyles = (popup, tone = "default") => {
     if (!popup) return;
 
+    const colors = dialogTones[tone] || dialogTones.default;
     const icon = popup.querySelector(".swal2-icon");
     const iconContent = popup.querySelector(".swal2-icon-content");
     const title = popup.querySelector(".swal2-title");
     const htmlContainer = popup.querySelector(".swal2-html-container");
     const actions = popup.querySelector(".swal2-actions");
+    const confirmButton = popup.querySelector(".swal2-confirm");
+    const cancelButton = popup.querySelector(".swal2-cancel");
 
     if (icon) {
-        icon.style.width = "56px";
-        icon.style.height = "56px";
-        icon.style.minWidth = "56px";
+        icon.style.width = "52px";
+        icon.style.height = "52px";
+        icon.style.minWidth = "52px";
         icon.style.margin = "0 auto";
-        icon.style.fontSize = "30px";
+        icon.style.fontSize = "26px";
+        icon.style.borderColor = colors.icon;
+        icon.style.color = colors.icon;
     }
 
     if (iconContent) {
-        iconContent.style.fontSize = "42px";
+        iconContent.style.fontSize = "36px";
         iconContent.style.lineHeight = "1";
     }
 
@@ -55,6 +83,26 @@ const applyCompactDialogStyles = (popup) => {
 
     if (actions) {
         actions.style.margin = "24px 0 0";
+    }
+
+    if (confirmButton) {
+        confirmButton.style.backgroundColor = colors.confirmBg;
+        confirmButton.style.border = `2px solid ${colors.confirmBg}`;
+        confirmButton.style.boxShadow = "none";
+        confirmButton.onmouseenter = () => {
+            confirmButton.style.backgroundColor = colors.confirmHover;
+            confirmButton.style.borderColor = colors.confirmHover;
+        };
+        confirmButton.onmouseleave = () => {
+            confirmButton.style.backgroundColor = colors.confirmBg;
+            confirmButton.style.borderColor = colors.confirmBg;
+        };
+    }
+
+    if (cancelButton) {
+        cancelButton.style.backgroundColor = "#fff8f6";
+        cancelButton.style.border = "2px solid rgba(0, 82, 45, 0.16)";
+        cancelButton.style.boxShadow = "none";
     }
 };
 
@@ -76,20 +124,28 @@ export const showConfirmDialog = async ({
     confirmButtonText = "Confirm",
     cancelButtonText = "Cancel",
     confirmButtonColor = "#3085d6",
+    tone,
 }) => {
-    const isDanger = ["#ef4444", "#d33", "#dc2626"].includes(confirmButtonColor);
-    const confirmButtonClass = isDanger
-        ? "inline-flex min-h-[44px] items-center justify-center rounded-[10px] bg-foudre-pink px-5 py-3 text-sm font-bold text-pale-canvas transition-colors hover:bg-deep-forest focus:outline-none"
-        : "inline-flex min-h-[44px] items-center justify-center rounded-[10px] bg-deep-forest px-5 py-3 text-sm font-bold text-pale-canvas transition-colors hover:bg-foudre-pink focus:outline-none";
+    const dialogTone =
+        tone ||
+        (["#ef4444", "#d33", "#dc2626"].includes(confirmButtonColor)
+            ? "danger"
+            : confirmButtonColor === "#22c55e"
+                ? "approve"
+                : ["#f59e0b", "#f97316"].includes(confirmButtonColor)
+                    ? "warning"
+                    : "default");
+    const confirmButtonClass =
+        "inline-flex min-h-[44px] items-center justify-center rounded-[10px] px-5 py-3 text-sm font-bold text-pale-canvas transition-colors focus:outline-none";
 
     const result = await Swal.fire({
         title,
         text,
         icon,
-        iconColor: isDanger ? "#db3c8a" : "#00522d",
+        iconColor: dialogTones[dialogTone].icon,
         background: "#fff8f6",
         color: "#00522d",
-        width: 420,
+        width: 400,
         showCancelButton: true,
         buttonsStyling: false,
         focusConfirm: false,
@@ -106,7 +162,7 @@ export const showConfirmDialog = async ({
             confirmButton: confirmButtonClass,
             cancelButton: cancelButtonClass,
         },
-        didOpen: applyCompactDialogStyles,
+        didOpen: (popup) => applyCompactDialogStyles(popup, dialogTone),
     });
 
     return result.isConfirmed;
@@ -123,6 +179,7 @@ export const confirmDelete = async (itemName = "this item") => {
         confirmButtonText: "Yes, delete it",
         cancelButtonText: "Cancel",
         confirmButtonColor: "#ef4444",
+        tone: "danger",
     });
 };
 
@@ -137,6 +194,7 @@ export const confirmApprove = async (itemName = "this item") => {
         confirmButtonText: "Yes, approve it",
         cancelButtonText: "Cancel",
         confirmButtonColor: "#22c55e",
+        tone: "approve",
     });
 };
 
@@ -152,6 +210,7 @@ export const confirmCancel = async (itemName = "this event", additionalInfo = ""
         confirmButtonText: "Yes, cancel it",
         cancelButtonText: "No, keep it",
         confirmButtonColor: "#f59e0b",
+        tone: "warning",
     });
 };
 
@@ -166,6 +225,7 @@ export const confirmCloseRegistration = async (eventName = "this event") => {
         confirmButtonText: "Yes, close it",
         cancelButtonText: "Cancel",
         confirmButtonColor: "#f59e0b",
+        tone: "warning",
     });
 };
 
@@ -193,7 +253,7 @@ export const showSuccess = async (title = "Success!", text = "") => {
             confirmButton:
                 "inline-flex min-h-[44px] items-center justify-center rounded-[10px] bg-deep-forest px-6 py-3 text-sm font-bold text-pale-canvas transition-colors hover:bg-foudre-pink focus:outline-none",
         },
-        didOpen: applyCompactDialogStyles,
+        didOpen: (popup) => applyCompactDialogStyles(popup, "default"),
     });
 };
 
@@ -221,6 +281,6 @@ export const showError = async (title = "Error!", text = "") => {
             confirmButton:
                 "inline-flex min-h-[44px] items-center justify-center rounded-[10px] bg-foudre-pink px-6 py-3 text-sm font-bold text-pale-canvas transition-colors hover:bg-deep-forest focus:outline-none",
         },
-        didOpen: applyCompactDialogStyles,
+        didOpen: (popup) => applyCompactDialogStyles(popup, "danger"),
     });
 };

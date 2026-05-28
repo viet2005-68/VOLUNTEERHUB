@@ -88,9 +88,9 @@ function PendingEventAd({ className }) {
           </div>
         )}
         {!isLoading && !isError && cards.length === 0 && (
-          <div className="text-sm text-deep-forest/65 flex flex-col gap-6 mt-5 items-center">
-            <div className="w-12 h-12 mx-auto">
-              <Clock className="w-full h-full text-deep-forest/45" />
+          <div className="mt-6 flex flex-col items-center gap-4 text-sm font-medium text-deep-forest/65">
+            <div className="flex h-14 w-14 items-center justify-center rounded-[14px] bg-ash-whisper text-deep-forest/45">
+              <Clock size={30} strokeWidth={2.25} />
             </div>
             <div>No pending events.</div>
           </div>

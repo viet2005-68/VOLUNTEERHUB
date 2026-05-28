@@ -76,7 +76,8 @@ function EventManagerCardAd({ data }) {
   };
 
   const getProgressPercentage = () => {
-    return Math.round((registered / capacity) * 100);
+    if (!capacity) return 0;
+    return Math.min(Math.round((registered / capacity) * 100), 100);
   };
 
   const handleApproveEvent = async () => {
@@ -165,15 +166,15 @@ function EventManagerCardAd({ data }) {
   return (
     <>
       {/* Desktop View - Table Row */}
-      <tr className="hidden lg:table-row border-b border-gray-200 hover:bg-gray-50 transition-colors">
-        <td className="px-6 py-4">
+      <tr className="hidden lg:table-row border-b border-gray-200 text-sm transition-colors hover:bg-gray-50 last:border-b-0">
+        <td className="px-4 py-4">
           <div className="flex flex-col">
-            <span className="font-semibold text-gray-900">{title}</span>
+            <span className="font-medium text-gray-900">{title}</span>
             <span className="text-sm text-gray-500">{category}</span>
           </div>
         </td>
 
-        <td className="px-6 py-4">
+        <td className="px-4 py-4">
           <div className="flex flex-col text-sm">
             <div className="flex items-center gap-1 text-gray-700">
               <i className="ri-calendar-line"></i>
@@ -186,17 +187,17 @@ function EventManagerCardAd({ data }) {
           </div>
         </td>
 
-        <td className="px-6 py-4">
+        <td className="px-4 py-4">
           <div className="flex items-center gap-2 text-sm text-gray-700">
             <i className="ri-map-pin-fill text-gray-400"></i>
             <span className="max-w-[150px] truncate">{location}</span>
           </div>
         </td>
 
-        <td className="px-6 py-4">
+        <td className="px-4 py-4">
           <div className="flex flex-col gap-2">
             <div className="flex items-center justify-between text-sm">
-              <span className="font-semibold text-gray-700">
+              <span className="font-medium text-gray-700">
                 {registered}/{capacity}
               </span>
             </div>
@@ -215,7 +216,7 @@ function EventManagerCardAd({ data }) {
           </div>
         </td>
 
-        <td className="px-6 py-4">
+        <td className="px-4 py-4">
           <span
             className={`px-3 py-1.5 rounded-lg text-sm font-medium capitalize min-w-[90px] inline-block text-center ${
               isDeleting
@@ -240,7 +241,7 @@ function EventManagerCardAd({ data }) {
           </span>
         </td>
 
-        <td className="px-6 py-4">
+        <td className="px-4 py-4">
           <div className="flex items-center gap-2">
             {/* Approve button - only for PENDING */}
             {currentStatus === EVENT_STATUS.PENDING && (
@@ -249,7 +250,7 @@ function EventManagerCardAd({ data }) {
                 disabled={
                   approveEventMutation.isPending || isUpdating || isDeleting
                 }
-                className="p-2 bg-green-500/90 text-white hover:bg-green-500 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-deep-forest text-white transition-colors hover:bg-green-800 disabled:cursor-not-allowed disabled:opacity-50"
                 title="Approve Event"
               >
                 <CircleCheckBig className="w-4 h-4" />
@@ -260,7 +261,7 @@ function EventManagerCardAd({ data }) {
             <button
               onClick={() => navigate(`/dashboard/eventmanager/${id}`)}
               disabled={isUpdating || isDeleting}
-              className="rounded-lg border border-deep-forest/20 p-2 text-deep-forest transition-colors hover:bg-deep-forest hover:text-pale-canvas disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-gray-300 text-deep-forest transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
               title="View Details"
             >
               <Eye className="h-4 w-4 text-current" />
@@ -272,10 +273,10 @@ function EventManagerCardAd({ data }) {
                 <button
                   onClick={() => setShowExportMenu(!showExportMenu)}
                   disabled={isExporting || isUpdating || isDeleting}
-                  className="p-2 bg-green-500 hover:bg-green-600 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-green-600 text-white transition-colors hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50"
                   title="Export Participants"
                 >
-                  <Download className="w-4 h-4 text-white" />
+                  <Download className="w-4 h-4" />
                 </button>
 
                 {/* Export Dropdown Menu */}
@@ -307,10 +308,10 @@ function EventManagerCardAd({ data }) {
                 disabled={
                   rejectEventMutation.isPending || isUpdating || isDeleting
                 }
-                className="p-2 bg-orange-500 hover:bg-orange-600 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-orange-500 text-white transition-colors hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-50"
                 title="Reject Event"
               >
-                <Ban className="w-4 h-4 text-white" />
+                <Ban className="w-4 h-4" />
               </button>
             )}
 
@@ -321,10 +322,10 @@ function EventManagerCardAd({ data }) {
                 disabled={
                   deleteEventMutation.isPending || isUpdating || isDeleting
                 }
-                className="p-2 bg-red-400 hover:bg-red-500 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-red-500 text-white transition-colors hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-50"
                 title="Delete Event"
               >
-                <Trash2 className="w-4 h-4 text-white" />
+                <Trash2 className="w-4 h-4" />
               </button>
             )}
           </div>

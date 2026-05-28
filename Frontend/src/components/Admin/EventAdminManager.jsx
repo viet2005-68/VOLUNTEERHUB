@@ -57,6 +57,18 @@ function EventAdminManager() {
   // Chọn data source dựa trên mode
   const activeQuery = isSearchMode ? searchQuery : filterQuery;
   const { data, isLoading, isFetching, isError, error } = activeQuery;
+  const events = data?.data || [];
+  const totalElements = data?.meta?.totalElements ?? events.length;
+  const totalPages = data?.meta?.totalPages || 0;
+  const hasExactTotal = data?.meta?.hasExactTotal !== false;
+  const showingStart = events.length > 0 ? page * PAGE_SIZE + 1 : 0;
+  const showingEnd = page * PAGE_SIZE + events.length;
+
+  useEffect(() => {
+    if (!isLoading && !isFetching && data && page > 0 && events.length === 0) {
+      setPage((currentPage) => Math.max(currentPage - 1, 0));
+    }
+  }, [data, events.length, isFetching, isLoading, page]);
 
   // Track first successful
   useEffect(() => {
@@ -137,7 +149,7 @@ function EventAdminManager() {
   }
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow-sm gap-6 flex flex-col">
+    <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm gap-5 sm:gap-6 flex flex-col">
       {/* Header */}
       <div className="flex flex-col gap-2">
         <h2 className="text-2xl font-semibold text-gray-900">
@@ -158,7 +170,7 @@ function EventAdminManager() {
           placeholder="Search events by name..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full pl-[42px] pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full pl-[42px] pr-10 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-deep-forest/15 focus:border-deep-forest"
         />
         {/* Loading indicator for search */}
         {isSearchMode && isFetching && (
@@ -218,26 +230,26 @@ function EventAdminManager() {
           )}
         </div>
       </div>
-      <div className="overflow-x-auto">
-        <table className="w-full">
+      <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white">
+        <table className="w-full text-left text-sm">
           <thead className="max-lg:hidden">
             <tr className="border-b border-gray-200 bg-gray-50">
-              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+              <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
                 Event
               </th>
-              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+              <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
                 Date & Time
               </th>
-              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+              <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
                 Location
               </th>
-              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+              <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
                 Volunteers
               </th>
-              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+              <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
                 Status
               </th>
-              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+              <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
                 Actions
               </th>
             </tr>
@@ -249,15 +261,15 @@ function EventAdminManager() {
                 : "transition-opacity"
             }
           >
-            {data?.data && data.data.length > 0 ? (
-              data.data.map((event) => (
+            {events.length > 0 ? (
+              events.map((event) => (
                 <EventManagerCardAd key={event.id} data={event} />
               ))
             ) : (
               <tr>
                 <td colSpan="6" className="px-6 py-12 text-center">
                   <div className="flex flex-col items-center gap-2">
-                    <p className="text-gray-500">No events found</p>
+                    <p className="text-sm text-gray-500">No events found</p>
                   </div>
                 </td>
               </tr>
@@ -267,27 +279,30 @@ function EventAdminManager() {
       </div>
 
       {/* Pagination */}
-      {data?.data && data.data.length > 0 && (
+      {events.length > 0 && (
         <div className="flex flex-col sm:flex-row items-center justify-between pt-4 border-t border-gray-200 gap-4">
           <p className="text-sm text-gray-500">
-            Showing {data.data.length} of {data.meta?.totalElements || 0} events
+            Showing {showingStart}-{showingEnd}
+            {hasExactTotal ? ` of ${totalElements}` : ""} events
           </p>
-          <Pagination
-            count={data.meta?.totalPages || 0}
-            page={page + 1}
-            onChange={handlePageChange}
-            sx={{
-              "& .MuiPaginationItem-root": {
-                "&.Mui-selected": {
-                  backgroundColor: "#00522d",
-                  color: "#fff8f6",
-                  "&:hover": {
+          {totalPages > 0 && (
+            <Pagination
+              count={totalPages}
+              page={Math.min(page + 1, totalPages)}
+              onChange={handlePageChange}
+              sx={{
+                "& .MuiPaginationItem-root": {
+                  "&.Mui-selected": {
                     backgroundColor: "#00522d",
+                    color: "#fff8f6",
+                    "&:hover": {
+                      backgroundColor: "#00522d",
+                    },
                   },
                 },
-              },
-            }}
-          />
+              }}
+            />
+          )}
         </div>
       )}
     </div>
