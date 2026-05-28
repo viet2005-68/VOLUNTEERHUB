@@ -1,28 +1,29 @@
 import { Search } from "lucide-react";
+import DropdownSelect from "../Dropdown/DropdownSelect";
 
 export default function EventVolunteerRegisterFilter({ filters, setFilters }) {
   return (
-    <div className="flex flex-col sm:flex-row justify-between sm:items-center max-sm:gap-5">
-      <div className="relative">
+    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="relative w-full sm:max-w-md sm:flex-1">
+        <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-deep-forest/45" />
         <input
           type="text"
           placeholder="Find by name..."
-          className="w-full pl-[42px] pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full rounded-[10px] border-2 border-ash-whisper bg-pale-canvas/80 px-4 py-4 pl-[48px] text-sm font-medium leading-[1.2] text-deep-forest placeholder:text-deep-forest/55 focus:border-foudre-pink focus:outline-none"
           value={filters.search}
           onChange={(e) => setFilters({ ...filters, search: e.target.value })}
         />
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
       </div>
-      <div className="flex max-sm:flex-row justify-end gap-5 basis-1/2">
-        <select
-          className="border rounded-2xl p-2 border-gray-600/20 bg-gray-200"
+      <div className="flex items-center justify-end">
+        <DropdownSelect
           value={filters.status}
-          onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-        >
-          <option value="pending">Pending</option>
-
-          <option value="rejected">Reject</option>
-        </select>
+          onChange={(status) => setFilters({ ...filters, status })}
+          options={[
+            { value: "pending", label: "Pending" },
+            { value: "rejected", label: "Reject" },
+          ]}
+          className="w-full sm:w-[160px]"
+        />
       </div>
     </div>
   );

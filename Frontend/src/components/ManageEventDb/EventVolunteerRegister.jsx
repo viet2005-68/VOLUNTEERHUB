@@ -111,35 +111,30 @@ export default function EventVolunteerRegister() {
   };
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow-sm ">
-      <div className={`${selectedReg ? "blur" : ""} flex flex-col gap-5`}>
-        <div className="flex flex-col gap-2">
-          <h3 className="text-2xl font-semibold text-gray-900">
+    <div className="flex flex-col gap-6 rounded-[25px] border border-ash-whisper bg-pale-canvas/90 px-7 pb-7 pt-10 text-deep-forest sm:gap-8 sm:border-2 sm:px-8 sm:pb-8 sm:pt-12 md:px-10 md:pb-10 md:pt-14">
+      <div className={`${selectedReg ? "blur" : ""} flex flex-col gap-6 sm:gap-8`}>
+        <div className="flex flex-col gap-3 pl-1">
+          <h2 className="font-beni text-[56px] font-black uppercase leading-[0.75] text-deep-forest md:text-[80px]">
             Register manager
-          </h3>
-          <p className="text-gray-500">
+          </h2>
+          <p className="text-base font-medium leading-[1.2] text-deep-forest/70">
             Manage all your volunteer registration
           </p>
         </div>
 
-        <div className="">
-          <EventVolunteerRegisterFilter
-            filters={filters}
-            setFilters={setFilters}
-          />
-        </div>
+        <EventVolunteerRegisterFilter filters={filters} setFilters={setFilters} />
 
         {isLoading ? (
-          <div className="text-center py-8 text-gray-500">
+          <div className="py-8 text-center text-sm font-bold leading-[1.2] text-deep-forest/70">
             Loading registrations...
           </div>
         ) : isError ? (
-          <div className="text-center py-8 text-red-500">
+          <div className="py-8 text-center text-sm font-bold leading-[1.2] text-foudre-pink">
             Error loading registrations
           </div>
         ) : (
           <>
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto rounded-[20px] border-2 border-ash-whisper bg-white">
               <RegistrationTableForAd
                 registrations={pagedRegistrations}
                 filters={filters}
@@ -150,8 +145,8 @@ export default function EventVolunteerRegister() {
 
             {/* Pagination */}
             {totalPages > 0 && (
-              <div className="flex flex-col sm:flex-row items-center justify-between pt-4 border-t border-gray-200 gap-4">
-                <p className="text-sm text-gray-500">
+              <div className="flex flex-col items-center justify-between gap-4 border-t border-deep-forest/10 pt-5 sm:flex-row">
+                <p className="text-sm font-medium leading-[1.2] text-deep-forest/70">
                   Showing {pagedRegistrations.length} of {totalElements}{" "}
                   {filters.status} registration(s)
                 </p>
