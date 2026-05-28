@@ -153,6 +153,8 @@
 .split-line-mask {
   display: block;
   overflow: hidden;
+  padding-top: 0.15em;
+  margin-top: -0.15em;
 }
 
 .page-reveal-shell {
@@ -927,6 +929,10 @@
   color: var(--foudre-cream);
 }
 
+.team-copy {
+  margin-bottom: clamp(40px, 8vh, 100px);
+}
+
 .team-card {
   display: grid;
   grid-template-columns: minmax(280px, 0.9fr) minmax(0, 1fr);
@@ -939,7 +945,7 @@
 }
 
 .team-card img {
-  min-height: 520px;
+  min-height: clamp(520px, 65vh, 900px);
   border-radius: 18px;
 }
 

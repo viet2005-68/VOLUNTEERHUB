@@ -1,12 +1,13 @@
 import tinhnguyen from '../../assets/landing/tinhnguyen.jpg'
 import nhatrac from '../../assets/landing/nhatrac.webp'
 import tnv from '../../assets/landing/tnv.png'
-import trongcay from '../../assets/landing/trongcay.jpg'
+import comkitchen from '../../assets/landing/comkitchen.jpeg'
+import nhatractp from "../../assets/landing/nhatractp.jpeg"
 const projects = [
   ['Teach for Tomorrow', 'Education support', tinhnguyen],
-  ['Clean City Day', 'Environment action', nhatrac],
+  ['Clean City Day', 'Environment action', nhatractp],
   ['Green Neighborhood', 'Tree planting', tnv],
-  ['Community Kitchen', 'Care and relief', trongcay],
+  ['Community Kitchen', 'Care and relief', comkitchen],
 ]
 
 function Projects() {
