@@ -484,7 +484,7 @@ function EventManagerCardAd({ data }) {
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      navigate(`/dashboard/eventmanager/${id}`);
+                      navigate(`/opportunities/overview/${id}`);
                     }}
                     disabled={isUpdating || isDeleting}
                     className={`${
