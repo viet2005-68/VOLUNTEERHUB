@@ -6,15 +6,10 @@ const faq = [
   ['What happens after an event?', 'Participation can be reviewed, completions are recorded, and volunteers keep building their impact profile.'],
 ]
 
-const steps = [
-  ['01', 'Your cause', ['Cause', 'Availability']],
-  ['02', 'Your role', ['Skills', 'Location']],
-  ['03', 'Contact', ['Email', 'Message']],
-]
+import gieomam from '../../assets/landing/gieomam.jpeg'
 
 function Contact() {
   const [openFaq, setOpenFaq] = useState(0)
-  const [activeStep, setActiveStep] = useState(0)
 
   return (
     <section id="contact" className="contact-section section-pad">
@@ -32,26 +27,13 @@ function Contact() {
         ))}
       </div>
 
-      <form className="quiz-shell" data-animate onSubmit={(event) => event.preventDefault()}>
-        <div className="quiz-progress">
-          {steps.map(([label], index) => (
-            <button key={label} type="button" className={activeStep === index ? 'is-active' : ''} onClick={() => setActiveStep(index)}>
-              {label}
-            </button>
-          ))}
-        </div>
-        <div className="quiz-step">
-          <p>{steps[activeStep][0]}</p>
-          <h3>{steps[activeStep][1]}</h3>
-          {steps[activeStep][2].map((label) => (
-            <label key={label}>
-              <span>{label}</span>
-              {label === 'Message' ? <textarea rows="4" /> : <input type={label === 'Email' ? 'email' : 'text'} />}
-            </label>
-          ))}
-        </div>
-        <button type="button" className="quiz-submit" onClick={() => setActiveStep((activeStep + 1) % steps.length)}>Continue</button>
-      </form>
+      <div className="quiz-shell" data-animate>
+        <img
+          src={gieomam}
+          alt="Volunteer impact"
+          style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '12px' }}
+        />
+      </div>
     </section>
   )
 }
