@@ -371,33 +371,33 @@ function NotificationCard({ noti }) {
           </p>
         </div>
 
-        <div className="flex min-w-[44px] shrink-0 flex-col items-end gap-2 sm:min-w-[104px]">
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              handleMarkAsRead(noti?.id);
-            }}
-            disabled={markAsReadMutation.isPending}
-            className={`${
-              noti?.isRead ? "hidden" : "text-pale-canvas"
-            } inline-flex h-10 w-10 items-center justify-center rounded-[10px] border border-deep-forest bg-deep-forest font-bold shadow-sm transition-colors hover:bg-foudre-pink disabled:cursor-not-allowed disabled:opacity-50 sm:w-full sm:gap-2 sm:px-3`}
-            title="Mark as read"
-          >
-            <Check className="h-4 w-4" />
-            <span className="hidden sm:inline">
-              {markAsReadMutation.isPending ? "..." : "Read"}
-            </span>
-          </button>
+        <div className="flex w-[44px] shrink-0 flex-col items-end gap-2 sm:w-[112px]">
+          {!noti?.isRead && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleMarkAsRead(noti?.id);
+              }}
+              disabled={markAsReadMutation.isPending}
+              className="inline-flex min-h-[40px] w-[44px] items-center justify-center rounded-[10px] border border-deep-forest bg-deep-forest px-3 py-2 text-pale-canvas font-bold shadow-sm transition-colors hover:bg-foudre-pink disabled:cursor-not-allowed disabled:opacity-50 sm:w-full sm:gap-2"
+              title="Mark as read"
+            >
+              <Check className="h-4 w-4 shrink-0" />
+              <span className="hidden sm:inline">
+                {markAsReadMutation.isPending ? "..." : "Read"}
+              </span>
+            </button>
+          )}
           <button
             onClick={(e) => {
               e.stopPropagation();
               handleDelete(noti?.id);
             }}
             disabled={deleteNotificationMutation.isPending}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-[10px] border border-deep-forest/15 bg-ash-whisper/45 font-bold text-deep-forest transition-colors hover:border-foudre-pink hover:bg-foudre-pink hover:text-pale-canvas disabled:cursor-not-allowed disabled:opacity-50 sm:w-full sm:gap-2 sm:px-3"
+            className="inline-flex min-h-[40px] w-[44px] items-center justify-center rounded-[10px] border border-deep-forest/15 bg-ash-whisper/45 px-3 py-2 font-bold text-deep-forest transition-colors hover:border-foudre-pink hover:bg-foudre-pink hover:text-pale-canvas disabled:cursor-not-allowed disabled:opacity-50 sm:w-full sm:gap-2"
             title="Delete"
           >
-            <Trash className="h-4 w-4" />
+            <Trash className="h-4 w-4 shrink-0" />
             <span className="hidden sm:inline">
               {deleteNotificationMutation.isPending ? "..." : "Delete"}
             </span>

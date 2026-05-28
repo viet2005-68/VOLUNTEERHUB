@@ -3,7 +3,7 @@ import React from "react";
 import { useAuth } from "../../hook/useAuth";
 import { ROLES } from "../../constant/role";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Logo } from "../../assets/img/index";
+import { VolunteerHubIcon } from "../../assets/img/index";
 import DropDown from "../Dropdown/DropDown";
 import DropDownItem from "../Dropdown/DropDownItem";
 import { LOGIN_LINK } from "../../constant/constNavigate";
@@ -48,9 +48,13 @@ export default function NavBar() {
       .join(" ");
   return (
     <div className="flex flex-row justify-between w-full text-deep-forest">
-      <div className="flex items-center -space-x-1">
-        <span className="w-12">
-          <img src={Logo} alt="logo" className="max-h-max" />
+      <div className="flex items-center gap-2">
+        <span className="flex h-[40px] w-[40px] shrink-0 items-center justify-center overflow-hidden rounded-[10px] bg-pale-canvas">
+          <img
+            src={VolunteerHubIcon}
+            alt="VolunteerHub logo"
+            className="h-full w-full object-cover"
+          />
         </span>
         <span className="max-sm:hidden font-beni text-4xl leading-[0.7] text-deep-forest uppercase max-sm:text-3xl">
           VolunteerHub

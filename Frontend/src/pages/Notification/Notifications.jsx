@@ -91,7 +91,7 @@ export default function Notifications() {
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex flex-col gap-2">
           <h3 className="inline-flex items-center gap-3 font-clash-grotesk text-2xl font-bold leading-[1.05] text-deep-forest sm:text-3xl">
-            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[14px] bg-ash-whisper text-deep-forest">
+            <span className="flex h-[48px] w-[48px] shrink-0 items-center justify-center rounded-[14px] bg-ash-whisper text-deep-forest">
               <Bell className="h-6 w-6" />
             </span>
             <span>Notifications</span>
@@ -117,7 +117,7 @@ export default function Notifications() {
           <button
             onClick={handleMarkAllAsRead}
             disabled={markAllReadMutation.isPending || unreadCount === 0}
-            className="flex h-12 items-center gap-2 rounded-[10px] bg-deep-forest px-4 text-sm font-bold text-pale-canvas shadow-sm transition-colors hover:bg-foudre-pink disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-[10px] bg-deep-forest px-4 py-2.5 text-sm font-bold text-pale-canvas shadow-sm transition-colors hover:bg-foudre-pink disabled:cursor-not-allowed disabled:opacity-50"
             title="Mark all as read"
           >
             <CheckCheck className="w-4 h-4" />

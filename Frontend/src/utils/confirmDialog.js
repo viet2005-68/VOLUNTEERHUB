@@ -5,6 +5,18 @@ import Swal from "sweetalert2";
  * Replaces all window.confirm() with a consistent, beautiful modal
  */
 
+const popupClass =
+    "font-clash-grotesk rounded-[24px] border-2 border-ash-whisper bg-pale-canvas px-8 pb-7 pt-6 text-center text-deep-forest shadow-2xl";
+const iconClass =
+    "mx-auto mt-2 !h-[72px] !w-[72px] border-2 text-[40px]";
+const titleClass =
+    "mt-2 text-center font-clash-grotesk text-2xl font-bold normal-case leading-[1.05] text-deep-forest";
+const bodyClass =
+    "mx-auto mt-3 max-w-[390px] text-center text-sm font-medium leading-[1.4] text-deep-forest/70";
+const actionsClass = "mt-7 flex w-full items-center justify-center gap-3";
+const cancelButtonClass =
+    "inline-flex min-h-[44px] items-center justify-center rounded-[10px] border-2 border-deep-forest/15 bg-pale-canvas px-5 py-3 text-sm font-bold text-deep-forest transition-colors hover:border-deep-forest hover:bg-ash-whisper focus:outline-none";
+
 /**
  * Show a confirmation dialog
  * @param {Object} options - Configuration options
@@ -26,8 +38,8 @@ export const showConfirmDialog = async ({
 }) => {
     const isDanger = ["#ef4444", "#d33", "#dc2626"].includes(confirmButtonColor);
     const confirmButtonClass = isDanger
-        ? "rounded-[10px] bg-foudre-pink px-5 py-3 text-sm font-bold text-pale-canvas transition-colors hover:bg-deep-forest focus:outline-none"
-        : "rounded-[10px] bg-deep-forest px-5 py-3 text-sm font-bold text-pale-canvas transition-colors hover:bg-foudre-pink focus:outline-none";
+        ? "inline-flex min-h-[44px] items-center justify-center rounded-[10px] bg-foudre-pink px-5 py-3 text-sm font-bold text-pale-canvas transition-colors hover:bg-deep-forest focus:outline-none"
+        : "inline-flex min-h-[44px] items-center justify-center rounded-[10px] bg-deep-forest px-5 py-3 text-sm font-bold text-pale-canvas transition-colors hover:bg-foudre-pink focus:outline-none";
 
     const result = await Swal.fire({
         title,
@@ -45,17 +57,13 @@ export const showConfirmDialog = async ({
         reverseButtons: true,
         backdrop: "rgba(0, 82, 45, 0.42)",
         customClass: {
-            popup:
-                "rounded-[25px] border-2 border-ash-whisper bg-pale-canvas p-6 shadow-2xl",
-            icon: "mt-3 border-2",
-            title:
-                "font-beni text-[42px] font-black uppercase leading-[0.76] text-deep-forest",
-            htmlContainer:
-                "mx-auto mt-2 max-w-[380px] text-sm font-medium leading-[1.35] text-deep-forest/70",
-            actions: "mt-6 flex items-center justify-center gap-3",
+            popup: popupClass,
+            icon: iconClass,
+            title: titleClass,
+            htmlContainer: bodyClass,
+            actions: actionsClass,
             confirmButton: confirmButtonClass,
-            cancelButton:
-                "rounded-[10px] border-2 border-deep-forest/20 bg-pale-canvas px-5 py-3 text-sm font-bold text-deep-forest transition-colors hover:border-deep-forest hover:bg-ash-whisper focus:outline-none",
+            cancelButton: cancelButtonClass,
         },
     });
 
@@ -135,14 +143,13 @@ export const showSuccess = async (title = "Success!", text = "") => {
         buttonsStyling: false,
         backdrop: "rgba(0, 82, 45, 0.32)",
         customClass: {
-            popup:
-                "rounded-[25px] border-2 border-ash-whisper bg-pale-canvas p-6 shadow-2xl",
-            title:
-                "font-beni text-[42px] font-black uppercase leading-[0.76] text-deep-forest",
-            htmlContainer:
-                "mx-auto mt-2 max-w-[360px] text-sm font-medium leading-[1.35] text-deep-forest/70",
+            popup: popupClass,
+            icon: iconClass,
+            title: titleClass,
+            htmlContainer: bodyClass,
+            actions: actionsClass,
             confirmButton:
-                "rounded-[10px] bg-deep-forest px-6 py-3 text-sm font-bold text-pale-canvas transition-colors hover:bg-foudre-pink focus:outline-none",
+                "inline-flex min-h-[44px] items-center justify-center rounded-[10px] bg-deep-forest px-6 py-3 text-sm font-bold text-pale-canvas transition-colors hover:bg-foudre-pink focus:outline-none",
         },
     });
 };
@@ -163,14 +170,13 @@ export const showError = async (title = "Error!", text = "") => {
         buttonsStyling: false,
         backdrop: "rgba(0, 82, 45, 0.32)",
         customClass: {
-            popup:
-                "rounded-[25px] border-2 border-ash-whisper bg-pale-canvas p-6 shadow-2xl",
-            title:
-                "font-beni text-[42px] font-black uppercase leading-[0.76] text-deep-forest",
-            htmlContainer:
-                "mx-auto mt-2 max-w-[360px] text-sm font-medium leading-[1.35] text-deep-forest/70",
+            popup: popupClass,
+            icon: iconClass,
+            title: titleClass,
+            htmlContainer: bodyClass,
+            actions: actionsClass,
             confirmButton:
-                "rounded-[10px] bg-foudre-pink px-6 py-3 text-sm font-bold text-pale-canvas transition-colors hover:bg-deep-forest focus:outline-none",
+                "inline-flex min-h-[44px] items-center justify-center rounded-[10px] bg-foudre-pink px-6 py-3 text-sm font-bold text-pale-canvas transition-colors hover:bg-deep-forest focus:outline-none",
         },
     });
 };

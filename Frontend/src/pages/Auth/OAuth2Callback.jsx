@@ -398,13 +398,13 @@ export default function OAuth2Callback() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
-      <div className="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full">
+    <div className="flex min-h-screen items-center justify-center bg-pale-canvas px-4 text-deep-forest">
+      <div className="w-full max-w-md rounded-[25px] border-2 border-ash-whisper bg-pale-canvas p-8 text-deep-forest shadow-2xl shadow-deep-forest/10">
         {error ? (
           <div className="text-center">
             <div className="mb-4">
               <svg
-                className="mx-auto h-16 w-16 text-red-500"
+                className="mx-auto h-[64px] w-[64px] text-foudre-pink"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -417,17 +417,21 @@ export default function OAuth2Callback() {
                 />
               </svg>
             </div>
-            <h2 className="mb-2 font-['Beni','Bebas_Neue',Impact,ui-sans-serif] text-[44px] font-black uppercase leading-[0.75] text-[#00522d]">
+            <h2 className="mb-2 font-beni text-[44px] font-black uppercase leading-[0.75] text-deep-forest">
               Authentication Error
             </h2>
-            <p className="text-gray-600 mb-4">{error}</p>
-            <p className="text-sm text-gray-500">Redirecting to login...</p>
+            <p className="mb-4 text-sm font-medium text-deep-forest/70">
+              {error}
+            </p>
+            <p className="text-sm font-bold text-foudre-pink">
+              Redirecting to login...
+            </p>
           </div>
         ) : loading ? (
           <div className="text-center">
             <div className="flex justify-center mb-4">
               <svg
-                className="animate-spin h-16 w-16 text-indigo-600"
+                className="h-[64px] w-[64px] animate-spin text-foudre-pink"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
@@ -447,16 +451,18 @@ export default function OAuth2Callback() {
                 ></path>
               </svg>
             </div>
-            <h2 className="mb-2 font-['Beni','Bebas_Neue',Impact,ui-sans-serif] text-[44px] font-black uppercase leading-[0.75] text-[#00522d]">
+            <h2 className="mb-2 font-beni text-[44px] font-black uppercase leading-[0.75] text-deep-forest">
               Completing sign&nbsp;in...
             </h2>
-            <p className="text-gray-600">Please wait while we log you in</p>
+            <p className="text-sm font-medium text-deep-forest/70">
+              Please wait while we log you in
+            </p>
           </div>
         ) : (
           <div className="text-center">
             <div className="mb-4">
               <svg
-                className="mx-auto h-16 w-16 text-green-500"
+                className="mx-auto h-[64px] w-[64px] text-deep-forest"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -469,10 +475,12 @@ export default function OAuth2Callback() {
                 />
               </svg>
             </div>
-            <h2 className="mb-2 font-['Beni','Bebas_Neue',Impact,ui-sans-serif] text-[44px] font-black uppercase leading-[0.75] text-[#00522d]">
+            <h2 className="mb-2 font-beni text-[44px] font-black uppercase leading-[0.75] text-deep-forest">
               Success!
             </h2>
-            <p className="text-gray-600">Redirecting to dashboard...</p>
+            <p className="text-sm font-medium text-deep-forest/70">
+              Redirecting to dashboard...
+            </p>
           </div>
         )}
       </div>

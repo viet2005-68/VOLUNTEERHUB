@@ -32,7 +32,7 @@ function NotificationList({ items, loadMore, hasMore, isLoading }) {
       {items.length === 0 ? (
         <div className="flex min-h-[280px] items-center justify-center rounded-[20px] border border-deep-forest/10 bg-ash-whisper/25">
           <div className="text-center">
-            <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-pale-canvas text-deep-forest/45 shadow-sm">
+            <div className="mx-auto mb-4 flex h-[80px] w-[80px] items-center justify-center rounded-full bg-pale-canvas text-deep-forest/45 shadow-sm">
               <Bell className="h-10 w-10" />
             </div>
             <p className="text-base font-bold text-deep-forest">
