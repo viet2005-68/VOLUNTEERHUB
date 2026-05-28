@@ -181,7 +181,7 @@ export default function ReactionButton({
           />
           <div
             ref={barRef}
-            className="bg-pale-canvas rounded-3xl px-2 py-3 shadow-2xl border border-ash-whisper flex items-center gap-3"
+            className="flex max-w-[calc(100vw-24px)] items-center gap-[10px] overflow-x-auto rounded-[999px] border border-ash-whisper bg-pale-canvas px-[10px] py-[10px] shadow-2xl sm:gap-[14px] sm:px-[14px]"
             onPointerMove={onBarPointerMove}
             onPointerUp={onBarPointerUp}
           >
@@ -190,13 +190,14 @@ export default function ReactionButton({
               return (
                 <div
                   key={r.key}
-                  className={`w-12 h-12 flex items-center justify-center text-2xl transition-all duration-200 rounded-full ${
+                  title={r.text}
+                  className={`flex h-[48px] w-[48px] shrink-0 items-center justify-center rounded-full text-[30px] leading-none transition-all duration-200 sm:h-[56px] sm:w-[56px] sm:text-[34px] ${
                     isHover
-                      ? "transform -translate-y-3 scale-125 bg-ash-whisper"
+                      ? "translate-y-[-10px] scale-110 bg-ash-whisper"
                       : "hover:bg-ash-whisper/70"
                   }`}
                 >
-                  <span>{r.label}</span>
+                  <span className="block leading-none">{r.label}</span>
                 </div>
               );
             })}

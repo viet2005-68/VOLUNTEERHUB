@@ -116,10 +116,16 @@ export default function CommentItem({
           isOwnComment ? "bg-ash-whisper/70" : "bg-pale-canvas"
         }`}
       >
-        <div className="flex gap-2">
+        <div className="flex gap-3">
           {/* Avatar */}
           <div className="flex-shrink-0">
-            <div className="w-8 h-8 overflow-hidden rounded-full bg-ash-whisper border border-bubblegum-blush flex items-center justify-center text-deep-forest text-xs font-semibold">
+            <div
+              className={`overflow-hidden rounded-full bg-ash-whisper border-2 border-bubblegum-blush flex items-center justify-center text-deep-forest font-semibold ${
+                isReply
+                  ? "h-[38px] w-[38px] text-sm"
+                  : "h-[46px] w-[46px] text-base"
+              }`}
+            >
               {comment.avatarUrl && !avatarFailed ? (
                 <img
                   src={comment.avatarUrl}
@@ -206,10 +212,10 @@ export default function CommentItem({
                 onSubmit={handleReplySubmit}
                 className="lg:mt-5 mt-2 flex gap-2 items-center relative py-0"
               >
-                <div className="w-6 h-6 rounded-full bg-deep-forest flex items-center justify-center text-white text-xs font-semibold flex-shrink-0 absolute -left-0 top-2">
+                <div className="h-[34px] w-[34px] rounded-full bg-deep-forest flex items-center justify-center text-white text-sm font-semibold flex-shrink-0 absolute left-0 top-2">
                   {(currentUserName && currentUserName[0]) || "?"}
                 </div>
-                <div className="flex-1 flex gap-2 bg-ash-whisper rounded-xl px-2 py-2 pl-8 pr-5 pb-5">
+                <div className="flex-1 flex gap-2 bg-ash-whisper rounded-xl px-2 py-2 pl-10 pr-5 pb-5">
                   <textarea
                     type="text"
                     value={replyText}

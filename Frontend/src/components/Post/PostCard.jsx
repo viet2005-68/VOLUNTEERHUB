@@ -183,7 +183,7 @@ export default function PostCard({
     <article className="rounded-[20px] shadow-sm p-6 mb-6 bg-pale-canvas border-2 border-ash-whisper">
       <header className="flex items-center justify-between">
         <div className="flex min-w-0 items-center gap-4">
-          <div className="w-14 h-14 shrink-0 overflow-hidden rounded-full border-2 border-bubblegum-blush bg-ash-whisper flex items-center justify-center font-bold text-deep-forest text-lg shadow-sm">
+          <div className="h-[72px] w-[72px] shrink-0 overflow-hidden rounded-full border-[3px] border-bubblegum-blush bg-ash-whisper flex items-center justify-center font-bold text-deep-forest text-2xl shadow-sm">
             {post.author.avatarUrl && !avatarFailed ? (
               <img
                 src={post.author.avatarUrl}

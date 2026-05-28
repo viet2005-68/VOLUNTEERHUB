@@ -148,7 +148,7 @@ export default function PostModal({
                 </div>
                 <div className="flex items-center gap-2 flex-row">
                   <div className="flex items-center gap-2 flex-row">
-                    <div className="h-12 w-12 shrink-0 overflow-hidden rounded-full border-2 border-bubblegum-blush bg-ash-whisper flex items-center justify-center text-deep-forest font-bold">
+                    <div className="h-[64px] w-[64px] shrink-0 overflow-hidden rounded-full border-[3px] border-bubblegum-blush bg-ash-whisper flex items-center justify-center text-deep-forest text-xl font-bold">
                       {post.author.avatarUrl && !avatarFailed ? (
                         <img
                           src={post.author.avatarUrl}

@@ -238,8 +238,23 @@ export default function FeedPage() {
     });
   };
 
-  const handleShare = (postId) => {
+  const handleShare = (postId, options = {}) => {
     if (isAdmin) return;
+    const shareUrl =
+      options.url ||
+      `${window.location.origin}/opportunities/discussion/${id}?postId=${postId}`;
+    const platformLabel = {
+      copy: "Post link copied.",
+      instagram: "Post link copied for Instagram.",
+    };
+
+    if (options.platform === "copy" || options.platform === "instagram") {
+      navigator.clipboard
+        ?.writeText(shareUrl)
+        .then(() => toast.success(platformLabel[options.platform]))
+        .catch(() => toast.error("Can't copy post link."));
+    }
+
     sharePost(postId, {
       onSuccess: (updatedPost) => {
         const nextShareCount = Number(updatedPost?.shareCount || 0);
@@ -261,9 +276,6 @@ export default function FeedPage() {
               }
             : post
         );
-        const shareUrl = `${window.location.origin}/opportunities/discussion/${id}?postId=${postId}`;
-        navigator.clipboard?.writeText(shareUrl).catch(() => {});
-        toast.success("Post link copied.");
       },
     });
   };

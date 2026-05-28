@@ -1,12 +1,21 @@
 // ReactionBar.jsx
-import React from "react";
+import React, { useState } from "react";
 import ReactionButton from "./ReactionButton";
-import { FaCommentAlt, FaShare } from "react-icons/fa";
+import {
+  FaCommentAlt,
+  FaFacebookF,
+  FaInstagram,
+  FaLinkedinIn,
+  FaLink,
+  FaShare,
+} from "react-icons/fa";
+import { FaXTwitter } from "react-icons/fa6";
 import {
   useCreateReaction,
   useMyReaction,
   useReactions,
 } from "../../hook/useCommunity";
+import useClickOutside from "../../hook/ClickOutside";
 
 const REACTION_ICONS = {
   like: "👍",
@@ -16,6 +25,14 @@ const REACTION_ICONS = {
   sad: "😢",
   angry: "😡",
 };
+
+const SHARE_TARGETS = [
+  { key: "facebook", label: "Facebook", icon: FaFacebookF },
+  { key: "instagram", label: "Instagram", icon: FaInstagram },
+  { key: "x", label: "X", icon: FaXTwitter },
+  { key: "linkedin", label: "LinkedIn", icon: FaLinkedinIn },
+  { key: "copy", label: "Copy link", icon: FaLink },
+];
 
 const toKeyType = (enumType) => {
   const map = {
@@ -41,6 +58,25 @@ const toEnumType = (key) => {
   return map[key] || "LIKE";
 };
 
+const getPostShareUrl = (eventId, postId) => {
+  if (typeof window === "undefined") return "";
+  return `${window.location.origin}/opportunities/discussion/${eventId}?postId=${postId}`;
+};
+
+const getExternalShareUrl = (platform, shareUrl, text) => {
+  const encodedUrl = encodeURIComponent(shareUrl);
+  const encodedText = encodeURIComponent(text || "VolunteerHub");
+
+  const urls = {
+    facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
+    x: `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedText}`,
+    linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`,
+    instagram: "https://www.instagram.com/",
+  };
+
+  return urls[platform];
+};
+
 export default function ReactionBar({
   post,
   onReact,
@@ -52,6 +88,9 @@ export default function ReactionBar({
   eventId,
   readOnly = false,
 }) {
+  const [showShareMenu, setShowShareMenu] = useState(false);
+  const shareMenuRef = useClickOutside(() => setShowShareMenu(false));
+
   const embeddedCounts = post?.reactionCounts || post?.reactions;
   const hasEmbeddedCounts =
     embeddedCounts && typeof embeddedCounts === "object";
@@ -97,6 +136,23 @@ export default function ReactionBar({
 
   const actionButtonClass =
     "inline-flex min-h-[48px] items-center gap-3 rounded-[10px] px-5 py-2.5 font-bold text-deep-forest transition-colors hover:bg-ash-whisper";
+
+  const handleShareOption = (platform) => {
+    const shareUrl = getPostShareUrl(eventId, post.id);
+    const shareText = post.text?.trim()
+      ? post.text.trim().slice(0, 120)
+      : "VolunteerHub";
+
+    if (platform !== "copy") {
+      const externalUrl = getExternalShareUrl(platform, shareUrl, shareText);
+      if (externalUrl) {
+        window.open(externalUrl, "_blank", "noopener,noreferrer");
+      }
+    }
+
+    onShare?.(post.id, { platform, url: shareUrl });
+    setShowShareMenu(false);
+  };
 
   return (
     <div className="flex flex-wrap items-center gap-x-5 gap-y-3 text-deep-forest">
@@ -164,17 +220,49 @@ export default function ReactionBar({
       )}
 
       {onShare && !readOnly && (
-        <button
-          onClick={() => onShare?.(post.id)}
-          className={actionButtonClass}
-        >
-          <FaShare className="w-5 h-5" />
-          {!compact && (
-            <span>
-              {post.shareCount > 0 ? `Chia sẻ (${post.shareCount})` : "Chia sẻ"}
-            </span>
+        <div className="relative" ref={shareMenuRef}>
+          <button
+            type="button"
+            onClick={() => setShowShareMenu((open) => !open)}
+            className={actionButtonClass}
+            aria-haspopup="menu"
+            aria-expanded={showShareMenu}
+          >
+            <FaShare className="w-5 h-5" />
+            {!compact && (
+              <span>
+                {post.shareCount > 0
+                  ? `Chia sẻ (${post.shareCount})`
+                  : "Chia sẻ"}
+              </span>
+            )}
+          </button>
+
+          {showShareMenu && (
+            <div
+              role="menu"
+              className="absolute left-0 top-[calc(100%+10px)] z-[120] w-[260px] max-w-[calc(100vw-24px)] rounded-[14px] border border-ash-whisper bg-pale-canvas p-2 shadow-2xl sm:left-auto sm:right-0"
+            >
+              <div className="px-2 pb-2 pt-1 text-xs font-bold uppercase text-deep-forest/55">
+                Share to
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                {SHARE_TARGETS.map(({ key, label, icon: Icon }) => (
+                  <button
+                    key={key}
+                    type="button"
+                    role="menuitem"
+                    onClick={() => handleShareOption(key)}
+                    className="flex min-h-[46px] items-center gap-2 rounded-[10px] px-3 py-2 text-left text-sm font-bold text-deep-forest transition-colors hover:bg-ash-whisper"
+                  >
+                    <Icon className="h-5 w-5 shrink-0" />
+                    <span className="truncate">{label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
           )}
-        </button>
+        </div>
       )}
     </div>
   );
