@@ -4,15 +4,17 @@ import { Eye, Users, MessageSquare, ThumbsUp, FileText } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const VIETNAMESE_TITLE_STYLE = {
-  fontFamily: '"Be Vietnam Pro", "Segoe UI", Arial, sans-serif',
-  fontWeight: 800,
-  letterSpacing: "-0.02em",
+  fontFamily:
+    '"Clash Grotesk", "Be Vietnam Pro", ui-sans-serif, system-ui, "Segoe UI", Arial, sans-serif',
+  fontWeight: 700,
+  letterSpacing: "-0.012em",
 };
 
 const VIETNAMESE_META_STYLE = {
-  fontFamily: '"Be Vietnam Pro", "Segoe UI", Arial, sans-serif',
+  fontFamily:
+    '"Clash Grotesk", "Be Vietnam Pro", ui-sans-serif, system-ui, "Segoe UI", Arial, sans-serif',
   fontWeight: 700,
-  letterSpacing: "-0.01em",
+  letterSpacing: "-0.008em",
 };
 
 function TrendingCard({ items }) {

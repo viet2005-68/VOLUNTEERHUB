@@ -2,9 +2,10 @@ import { ArrowLeft, CircleCheckBig, ClockFading, Image as ImageIcon, Pencil } fr
 import { useNavigate } from "react-router-dom";
 
 const VIETNAMESE_TITLE_STYLE = {
-  fontFamily: '"Be Vietnam Pro", "Segoe UI", Arial, sans-serif',
-  fontWeight: 800,
-  letterSpacing: "-0.03em",
+  fontFamily:
+    '"Clash Grotesk", "Be Vietnam Pro", ui-sans-serif, system-ui, "Segoe UI", Arial, sans-serif',
+  fontWeight: 700,
+  letterSpacing: "-0.02em",
 };
 
 function ManagerDbHero({ thumbnail, title, status = "pending", onEditImage }) {

@@ -6,9 +6,10 @@ import VolunteerHero from "./VolunteerHero";
 import { useConstUserApprovedList } from "../../hook/useRegistration";
 
 const VIETNAMESE_TITLE_STYLE = {
-  fontFamily: '"Be Vietnam Pro", "Segoe UI", Arial, sans-serif',
-  fontWeight: 800,
-  letterSpacing: "-0.025em",
+  fontFamily:
+    '"Clash Grotesk", "Be Vietnam Pro", ui-sans-serif, system-ui, "Segoe UI", Arial, sans-serif',
+  fontWeight: 700,
+  letterSpacing: "-0.015em",
 };
 
 function EventHero({ id, imgURL, organizerName, eventName }) {
