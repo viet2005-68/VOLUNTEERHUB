@@ -33,7 +33,7 @@ function TrendingCard({ items }) {
   const trendPercentage = Math.round(maxGrowth);
 
   const handleViewClick = () => {
-    navigate(`/dashboard/event/${id}/overview`);
+    navigate(`opportunities/overview/${id}`);
   };
 
   const fallbackInitial = name?.charAt(0)?.toUpperCase() || "E";
