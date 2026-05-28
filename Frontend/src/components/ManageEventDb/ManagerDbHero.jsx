@@ -1,6 +1,8 @@
 import { ArrowLeft, CircleCheckBig, ClockFading, Image as ImageIcon, Pencil } from "lucide-react";
-import React from "react";
 import { useNavigate } from "react-router-dom";
+
+const VIETNAMESE_TITLE_FONT_FAMILY =
+  '"Noto Sans", "Be Vietnam Pro", Inter, "Segoe UI", Roboto, Arial, sans-serif';
 
 function ManagerDbHero({ thumbnail, title, status = "pending", onEditImage }) {
   const navigate = useNavigate();
@@ -50,7 +52,10 @@ function ManagerDbHero({ thumbnail, title, status = "pending", onEditImage }) {
 
         <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-            <h1 className="max-w-4xl break-words font-beni text-5xl uppercase leading-[0.82] !text-pale-canvas drop-shadow-sm sm:text-6xl md:text-7xl lg:text-8xl">
+            <h1
+              className="max-w-4xl break-words text-5xl uppercase leading-[0.82] !text-pale-canvas drop-shadow-sm sm:text-6xl md:text-7xl lg:text-8xl"
+              style={{ fontFamily: VIETNAMESE_TITLE_FONT_FAMILY }}
+            >
               {title}
             </h1>
             <span

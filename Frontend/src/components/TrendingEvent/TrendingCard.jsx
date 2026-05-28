@@ -3,6 +3,9 @@ import { FaArrowTrendUp } from "react-icons/fa6";
 import { Eye, Users, MessageSquare, ThumbsUp, FileText } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
+const VIETNAMESE_TEXT_FONT_FAMILY =
+  '"Noto Sans", "Be Vietnam Pro", Inter, "Segoe UI", Roboto, Arial, sans-serif';
+
 function TrendingCard({ items }) {
   const navigate = useNavigate();
 
@@ -58,10 +61,16 @@ function TrendingCard({ items }) {
           <div className="flex min-w-0 flex-col gap-2">
             <div className="flex flex-row justify-between gap-3 items-start">
               <div className="min-w-0">
-                <p className="text-base font-bold leading-[1.15] text-deep-forest line-clamp-2">
+                <p
+                  className="text-base font-bold leading-[1.15] text-deep-forest line-clamp-2"
+                  style={{ fontFamily: VIETNAMESE_TEXT_FONT_FAMILY }}
+                >
                   {name}
                 </p>
-                <div className="mt-1 text-sm font-bold leading-[1.15] text-deep-forest/60">
+                <div
+                  className="mt-1 text-sm font-bold leading-[1.15] text-deep-forest/60"
+                  style={{ fontFamily: VIETNAMESE_TEXT_FONT_FAMILY }}
+                >
                   {category?.name || "Uncategorized"}
                 </div>
               </div>
