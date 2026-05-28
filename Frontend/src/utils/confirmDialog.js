@@ -6,16 +6,57 @@ import Swal from "sweetalert2";
  */
 
 const popupClass =
-    "font-clash-grotesk rounded-[24px] border-2 border-ash-whisper bg-pale-canvas px-8 pb-7 pt-6 text-center text-deep-forest shadow-2xl";
+    "font-jost rounded-[20px] border-2 border-ash-whisper bg-pale-canvas px-6 pb-6 pt-5 text-center text-deep-forest shadow-xl";
 const iconClass =
-    "mx-auto mt-2 !h-[72px] !w-[72px] border-2 text-[40px]";
+    "mx-auto my-0 !h-14 !w-14 border-2 text-[30px]";
 const titleClass =
-    "mt-2 text-center font-clash-grotesk text-2xl font-bold normal-case leading-[1.05] text-deep-forest";
+    "mt-4 text-center font-jost text-xl font-black normal-case leading-[1.1] text-deep-forest";
 const bodyClass =
-    "mx-auto mt-3 max-w-[390px] text-center text-sm font-medium leading-[1.4] text-deep-forest/70";
-const actionsClass = "mt-7 flex w-full items-center justify-center gap-3";
+    "mx-auto mt-3 max-w-[320px] text-center text-sm font-medium leading-[1.35] text-deep-forest/70";
+const actionsClass = "mt-6 flex w-full items-center justify-center gap-3";
 const cancelButtonClass =
     "inline-flex min-h-[44px] items-center justify-center rounded-[10px] border-2 border-deep-forest/15 bg-pale-canvas px-5 py-3 text-sm font-bold text-deep-forest transition-colors hover:border-deep-forest hover:bg-ash-whisper focus:outline-none";
+
+const applyCompactDialogStyles = (popup) => {
+    if (!popup) return;
+
+    const icon = popup.querySelector(".swal2-icon");
+    const iconContent = popup.querySelector(".swal2-icon-content");
+    const title = popup.querySelector(".swal2-title");
+    const htmlContainer = popup.querySelector(".swal2-html-container");
+    const actions = popup.querySelector(".swal2-actions");
+
+    if (icon) {
+        icon.style.width = "56px";
+        icon.style.height = "56px";
+        icon.style.minWidth = "56px";
+        icon.style.margin = "0 auto";
+        icon.style.fontSize = "30px";
+    }
+
+    if (iconContent) {
+        iconContent.style.fontSize = "42px";
+        iconContent.style.lineHeight = "1";
+    }
+
+    if (title) {
+        title.style.padding = "0";
+        title.style.margin = "16px 0 0";
+        title.style.fontFamily = "Jost, sans-serif";
+        title.style.fontSize = "20px";
+        title.style.fontWeight = "900";
+        title.style.lineHeight = "1.1";
+    }
+
+    if (htmlContainer) {
+        htmlContainer.style.padding = "0";
+        htmlContainer.style.margin = "12px auto 0";
+    }
+
+    if (actions) {
+        actions.style.margin = "24px 0 0";
+    }
+};
 
 /**
  * Show a confirmation dialog
@@ -48,7 +89,7 @@ export const showConfirmDialog = async ({
         iconColor: isDanger ? "#db3c8a" : "#00522d",
         background: "#fff8f6",
         color: "#00522d",
-        width: 520,
+        width: 420,
         showCancelButton: true,
         buttonsStyling: false,
         focusConfirm: false,
@@ -65,6 +106,7 @@ export const showConfirmDialog = async ({
             confirmButton: confirmButtonClass,
             cancelButton: cancelButtonClass,
         },
+        didOpen: applyCompactDialogStyles,
     });
 
     return result.isConfirmed;
@@ -138,7 +180,7 @@ export const showSuccess = async (title = "Success!", text = "") => {
         iconColor: "#00522d",
         background: "#fff8f6",
         color: "#00522d",
-        width: 480,
+        width: 420,
         confirmButtonText: "OK",
         buttonsStyling: false,
         backdrop: "rgba(0, 82, 45, 0.32)",
@@ -151,6 +193,7 @@ export const showSuccess = async (title = "Success!", text = "") => {
             confirmButton:
                 "inline-flex min-h-[44px] items-center justify-center rounded-[10px] bg-deep-forest px-6 py-3 text-sm font-bold text-pale-canvas transition-colors hover:bg-foudre-pink focus:outline-none",
         },
+        didOpen: applyCompactDialogStyles,
     });
 };
 
@@ -165,7 +208,7 @@ export const showError = async (title = "Error!", text = "") => {
         iconColor: "#db3c8a",
         background: "#fff8f6",
         color: "#00522d",
-        width: 480,
+        width: 420,
         confirmButtonText: "OK",
         buttonsStyling: false,
         backdrop: "rgba(0, 82, 45, 0.32)",
@@ -178,5 +221,6 @@ export const showError = async (title = "Error!", text = "") => {
             confirmButton:
                 "inline-flex min-h-[44px] items-center justify-center rounded-[10px] bg-foudre-pink px-6 py-3 text-sm font-bold text-pale-canvas transition-colors hover:bg-deep-forest focus:outline-none",
         },
+        didOpen: applyCompactDialogStyles,
     });
 };
