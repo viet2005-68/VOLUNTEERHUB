@@ -9,7 +9,6 @@ import MapPreview from "../Location/MapPreview";
 import { useCreateEvent } from "../../hook/useEvent";
 import { useProvinces, useDistricts } from "../../hook/useVietnamLocations";
 import { Trash2, X } from "lucide-react";
-import { BADGE_OPTIONS } from "../../constant/badgeCatalog";
 
 const categoryOptions = [
   { value: "health", label: "Health" },
@@ -32,7 +31,6 @@ const eventSchema = yup.object({
     })
     .notRequired(),
   categoryName: yup.string().required("Please select a category."),
-  completionBadgeId: yup.string().nullable(),
   startTime: yup.string().required("Start time is required."),
   endTime: yup
     .string()
@@ -83,7 +81,6 @@ function CreateEvent({ onSuccess, onCancel }) {
       description: "",
       imageFile: null,
       categoryName: "",
-      completionBadgeId: "",
       startTime: "",
       endTime: "",
       capacity: "",
@@ -116,9 +113,6 @@ function CreateEvent({ onSuccess, onCancel }) {
       name: values.name,
       description: values.description,
       categoryName: values.categoryName,
-      completionBadgeId: values.completionBadgeId
-        ? Number(values.completionBadgeId)
-        : undefined,
       startTime: values.startTime,
       endTime: values.endTime,
       capacity: values.capacity,
@@ -335,28 +329,6 @@ function CreateEvent({ onSuccess, onCancel }) {
             </p>
           )}
         </div>
-      </div>
-
-      <div className="flex flex-col gap-2">
-        <label htmlFor="completionBadgeId" className="text-sm font-bold uppercase leading-[0.85] text-deep-forest">
-          Completion Badge
-        </label>
-        <Controller
-          name="completionBadgeId"
-          control={control}
-          render={({ field }) => (
-            <DropdownSelect
-              value={field.value}
-              onChange={field.onChange}
-              options={BADGE_OPTIONS}
-              placeholder="Basic Badge by default"
-              className="w-full"
-            />
-          )}
-        />
-        <p className="text-xs font-medium leading-[1.2] text-deep-forest/55">
-          If left blank, volunteers receive Basic Badge after completion.
-        </p>
       </div>
 
       <div className="flex flex-col gap-2">

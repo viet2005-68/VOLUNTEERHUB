@@ -3,7 +3,6 @@ import * as yup from "yup";
 const eventSchema = yup.object({
     name: yup.string().trim().required("Event title is required."),
     categoryName: yup.string().required("Please select a category."),
-    completionBadgeId: yup.string().nullable(),
     description: yup.string().trim().min(20, "Describe at least 20 characters."),
     startTime: yup.date().required(),
     endTime: yup

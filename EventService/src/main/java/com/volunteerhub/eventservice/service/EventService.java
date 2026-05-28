@@ -35,6 +35,10 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class EventService {
     private static final Long DEFAULT_COMPLETION_BADGE_ID = 8L;
+    private static final Long EDUCATION_BADGE_ID = 2L;
+    private static final Long ENVIRONMENT_BADGE_ID = 4L;
+    private static final Long ANIMAL_BADGE_ID = 11L;
+    private static final Long HEALTH_BADGE_ID = 13L;
 
     private final EventRepository eventRepository;
     private final CategoryService categoryService;
@@ -115,9 +119,7 @@ public class EventService {
                 .qrJoinPolicy(eventRequest.getQrJoinPolicy() == null
                         ? QrJoinPolicy.REQUIRE_APPROVAL
                         : eventRequest.getQrJoinPolicy())
-                .completionBadgeId(eventRequest.getCompletionBadgeId() == null
-                        ? DEFAULT_COMPLETION_BADGE_ID
-                        : eventRequest.getCompletionBadgeId())
+                .completionBadgeId(resolveCompletionBadgeId(eventRequest.getCategoryName()))
                 .build();
 
         Event savedEvent = eventRepository.save(event);
@@ -158,7 +160,10 @@ public class EventService {
             Category category = categoryService.findByNameOrCreate(eventRequest.getCategoryName());
             event.setCategory(category);
             event.setCategoryId(category.getId());
+            Long completionBadgeId = resolveCompletionBadgeId(eventRequest.getCategoryName());
+            event.setCompletionBadgeId(completionBadgeId);
             updatedFields.put("category", eventRequest.getCategoryName());
+            updatedFields.put("completion_badge_id", completionBadgeId);
         }
 
         if (eventRequest.getAddress() != null && eventRequest.getAddress().getDistrict() != null &&
@@ -195,10 +200,6 @@ public class EventService {
         if (eventRequest.getQrJoinPolicy() != null) {
             event.setQrJoinPolicy(eventRequest.getQrJoinPolicy());
             updatedFields.put("qr_join_policy", eventRequest.getQrJoinPolicy().name());
-        }
-        if (eventRequest.getCompletionBadgeId() != null) {
-            event.setCompletionBadgeId(eventRequest.getCompletionBadgeId());
-            updatedFields.put("completion_badge_id", eventRequest.getCompletionBadgeId());
         }
         Event savedEvent = eventRepository.save(event);
         eventPublisher.publishEvent(eventMapper.toUpdatedMessage(savedEvent, updatedFields));
@@ -359,5 +360,18 @@ public class EventService {
             counts.put(status.name().toLowerCase(), count);
         }
         return counts;
+    }
+
+    private Long resolveCompletionBadgeId(String categoryName) {
+        if (categoryName == null) {
+            return DEFAULT_COMPLETION_BADGE_ID;
+        }
+        return switch (categoryName.trim().toLowerCase()) {
+            case "education" -> EDUCATION_BADGE_ID;
+            case "environment" -> ENVIRONMENT_BADGE_ID;
+            case "animals", "animal" -> ANIMAL_BADGE_ID;
+            case "health" -> HEALTH_BADGE_ID;
+            default -> DEFAULT_COMPLETION_BADGE_ID;
+        };
     }
 }

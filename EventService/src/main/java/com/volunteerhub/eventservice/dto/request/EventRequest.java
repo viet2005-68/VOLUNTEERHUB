@@ -4,7 +4,6 @@
     import com.volunteerhub.common.enums.QrJoinPolicy;
     import com.volunteerhub.eventservice.validation.OnCreate;
     import jakarta.validation.Valid;
-    import jakarta.validation.constraints.Max;
     import jakarta.validation.constraints.Min;
     import jakarta.validation.constraints.NotBlank;
     import jakarta.validation.constraints.NotNull;
@@ -46,10 +45,6 @@
         private String optional;
 
         private QrJoinPolicy qrJoinPolicy;
-
-        @Min(value = 1, message = "Completion badge id must be between 1 and 13")
-        @Max(value = 13, message = "Completion badge id must be between 1 and 13")
-        private Long completionBadgeId;
 
         @Min(value = 1, message = "Capacity must be at least 1", groups = OnCreate.class)
         private int capacity;

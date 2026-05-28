@@ -29,8 +29,3 @@ export const BADGE_CATALOG = [
   { id: 12, title: "Society Badge", description: "Society Badge", icon: SocietyBadge },
   { id: 13, title: "Blood Badge", description: "Blood Badge", icon: BloodBadge },
 ];
-
-export const BADGE_OPTIONS = BADGE_CATALOG.map((badge) => ({
-  value: String(badge.id),
-  label: badge.title,
-}));
