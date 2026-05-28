@@ -1,5 +1,5 @@
-import { BellDot, MessageSquare } from "lucide-react";
-import React from "react";
+import { BellDot } from "lucide-react";
+import { useMemo, useState } from "react";
 import { useAuth } from "../../hook/useAuth";
 import { ROLES } from "../../constant/role";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -11,6 +11,7 @@ export default function NavBar() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useAuth();
+  const [avatarFailed, setAvatarFailed] = useState(false);
 
   console.log("==== NavBar Check ====");
   console.log("NavBar user:", user);
@@ -30,6 +31,19 @@ export default function NavBar() {
   const displayName = user?.name ?? "Guest";
   const roleLabel = user?.role ? normalizeRole(user.role) : "Guest";
   const canUseChat = user?.role !== ROLES.ADMIN;
+  const avatarSrc = useMemo(() => {
+    if (avatarFailed) return "";
+
+    return (
+      user?.avatarUrl ||
+      user?.urlAvatar ||
+      user?.urlAvartar ||
+      `https://api.dicebear.com/9.x/avataaars/svg?seed=${encodeURIComponent(
+        displayName
+      )}`
+    );
+  }, [avatarFailed, displayName, user?.avatarUrl, user?.urlAvatar, user?.urlAvartar]);
+  const avatarInitial = displayName?.trim()?.charAt(0)?.toUpperCase() || "G";
   const isActiveNav = (key) => {
     if (key === "Dashboard") return location.pathname === "/dashboard";
     if (key === "Opportunities") return location.pathname.startsWith("/opportunities");
@@ -92,12 +106,6 @@ export default function NavBar() {
         </ul>
       </div>
       <div className="flex items-center gap-8">
-        {canUseChat && (
-          <MessageSquare
-            className="cursor-pointer text-deep-forest transition-colors hover:text-foudre-pink"
-            onClick={() => navigate("/dashboard/messages")}
-          />
-        )}
         <BellDot
           className="cursor-pointer text-deep-forest transition-colors hover:text-foudre-pink"
           onClick={() => navigate("/dashboard/notifications")}
@@ -105,12 +113,19 @@ export default function NavBar() {
         <DropDown
           trigger={
             <div className="flex flex-row items-center gap-3">
-              <div className="flex h-10 w-10 flex-col items-center justify-center rounded-full border-2 border-ash-whisper bg-pale-canvas">
-                <img
-                  src={`https://api.dicebear.com/9.x/avataaars/svg?seed=${displayName}`}
-                  alt="avatar"
-                  className="w-6 h-6 object-container"
-                />
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-ash-whisper bg-pale-canvas">
+                {avatarSrc ? (
+                  <img
+                    src={avatarSrc}
+                    alt={displayName}
+                    className="h-full w-full object-cover"
+                    onError={() => setAvatarFailed(true)}
+                  />
+                ) : (
+                  <span className="text-sm font-black text-deep-forest">
+                    {avatarInitial}
+                  </span>
+                )}
               </div>
               <div className="flex flex-col text-left">
                 <span className="font-bold text-deep-forest">{displayName}</span>
