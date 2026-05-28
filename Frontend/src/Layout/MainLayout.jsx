@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import NavBar from "../components/Sidebar/NavBar";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import BottomNav from "../components/Sidebar/BottomNav";
@@ -14,7 +14,7 @@ import { saveRedirectAfterLogin } from "../utils/authRedirect";
 
 export default function MainLayout() {
   const { showNavbar } = useNavbar();
-  const { user } = useAuth();
+  const { user, setUser } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [isCheckingBan, setIsCheckingBan] = useState(true);
@@ -30,6 +30,19 @@ export default function MainLayout() {
 
   console.log("==== MainLayout Check ====");
   console.log("MainLayout user:", user);
+
+  const normalizedStoredUser = useMemo(
+    () => ({
+      id: user?.id || null,
+      name: user?.name || null,
+      fullName: user?.fullName || null,
+      email: user?.email || null,
+      role: user?.role || null,
+      avatarUrl: user?.avatarUrl || user?.urlAvatar || user?.urlAvartar || null,
+      status: user?.status || null,
+    }),
+    [user]
+  );
 
   useEffect(() => {
     if (!user) {
@@ -47,6 +60,43 @@ export default function MainLayout() {
         const userInfo = await getUserInfo();
         console.log("User info from /me:", userInfo);
 
+        const mergedUser = {
+          ...user,
+          ...userInfo,
+          name:
+            userInfo?.fullName ||
+            userInfo?.name ||
+            user?.fullName ||
+            user?.name ||
+            "Guest",
+          fullName: userInfo?.fullName || userInfo?.name || user?.fullName || user?.name || "",
+          avatarUrl:
+            userInfo?.avatarUrl ||
+            userInfo?.urlAvatar ||
+            userInfo?.urlAvartar ||
+            user?.avatarUrl ||
+            user?.urlAvatar ||
+            user?.urlAvartar ||
+            "",
+        };
+
+        const normalizedMeUser = {
+          id: mergedUser?.id || null,
+          name: mergedUser?.name || null,
+          fullName: mergedUser?.fullName || null,
+          email: mergedUser?.email || null,
+          role: mergedUser?.role || null,
+          avatarUrl: mergedUser?.avatarUrl || null,
+          status: mergedUser?.status || null,
+        };
+
+        if (
+          JSON.stringify(normalizedStoredUser) !==
+          JSON.stringify(normalizedMeUser)
+        ) {
+          setUser(mergedUser);
+        }
+
         if (userInfo?.status === "BANNED" || userInfo?.status === "banned") {
           console.log("User is banned, redirecting to /banned");
           navigate("/banned", { replace: true });
@@ -62,7 +112,15 @@ export default function MainLayout() {
     };
 
     checkBanStatus();
-  }, [user, navigate, location.pathname, location.search, location.hash]);
+  }, [
+    user,
+    setUser,
+    normalizedStoredUser,
+    navigate,
+    location.pathname,
+    location.search,
+    location.hash,
+  ]);
 
   // Check if user dismissed banner
   useEffect(() => {
