@@ -881,24 +881,6 @@ export default function Settingpage() {
                 <div className="flex flex-col gap-2">
                   <label className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-deep-forest/60">
                     <User className="h-4 w-4" />
-                    Username
-                  </label>
-                  <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    disabled={true}
-                    className={
-                      getInputClasses("name") + " disabled:cursor-not-allowed"
-                    }
-                    placeholder="Enter your username"
-                  />
-                </div>
-
-                <div className="flex flex-col gap-2">
-                  <label className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-deep-forest/60">
-                    <User className="h-4 w-4" />
                     Full Name
                   </label>
                   <input
