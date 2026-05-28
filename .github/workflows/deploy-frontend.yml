@@ -148,9 +148,17 @@ jobs:
       - name: Deploy frontend image
         shell: bash
         run: |
+          set +e
           IMAGE="${{ env.REGISTRY }}/${{ env.OWNER }}/${{ env.IMAGE }}:${DEPLOY_SHA}"
           kubectl set image deployment/frontend frontend="${IMAGE}" -n volunteerhub
           kubectl rollout status deployment/frontend -n volunteerhub --timeout=300s
+          status=$?
+          if [ "$status" -ne 0 ]; then
+            echo "::error::Frontend rollout failed. Initiating auto-rollback..."
+            kubectl rollout undo deployment/frontend -n volunteerhub
+            kubectl rollout status deployment/frontend -n volunteerhub --timeout=120s
+            exit 1
+          fi
 
       - name: Smoke test
         shell: bash
