@@ -10,7 +10,6 @@ import {
   UserCheck,
   AlertCircle,
   CheckCircle,
-  Image as ImageIcon,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
@@ -71,12 +70,9 @@ function NotificationCard({ noti }) {
   };
 
   const handleDelete = async (id) => {
-    const result = await confirmDelete(
-      "this notification",
-      "This action cannot be undone."
-    );
+    const confirmed = await confirmDelete("this notification");
 
-    if (result.isConfirmed) {
+    if (confirmed) {
       try {
         await deleteNotificationMutation.mutateAsync(id);
         showSuccess("Deleted!", "Notification has been deleted successfully.");
@@ -317,14 +313,14 @@ function NotificationCard({ noti }) {
   return (
     <div
       onClick={handleCardClick}
-      className={`mb-3 w-full cursor-pointer rounded-[16px] border p-3 text-deep-forest transition-colors duration-200 hover:border-bubblegum-blush hover:bg-ash-whisper/45 sm:p-4 ${
+      className={`mb-3 w-full cursor-pointer rounded-[20px] border p-3 text-deep-forest shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-bubblegum-blush hover:shadow-md sm:p-4 ${
         !noti?.isRead
-          ? "border-foudre-pink/35 bg-ash-whisper/70"
-          : "border-deep-forest/12 bg-pale-canvas"
+          ? "border-foudre-pink/35 bg-pale-canvas ring-1 ring-foudre-pink/15"
+          : "border-deep-forest/10 bg-pale-canvas"
       }`}
     >
       <div className="flex items-start gap-3 sm:gap-4">
-        <div className="relative h-[72px] w-[96px] shrink-0 overflow-hidden rounded-[12px] border border-deep-forest/12 bg-ash-whisper">
+        <div className="relative aspect-square w-[76px] shrink-0 overflow-hidden rounded-[16px] border border-deep-forest/10 bg-ash-whisper sm:w-[88px]">
           {notificationImage ? (
             <img
               src={notificationImage}
@@ -337,18 +333,18 @@ function NotificationCard({ noti }) {
               <IconComponent className="h-6 w-6 text-pale-canvas" />
             </div>
           )}
-          {!notificationImage && (
-            <ImageIcon className="absolute bottom-2 right-2 h-4 w-4 text-pale-canvas/75" />
-          )}
         </div>
 
         <div className="flex-1 min-w-0">
-          <div className="mb-1 flex items-center gap-2">
-            <h4 className="line-clamp-1 text-sm font-bold text-deep-forest sm:text-base">
+          <div className="mb-1.5 flex flex-wrap items-center gap-2">
+            <h4 className="line-clamp-1 text-base font-bold leading-[1.15] text-deep-forest">
               {message.title}
             </h4>
             {!noti?.isRead && (
-              <div className="h-2 w-2 shrink-0 rounded-full bg-foudre-pink" />
+              <span className="inline-flex items-center gap-1 rounded-full bg-foudre-pink/10 px-2 py-1 text-[11px] font-bold leading-none text-foudre-pink">
+                <span className="h-1.5 w-1.5 rounded-full bg-foudre-pink" />
+                New
+              </span>
             )}
           </div>
 
@@ -375,7 +371,7 @@ function NotificationCard({ noti }) {
           </p>
         </div>
 
-        <div className="flex min-w-[44px] shrink-0 flex-col items-end gap-2 sm:min-w-[96px]">
+        <div className="flex min-w-[44px] shrink-0 flex-col items-end gap-2 sm:min-w-[104px]">
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -384,7 +380,7 @@ function NotificationCard({ noti }) {
             disabled={markAsReadMutation.isPending}
             className={`${
               noti?.isRead ? "hidden" : "text-pale-canvas"
-            } inline-flex h-10 w-10 items-center justify-center rounded-[10px] border border-deep-forest bg-deep-forest font-bold transition-colors hover:bg-foudre-pink disabled:cursor-not-allowed disabled:opacity-50 sm:w-full sm:gap-2 sm:px-3`}
+            } inline-flex h-10 w-10 items-center justify-center rounded-[10px] border border-deep-forest bg-deep-forest font-bold shadow-sm transition-colors hover:bg-foudre-pink disabled:cursor-not-allowed disabled:opacity-50 sm:w-full sm:gap-2 sm:px-3`}
             title="Mark as read"
           >
             <Check className="h-4 w-4" />
@@ -398,7 +394,7 @@ function NotificationCard({ noti }) {
               handleDelete(noti?.id);
             }}
             disabled={deleteNotificationMutation.isPending}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-[10px] border border-deep-forest/25 bg-pale-canvas font-bold text-deep-forest transition-colors hover:border-deep-forest hover:bg-deep-forest hover:text-pale-canvas disabled:cursor-not-allowed disabled:opacity-50 sm:w-full sm:gap-2 sm:px-3"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-[10px] border border-deep-forest/15 bg-ash-whisper/45 font-bold text-deep-forest transition-colors hover:border-foudre-pink hover:bg-foudre-pink hover:text-pale-canvas disabled:cursor-not-allowed disabled:opacity-50 sm:w-full sm:gap-2 sm:px-3"
             title="Delete"
           >
             <Trash className="h-4 w-4" />

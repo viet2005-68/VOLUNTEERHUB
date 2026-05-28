@@ -2,8 +2,14 @@ import React, { useState, useEffect } from "react";
 import { Virtuoso } from "react-virtuoso";
 import { useInfiniteTrendingEvents } from "../../hook/useEvent";
 import TrendingEventCard from "../../components/TrendingEvent/TrendingEventCard";
-import { TrendingUp, Flame, Calendar, Sparkles, ArrowLeft } from "lucide-react";
-import { Skeleton } from "@mui/material";
+import {
+  TrendingUp,
+  Flame,
+  Calendar,
+  ArrowLeft,
+  Loader2,
+  SearchX,
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 function TrendingPage() {
@@ -46,8 +52,8 @@ function TrendingPage() {
     { value: 90, label: "Last 3 Months" },
   ];
 
-  // Group events into rows of 3 for better virtualization
-  const ITEMS_PER_ROW = 3;
+  // Group events into rows for smoother window virtualization
+  const ITEMS_PER_ROW = 2;
   const groupedEvents = [];
   for (let i = 0; i < events.length; i += ITEMS_PER_ROW) {
     groupedEvents.push(events.slice(i, i + ITEMS_PER_ROW));
@@ -57,9 +63,11 @@ function TrendingPage() {
   const Footer = () => {
     if (!hasMore && events.length > 0) {
       return (
-        <div className="py-6 text-center">
-          <p className="text-gray-500 text-lg">🎉 You've reached the end!</p>
-          <p className="text-gray-400 text-sm mt-2">
+        <div className="py-8 text-center">
+          <p className="text-base font-bold text-deep-forest">
+            You've reached the end
+          </p>
+          <p className="mt-2 text-sm font-medium text-deep-forest/55">
             No more trending events to show
           </p>
         </div>
@@ -69,8 +77,10 @@ function TrendingPage() {
     if (hasMore && isFetching) {
       return (
         <div className="flex flex-col items-center gap-3 py-6">
-          <div className="w-8 h-8 border-4 border-red-500 border-t-transparent rounded-full animate-spin" />
-          <p className="text-gray-600">Loading more events...</p>
+          <Loader2 className="h-6 w-6 animate-spin text-deep-forest" />
+          <p className="text-sm font-bold text-deep-forest/60">
+            Loading more events...
+          </p>
         </div>
       );
     }
@@ -81,7 +91,7 @@ function TrendingPage() {
   // Virtuoso Item Component - renders a row of cards
   const ItemContent = (index, row) => {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+      <div className="mb-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
         {row.map((event, idx) => (
           <div
             key={event.id}
@@ -100,19 +110,21 @@ function TrendingPage() {
 
   if (isError) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-pink-50 p-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
-            <div className="text-red-500 text-6xl mb-4">⚠️</div>
-            <h2 className="text-2xl font-bold text-gray-800 mb-2">
+      <div className="min-h-screen bg-pale-canvas p-6 text-deep-forest">
+        <div className="mx-auto max-w-7xl">
+          <div className="rounded-[25px] border-2 border-ash-whisper bg-pale-canvas p-8 text-center shadow-sm">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-[18px] bg-ash-whisper text-foudre-pink">
+              <SearchX className="h-8 w-8" />
+            </div>
+            <h2 className="mb-2 text-2xl font-bold text-deep-forest">
               Oops! Something went wrong
             </h2>
-            <p className="text-gray-600 mb-4">
+            <p className="mb-4 text-sm font-medium text-deep-forest/65">
               {error?.message || "Failed to load trending events"}
             </p>
             <button
               onClick={() => window.location.reload()}
-              className="px-6 py-2 bg-gradient-to-r from-red-500 to-orange-500 text-white rounded-lg hover:from-red-600 hover:to-orange-600 transition-all"
+              className="rounded-[10px] bg-deep-forest px-6 py-3 text-sm font-bold text-pale-canvas transition-colors hover:bg-foudre-pink"
             >
               Try Again
             </button>
@@ -123,61 +135,56 @@ function TrendingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-pink-50">
+    <div className="min-h-screen bg-pale-canvas text-deep-forest">
       {/* Header Section */}
-      <div className="bg-gradient-to-r from-red-600 via-orange-500 to-pink-500 text-white relative">
-        <div className="max-w-7xl mx-auto px-6 py-12">
+      <div className="mx-auto max-w-7xl px-4 pt-8 sm:px-6">
+        <div className="relative overflow-hidden rounded-[25px] border-2 border-ash-whisper bg-deep-forest p-6 text-pale-canvas shadow-sm sm:p-8">
           {/* Back Button */}
           <button
             onClick={() => navigate(-1)}
-            className="absolute top-4 left-4 p-2 bg-black/50 backdrop-blur-sm rounded-full hover:bg-white/30 transition-all duration-200 group"
+            className="absolute right-5 top-5 flex h-11 w-11 items-center justify-center rounded-[12px] bg-pale-canvas/10 text-pale-canvas transition-colors hover:bg-foudre-pink"
             aria-label="Go back"
           >
-            <ArrowLeft className="w-6 h-6 group-hover:scale-110 transition-transform" />
+            <ArrowLeft className="h-5 w-5" />
           </button>
 
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-3 bg-white/20 backdrop-blur-sm rounded-2xl">
-              <Flame className="w-10 h-10 animate-pulse" />
+          <div className="mb-4 flex items-center gap-4 pr-14">
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[16px] bg-ash-whisper text-deep-forest">
+              <Flame className="h-7 w-7" />
             </div>
             <div>
-              <h1 className="text-4xl md:text-5xl font-bold flex items-center gap-3">
+              <div className="font-beni text-[58px] font-black uppercase leading-[0.75] text-pale-canvas sm:text-[76px]">
                 Trending Events
-                <Sparkles className="w-8 h-8 animate-spin" />
-              </h1>
-              <p className="text-white/90 text-lg mt-2">
+              </div>
+              <p className="mt-2 max-w-2xl text-sm font-medium leading-[1.25] text-pale-canvas/75 sm:text-base">
                 Discover the hottest volunteer opportunities right now
               </p>
             </div>
           </div>
 
           {/* Stats Bar */}
-          <div className="flex flex-wrap items-center gap-4 mt-6">
-            <div className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-lg">
-              <div className="flex items-center gap-2">
-                <TrendingUp className="w-5 h-5" />
-                <span className="font-semibold">
-                  {totalElements} Trending Events
-                </span>
-              </div>
+          <div className="mt-6 flex flex-wrap items-center gap-3">
+            <div className="inline-flex items-center gap-2 rounded-[10px] bg-pale-canvas/10 px-4 py-3 text-sm font-bold">
+              <TrendingUp className="h-4 w-4" />
+              <span>{totalElements} Trending Events</span>
             </div>
-            <div className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-lg">
-              <div className="flex items-center gap-2">
-                <Calendar className="w-5 h-5" />
-                <span className="font-semibold">Updated Daily</span>
-              </div>
+            <div className="inline-flex items-center gap-2 rounded-[10px] bg-pale-canvas/10 px-4 py-3 text-sm font-bold">
+              <Calendar className="h-4 w-4" />
+              <span>Updated Daily</span>
             </div>
           </div>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="max-w-7xl mx-auto px-6 py-6">
-        <div className="bg-white rounded-2xl shadow-lg p-6">
+      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
+        <div className="rounded-[20px] border-2 border-ash-whisper bg-pale-canvas p-5 shadow-sm">
           <div className="flex flex-wrap items-center justify-between gap-4">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-              <span className="text-gray-700 font-semibold">Time Range:</span>
-              <div className="flex gap-2 flex-wrap">
+            <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center">
+              <span className="text-sm font-bold text-deep-forest/70">
+                Time Range:
+              </span>
+              <div className="flex flex-wrap gap-2">
                 {timeRangeOptions.map((option) => (
                   <button
                     key={option.value}
@@ -185,15 +192,15 @@ function TrendingPage() {
                     disabled={
                       isChangingFilter || (isLoading && days === option.value)
                     }
-                    className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
+                    className={`rounded-[10px] px-4 py-3 text-sm font-bold transition-colors ${
                       days === option.value
-                        ? "bg-gradient-to-r from-red-500 to-orange-500 text-white shadow-lg scale-105"
-                        : "bg-gray-100 text-gray-700 hover:bg-gray-200 hover:scale-105"
+                        ? "bg-deep-forest text-pale-canvas"
+                        : "bg-ash-whisper/70 text-deep-forest hover:bg-bubblegum-blush"
                     } disabled:opacity-50 disabled:cursor-not-allowed`}
                   >
                     {isLoading && days === option.value ? (
                       <div className="flex items-center gap-2">
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        <Loader2 className="h-4 w-4 animate-spin" />
                         <span>Loading...</span>
                       </div>
                     ) : (
@@ -205,8 +212,8 @@ function TrendingPage() {
             </div>
 
             {isFetching && events.length > 0 && !isChangingFilter && (
-              <div className="flex items-center gap-2 text-gray-600 animate-pulse">
-                <div className="w-5 h-5 border-2 border-red-500 border-t-transparent rounded-full animate-spin" />
+              <div className="flex animate-pulse items-center gap-2 text-deep-forest/60">
+                <Loader2 className="h-5 w-5 animate-spin text-deep-forest" />
                 <span className="text-sm">Loading more...</span>
               </div>
             )}
@@ -214,14 +221,14 @@ function TrendingPage() {
 
           {/* Progress indicator when changing filter */}
           {isChangingFilter && (
-            <div className="mt-4 pt-4 border-t border-gray-200">
-              <div className="flex items-center gap-3 text-gray-600">
-                <div className="w-5 h-5 border-2 border-red-500 border-t-transparent rounded-full animate-spin" />
+            <div className="mt-4 border-t border-deep-forest/10 pt-4">
+              <div className="flex items-center gap-3 text-deep-forest/60">
+                <Loader2 className="h-5 w-5 animate-spin text-deep-forest" />
                 <span className="text-sm">Fetching trending events...</span>
               </div>
-              <div className="mt-2 w-full bg-gray-200 rounded-full h-1 overflow-hidden">
+              <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-ash-whisper">
                 <div
-                  className="h-full bg-gradient-to-r from-red-500 to-orange-500 animate-pulse"
+                  className="h-full animate-pulse rounded-full bg-deep-forest"
                   style={{ width: "60%" }}
                 ></div>
               </div>
@@ -231,34 +238,34 @@ function TrendingPage() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-6 pb-12">
+      <div className="mx-auto max-w-7xl px-4 pb-12 sm:px-6">
         {isLoading || isChangingFilter ? (
           <div className="space-y-4">
             {isChangingFilter && (
               <div className="text-center py-4">
-                <p className="text-gray-600 font-medium">
+                <p className="text-sm font-bold text-deep-forest/60">
                   Loading trending events for the selected time range...
                 </p>
               </div>
             )}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {[...Array(8)].map((_, index) => (
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+              {[...Array(4)].map((_, index) => (
                 <div
                   key={index}
-                  className="bg-white rounded-xl shadow-sm overflow-hidden animate-pulse"
+                  className="overflow-hidden rounded-[20px] border border-deep-forest/10 bg-white/55 p-5 shadow-sm"
                 >
-                  <Skeleton
-                    variant="rectangular"
-                    height={200}
-                    animation="wave"
-                  />
-                  <div className="p-4 space-y-2">
-                    <Skeleton variant="text" width="70%" height={28} />
-                    <Skeleton variant="text" width="90%" height={20} />
-                    <Skeleton variant="text" width="50%" height={20} />
-                    <div className="grid grid-cols-2 gap-2 pt-2">
-                      <Skeleton variant="rectangular" height={40} />
-                      <Skeleton variant="rectangular" height={40} />
+                  <div className="animate-pulse">
+                    <div className="aspect-[16/10] rounded-2xl bg-deep-forest/10" />
+                    <div className="mt-5 space-y-3">
+                      <div className="h-5 w-2/3 rounded-full bg-deep-forest/10" />
+                      <div className="h-4 w-5/6 rounded-full bg-deep-forest/10" />
+                      <div className="grid grid-cols-2 gap-3 pt-2">
+                        <div className="h-12 rounded-[10px] bg-deep-forest/10" />
+                        <div className="h-12 rounded-[10px] bg-deep-forest/10" />
+                        <div className="h-12 rounded-[10px] bg-deep-forest/10" />
+                        <div className="h-12 rounded-[10px] bg-deep-forest/10" />
+                      </div>
+                      <div className="h-11 rounded-[10px] bg-deep-forest/10" />
                     </div>
                   </div>
                 </div>
@@ -266,17 +273,19 @@ function TrendingPage() {
             </div>
           </div>
         ) : events.length === 0 ? (
-          <div className="bg-white rounded-2xl shadow-lg p-12 text-center">
-            <div className="text-gray-400 text-6xl mb-4">🔍</div>
-            <h2 className="text-2xl font-bold text-gray-800 mb-2">
+          <div className="rounded-[25px] border-2 border-ash-whisper bg-pale-canvas p-12 text-center shadow-sm">
+            <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-ash-whisper text-deep-forest/45">
+              <SearchX className="h-10 w-10" />
+            </div>
+            <h2 className="mb-2 text-2xl font-bold text-deep-forest">
               No Trending Events Found
             </h2>
-            <p className="text-gray-600 mb-6">
+            <p className="mb-6 text-sm font-medium text-deep-forest/60">
               Check back later for new trending opportunities!
             </p>
             <button
               onClick={() => setDays(90)}
-              className="px-6 py-2 bg-gradient-to-r from-red-500 to-orange-500 text-white rounded-lg hover:from-red-600 hover:to-orange-600 transition-all"
+              className="rounded-[10px] bg-deep-forest px-6 py-3 text-sm font-bold text-pale-canvas transition-colors hover:bg-foudre-pink"
             >
               Try Longer Time Range
             </button>

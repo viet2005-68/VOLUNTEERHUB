@@ -24,20 +24,38 @@ export const showConfirmDialog = async ({
     cancelButtonText = "Cancel",
     confirmButtonColor = "#3085d6",
 }) => {
+    const isDanger = ["#ef4444", "#d33", "#dc2626"].includes(confirmButtonColor);
+    const confirmButtonClass = isDanger
+        ? "rounded-[10px] bg-foudre-pink px-5 py-3 text-sm font-bold text-pale-canvas transition-colors hover:bg-deep-forest focus:outline-none"
+        : "rounded-[10px] bg-deep-forest px-5 py-3 text-sm font-bold text-pale-canvas transition-colors hover:bg-foudre-pink focus:outline-none";
+
     const result = await Swal.fire({
         title,
         text,
         icon,
+        iconColor: isDanger ? "#db3c8a" : "#00522d",
+        background: "#fff8f6",
+        color: "#00522d",
+        width: 520,
         showCancelButton: true,
-        confirmButtonColor,
-        cancelButtonColor: "#d33",
+        buttonsStyling: false,
+        focusConfirm: false,
         confirmButtonText,
         cancelButtonText,
         reverseButtons: true,
+        backdrop: "rgba(0, 82, 45, 0.42)",
         customClass: {
-            popup: "rounded-xl",
-            confirmButton: "px-6 py-2.5 rounded-lg font-medium",
-            cancelButton: "px-6 py-2.5 rounded-lg font-medium",
+            popup:
+                "rounded-[25px] border-2 border-ash-whisper bg-pale-canvas p-6 shadow-2xl",
+            icon: "mt-3 border-2",
+            title:
+                "font-beni text-[42px] font-black uppercase leading-[0.76] text-deep-forest",
+            htmlContainer:
+                "mx-auto mt-2 max-w-[380px] text-sm font-medium leading-[1.35] text-deep-forest/70",
+            actions: "mt-6 flex items-center justify-center gap-3",
+            confirmButton: confirmButtonClass,
+            cancelButton:
+                "rounded-[10px] border-2 border-deep-forest/20 bg-pale-canvas px-5 py-3 text-sm font-bold text-deep-forest transition-colors hover:border-deep-forest hover:bg-ash-whisper focus:outline-none",
         },
     });
 
@@ -109,11 +127,22 @@ export const showSuccess = async (title = "Success!", text = "") => {
         title,
         text,
         icon: "success",
+        iconColor: "#00522d",
+        background: "#fff8f6",
+        color: "#00522d",
+        width: 480,
         confirmButtonText: "OK",
-        confirmButtonColor: "#22c55e",
+        buttonsStyling: false,
+        backdrop: "rgba(0, 82, 45, 0.32)",
         customClass: {
-            popup: "rounded-xl",
-            confirmButton: "px-6 py-2.5 rounded-lg font-medium",
+            popup:
+                "rounded-[25px] border-2 border-ash-whisper bg-pale-canvas p-6 shadow-2xl",
+            title:
+                "font-beni text-[42px] font-black uppercase leading-[0.76] text-deep-forest",
+            htmlContainer:
+                "mx-auto mt-2 max-w-[360px] text-sm font-medium leading-[1.35] text-deep-forest/70",
+            confirmButton:
+                "rounded-[10px] bg-deep-forest px-6 py-3 text-sm font-bold text-pale-canvas transition-colors hover:bg-foudre-pink focus:outline-none",
         },
     });
 };
@@ -126,12 +155,22 @@ export const showError = async (title = "Error!", text = "") => {
         title,
         text,
         icon: "error",
+        iconColor: "#db3c8a",
+        background: "#fff8f6",
+        color: "#00522d",
+        width: 480,
         confirmButtonText: "OK",
-        confirmButtonColor: "#ef4444",
+        buttonsStyling: false,
+        backdrop: "rgba(0, 82, 45, 0.32)",
         customClass: {
-            popup: "rounded-xl",
-            confirmButton: "px-6 py-2.5 rounded-lg font-medium",
+            popup:
+                "rounded-[25px] border-2 border-ash-whisper bg-pale-canvas p-6 shadow-2xl",
+            title:
+                "font-beni text-[42px] font-black uppercase leading-[0.76] text-deep-forest",
+            htmlContainer:
+                "mx-auto mt-2 max-w-[360px] text-sm font-medium leading-[1.35] text-deep-forest/70",
+            confirmButton:
+                "rounded-[10px] bg-foudre-pink px-6 py-3 text-sm font-bold text-pale-canvas transition-colors hover:bg-deep-forest focus:outline-none",
         },
     });
 };
-

@@ -2,8 +2,26 @@ import React from "react";
 import ModalActivity from "../../components/ModalActivity/ModalActivity";
 import AnnouncedEventCard from "../../components/Dashboard/AnnouncedEventCard";
 import { useApprovedEventsTop2ByName } from "../../hook/useEvent";
-import { noAnnounce } from "../../assets/dashboard";
 import { BellOff } from "lucide-react";
+
+const SkeletonAnnouncedEventCard = () => (
+  <div className="min-h-[154px] rounded-2xl border border-deep-forest/10 bg-white/55 p-5 shadow-sm">
+    <div className="grid min-h-[112px] animate-pulse grid-cols-[minmax(0,1fr)_96px] items-center gap-5 max-sm:grid-cols-1">
+      <div className="flex min-w-0 flex-col gap-4">
+        <div className="space-y-2">
+          <div className="h-5 w-2/3 rounded-full bg-deep-forest/10" />
+          <div className="h-3 w-32 rounded-full bg-deep-forest/10" />
+        </div>
+        <div className="grid grid-cols-2 gap-3 max-sm:grid-cols-1">
+          <div className="h-10 rounded-[10px] bg-deep-forest/10" />
+          <div className="h-10 rounded-[10px] bg-deep-forest/10" />
+        </div>
+        <div className="h-4 w-5/6 rounded-full bg-deep-forest/10" />
+      </div>
+      <div className="aspect-square w-24 justify-self-end rounded-2xl bg-deep-forest/10 max-sm:w-full" />
+    </div>
+  </div>
+);
 
 function NewEventsAnnounced({ className }) {
   const { data, isLoading, isError } = useApprovedEventsTop2ByName();
@@ -48,37 +66,13 @@ function NewEventsAnnounced({ className }) {
         subtile="Recently Announced"
         viewMore={true}
         path="/dashboard/eventmanager"
-        className="min-h-[430px]"
+        className="min-h-[470px]"
       >
         {isLoading && (
           <>
-            <AnnouncedEventCard
-              title="Loading..."
-              date={null}
-              starttime={null}
-              endtime={null}
-              location=""
-              joined={0}
-              capacity={0}
-            />
-            <AnnouncedEventCard
-              title="Loading..."
-              date={null}
-              starttime={null}
-              endtime={null}
-              location=""
-              joined={0}
-              capacity={0}
-            />
-            <AnnouncedEventCard
-              title="Loading..."
-              date={null}
-              starttime={null}
-              endtime={null}
-              location=""
-              joined={0}
-              capacity={0}
-            />
+            {[0, 1].map((i) => (
+              <SkeletonAnnouncedEventCard key={i} />
+            ))}
           </>
         )}
         {isError && (

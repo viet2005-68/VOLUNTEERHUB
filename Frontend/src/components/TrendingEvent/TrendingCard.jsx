@@ -42,7 +42,7 @@ function TrendingCard({ items }) {
     <div className="rounded-2xl">
       <Card className="group border-2 border-ash-whisper bg-pale-canvas shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-bubblegum-blush hover:shadow-md">
         <div className="grid items-center gap-4 md:grid-cols-[112px_minmax(0,1fr)_56px]">
-          <div className="h-[80px] w-full overflow-hidden rounded-2xl border border-ash-whisper bg-ash-whisper max-md:h-[160px]">
+          <div className="aspect-square w-full overflow-hidden rounded-2xl border border-ash-whisper bg-ash-whisper">
             {imageUrl ? (
               <img
                 src={imageUrl}

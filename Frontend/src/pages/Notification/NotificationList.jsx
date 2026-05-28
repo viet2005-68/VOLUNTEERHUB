@@ -30,16 +30,21 @@ function NotificationList({ items, loadMore, hasMore, isLoading }) {
   return (
     <div className="relative bg-pale-canvas">
       {items.length === 0 ? (
-        <div className="flex min-h-[220px] items-center justify-center">
+        <div className="flex min-h-[280px] items-center justify-center rounded-[20px] border border-deep-forest/10 bg-ash-whisper/25">
           <div className="text-center">
-            <div className="mb-4 flex justify-center text-deep-forest/45">
-              <Bell className="w-12 h-12" />
+            <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-pale-canvas text-deep-forest/45 shadow-sm">
+              <Bell className="h-10 w-10" />
             </div>
-            <p className="text-deep-forest/60">No notifications yet</p>
+            <p className="text-base font-bold text-deep-forest">
+              No notifications yet
+            </p>
+            <p className="mt-1 text-sm font-medium text-deep-forest/55">
+              New updates will show up here.
+            </p>
           </div>
         </div>
       ) : (
-        <div className="h-[min(68vh,720px)] min-h-[420px] overflow-hidden rounded-[16px] border border-deep-forest/10 bg-pale-canvas/80">
+        <div className="h-[min(68vh,720px)] min-h-[420px] overflow-hidden rounded-[20px] border border-deep-forest/10 bg-ash-whisper/25">
           <Virtuoso
             data={items}
             endReached={loadMore}

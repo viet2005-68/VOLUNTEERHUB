@@ -2,21 +2,23 @@ import React from "react";
 import ModalActivity from "../ModalActivity/ModalActivity";
 import RequestCard from "./RequestCard";
 import { usePendingRegistrationsTop3ByNameAsc } from "../../hook/useRegistration";
-import { Skeleton } from "@mui/material";
 import { BellOff } from "lucide-react";
 
 const SkeletonRequestCard = () => (
-  <div className="flex min-h-[142px] flex-col sm:flex-row sm:items-center sm:justify-between p-5 bg-pale-canvas border-2 border-ash-whisper rounded-2xl shadow-sm mb-3 gap-4">
-    <div className="flex items-center gap-3">
-      <Skeleton variant="circular" width={40} height={40} />
-      <div className="flex flex-col gap-1">
-        <Skeleton variant="text" width={160} height={20} />
-        <Skeleton variant="text" width={120} height={16} />
+  <div className="min-h-[154px] rounded-2xl border border-deep-forest/10 bg-white/55 p-5 shadow-sm">
+    <div className="flex min-h-[112px] animate-pulse flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex min-w-0 flex-1 items-start gap-4">
+        <div className="h-16 w-16 shrink-0 rounded-2xl bg-deep-forest/10" />
+        <div className="flex min-w-0 flex-1 flex-col gap-3">
+          <div className="h-5 w-44 max-w-full rounded-full bg-deep-forest/10" />
+          <div className="h-4 w-56 max-w-full rounded-full bg-deep-forest/10" />
+          <div className="h-8 w-28 rounded-[10px] bg-deep-forest/10" />
+        </div>
       </div>
-    </div>
-    <div className="flex flex-row items-center gap-2">
-      <Skeleton variant="rectangular" width={90} height={34} />
-      <Skeleton variant="rectangular" width={80} height={34} />
+      <div className="flex gap-3 sm:min-w-[240px]">
+        <div className="h-11 flex-1 rounded-[10px] bg-deep-forest/10" />
+        <div className="h-11 flex-1 rounded-[10px] bg-deep-forest/10" />
+      </div>
     </div>
   </div>
 );
@@ -32,6 +34,7 @@ function RequestCardOverview({ className }) {
     : Array.isArray(data)
     ? data
     : [];
+  const overviewItems = items.slice(0, 2);
 
   const loading = isLoading || isFetching;
 
@@ -42,17 +45,17 @@ function RequestCardOverview({ className }) {
         subtile="Join Requests"
         viewMore={true}
         path="/dashboard/approve-registration"
-        className="flex flex-col justify-start min-h-[430px]"
+        className="flex flex-col justify-start min-h-[470px]"
       >
-        {loading && [0, 1, 2, 3].map((i) => <SkeletonRequestCard key={i} />)}
+        {loading && [0, 1].map((i) => <SkeletonRequestCard key={i} />)}
 
         {!loading && isError && (
-          <div className="text-sm text-red-600">
+          <div className="text-sm font-bold text-foudre-pink">
             Error: {error?.message || "Error undefined"}
           </div>
         )}
 
-        {!loading && !isError && items.length === 0 && (
+        {!loading && !isError && overviewItems.length === 0 && (
           <div className="text-sm text-deep-forest/60 flex flex-col gap-2 mt-5 items-center justify-center flex-1">
             <div className="mx-auto flex h-[64px] w-[64px] items-center justify-center rounded-full bg-deep-forest/5">
               <BellOff className="h-[32px] w-[32px] text-deep-forest/45" />
@@ -63,7 +66,7 @@ function RequestCardOverview({ className }) {
 
         {!loading &&
           !isError &&
-          items.map((item, idx) => (
+          overviewItems.map((item, idx) => (
             <RequestCard
               key={item.id ?? item.registrationId ?? idx}
               data={item}
