@@ -38,7 +38,7 @@ function EventHero({ id, imgURL, organizerName, eventName }) {
         {/* Back Button */}
         <button
           onClick={() => navigate("/opportunities")}
-          className="absolute left-4 top-4 flex items-center gap-2 rounded-full bg-pale-canvas p-3 text-deep-forest transition-colors hover:bg-bubblegum-blush"
+          className="absolute left-6 top-6 flex items-center gap-2 rounded-full bg-deep-forest px-4 py-3 text-pale-canvas transition-colors hover:bg-foudre-pink shadow-lg"
           title="Back to Opportunities"
         >
           <ArrowLeft size={20} />
