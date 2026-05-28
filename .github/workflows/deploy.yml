@@ -24,49 +24,129 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  detect-changes:
+    name: Detect changed services
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+      has_changes: ${{ steps.set-matrix.outputs.has_changes }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GHCR_TOKEN }}
+          fetch-depth: 0
+
+      - name: Filter Paths
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            service-discovery:
+              - 'ServiceDiscovery/**'
+              - 'Common/**'
+            api-gateway:
+              - 'ApiGateway/**'
+              - 'Common/**'
+            authorization-server:
+              - 'AuthorizationServer/**'
+              - 'Common/**'
+            user-service:
+              - 'UserService/**'
+              - 'Common/**'
+            event-service:
+              - 'EventService/**'
+              - 'Common/**'
+            community-service:
+              - 'CommunityService/**'
+              - 'Common/**'
+            registration-service:
+              - 'RegistrationService/**'
+              - 'Common/**'
+            notification-service:
+              - 'NotificationService/**'
+              - 'Common/**'
+            chat-service:
+              - 'ChatService/**'
+              - 'Common/**'
+            aggregation-service:
+              - 'AggregationService/**'
+              - 'Common/**'
+            analytic-service:
+              - 'AnalyticService/**'
+              - 'Common/**'
+            frontend:
+              - 'Frontend/**'
+
+      - name: Generate build matrix
+        id: set-matrix
+        shell: bash
+        run: |
+          IS_DISPATCH="${{ github.event_name == 'workflow_dispatch' }}"
+          matrix_json="[]"
+          
+          append_to_matrix() {
+            local image=$1
+            local service_dir=$2
+            local kind=$3
+            matrix_json=$(echo "$matrix_json" | jq ". += [{\"image\": \"$image\", \"service_dir\": \"$service_dir\", \"kind\": \"$kind\"}]")
+          }
+          
+          if [ "$IS_DISPATCH" = "true" ] || [ "${{ steps.filter.outputs.service-discovery }}" = "true" ]; then
+            append_to_matrix "volunteerhub-service-discovery" "ServiceDiscovery" "spring"
+          fi
+          if [ "$IS_DISPATCH" = "true" ] || [ "${{ steps.filter.outputs.api-gateway }}" = "true" ]; then
+            append_to_matrix "volunteerhub-api-gateway" "ApiGateway" "spring"
+          fi
+          if [ "$IS_DISPATCH" = "true" ] || [ "${{ steps.filter.outputs.authorization-server }}" = "true" ]; then
+            append_to_matrix "volunteerhub-authorization-server" "AuthorizationServer" "spring"
+          fi
+          if [ "$IS_DISPATCH" = "true" ] || [ "${{ steps.filter.outputs.user-service }}" = "true" ]; then
+            append_to_matrix "volunteerhub-user-service" "UserService" "spring"
+          fi
+          if [ "$IS_DISPATCH" = "true" ] || [ "${{ steps.filter.outputs.event-service }}" = "true" ]; then
+            append_to_matrix "volunteerhub-event-service" "EventService" "spring"
+          fi
+          if [ "$IS_DISPATCH" = "true" ] || [ "${{ steps.filter.outputs.community-service }}" = "true" ]; then
+            append_to_matrix "volunteerhub-community-service" "CommunityService" "spring"
+          fi
+          if [ "$IS_DISPATCH" = "true" ] || [ "${{ steps.filter.outputs.registration-service }}" = "true" ]; then
+            append_to_matrix "volunteerhub-registration-service" "RegistrationService" "spring"
+          fi
+          if [ "$IS_DISPATCH" = "true" ] || [ "${{ steps.filter.outputs.notification-service }}" = "true" ]; then
+            append_to_matrix "volunteerhub-notification-service" "NotificationService" "spring"
+          fi
+          if [ "$IS_DISPATCH" = "true" ] || [ "${{ steps.filter.outputs.chat-service }}" = "true" ]; then
+            append_to_matrix "volunteerhub-chat-service" "ChatService" "spring"
+          fi
+          if [ "$IS_DISPATCH" = "true" ] || [ "${{ steps.filter.outputs.aggregation-service }}" = "true" ]; then
+            append_to_matrix "volunteerhub-aggregation-service" "AggregationService" "spring"
+          fi
+          if [ "$IS_DISPATCH" = "true" ] || [ "${{ steps.filter.outputs.analytic-service }}" = "true" ]; then
+            append_to_matrix "volunteerhub-analytic-service" "AnalyticService" "spring"
+          fi
+          if [ "$IS_DISPATCH" = "true" ] || [ "${{ steps.filter.outputs.frontend }}" = "true" ]; then
+            append_to_matrix "volunteerhub-frontend" "Frontend" "frontend"
+          fi
+          
+          length=$(echo "$matrix_json" | jq '. | length')
+          if [ "$length" -eq 0 ]; then
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+            echo "matrix=[]" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+            echo "matrix=$(echo "$matrix_json" | jq -c '.')" >> "$GITHUB_OUTPUT"
+          fi
+
   build:
     name: Build and push images
+    needs: detect-changes
+    if: needs.detect-changes.outputs.has_changes == 'true'
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - image: volunteerhub-service-discovery
-            service_dir: ServiceDiscovery
-            kind: spring
-          - image: volunteerhub-api-gateway
-            service_dir: ApiGateway
-            kind: spring
-          - image: volunteerhub-authorization-server
-            service_dir: AuthorizationServer
-            kind: spring
-          - image: volunteerhub-user-service
-            service_dir: UserService
-            kind: spring
-          - image: volunteerhub-event-service
-            service_dir: EventService
-            kind: spring
-          - image: volunteerhub-community-service
-            service_dir: CommunityService
-            kind: spring
-          - image: volunteerhub-registration-service
-            service_dir: RegistrationService
-            kind: spring
-          - image: volunteerhub-notification-service
-            service_dir: NotificationService
-            kind: spring
-          - image: volunteerhub-chat-service
-            service_dir: ChatService
-            kind: spring
-          - image: volunteerhub-aggregation-service
-            service_dir: AggregationService
-            kind: spring
-          - image: volunteerhub-analytic-service
-            service_dir: AnalyticService
-            kind: spring
-          - image: volunteerhub-frontend
-            service_dir: Frontend
-            kind: frontend
+        include: ${{ fromJson(needs.detect-changes.outputs.matrix) }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -137,7 +217,8 @@ jobs:
   deploy:
     name: Deploy to k3s
     runs-on: ubuntu-latest
-    needs: build
+    needs: [detect-changes, build]
+    if: needs.detect-changes.outputs.has_changes == 'true'
     environment: staging
     steps:
       - name: Checkout
@@ -180,8 +261,13 @@ jobs:
             "${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}"
           kubectl get nodes
 
+      - name: Install PyYAML
+        run: pip install pyyaml --quiet
+
       - name: Patch deployment config
         shell: bash
+        env:
+          SERVICES_JSON: ${{ needs.detect-changes.outputs.matrix }}
         run: |
           PUBLIC_BASE_URL="${{ vars.PUBLIC_BASE_URL }}"
           if [ -z "$PUBLIC_BASE_URL" ]; then
@@ -206,7 +292,44 @@ jobs:
           sed -i "s|__VAPID_SUBJECT__|${VAPID_SUBJECT}|g" k8s/overlays/prod-lite/config-patch.yaml
           sed -i "s|__APP_HOST__|${APP_HOST}|g" k8s/overlays/prod-lite/ingress.yaml
           sed -i "s|__LETSENCRYPT_EMAIL__|${LETSENCRYPT_EMAIL}|g" k8s/overlays/prod-lite/cluster-issuer.yaml
-          sed -i "s|newTag: latest|newTag: ${DEPLOY_SHA}|g" k8s/overlays/prod-lite/kustomization.yaml
+          
+          python3 -c "
+          import os, json, subprocess, yaml
+          
+          deploy_sha = os.environ['DEPLOY_SHA']
+          services_json = os.environ.get('SERVICES_JSON', '[]')
+          built_services = {item['image'] for item in json.loads(services_json)}
+          
+          kust_path = 'k8s/overlays/prod-lite/kustomization.yaml'
+          with open(kust_path, 'r') as f:
+              kust = yaml.safe_load(f)
+              
+          for img in kust.get('images', []):
+              name = img['name']
+              image_name = name.split('/')[-1]
+              gh_image = f'volunteerhub-{image_name}'
+              
+              if gh_image in built_services:
+                  img['newTag'] = deploy_sha
+                  print(f'Set {image_name} to new tag: {deploy_sha}')
+              else:
+                  try:
+                      cmd = f'kubectl get deployment/{image_name} -n volunteerhub -o jsonpath=\"{{.spec.template.spec.containers[0].image}}\"'
+                      curr_image = subprocess.check_output(cmd, shell=True, text=True).strip()
+                      if curr_image and \":\" in curr_image:
+                          curr_tag = curr_image.split(\":\")[-1]
+                          img['newTag'] = curr_tag
+                          print(f'Keep {image_name} on running tag: {curr_tag}')
+                      else:
+                          img['newTag'] = 'latest'
+                          print(f'No running tag found for {image_name}, default to latest')
+                  except Exception as e:
+                      img['newTag'] = deploy_sha
+                      print(f'Deployment {image_name} not found in K3s, default to {deploy_sha} (first-time deploy)')
+                      
+          with open(kust_path, 'w') as f:
+              yaml.safe_dump(kust, f)
+          "
 
       - name: Install cert-manager
         shell: bash
@@ -346,6 +469,11 @@ jobs:
 
           failed=0
           for deployment in "${deployments[@]}"; do
+            if ! kubectl get deployment "${deployment}" -n volunteerhub >/dev/null 2>&1; then
+              echo "Deployment ${deployment} does not exist in cluster. Skipping rollout check."
+              continue
+            fi
+
             kubectl rollout status "deployment/${deployment}" -n volunteerhub --timeout=600s
             status=$?
             if [ "$status" -ne 0 ]; then
@@ -359,6 +487,10 @@ jobs:
                 kubectl logs -n volunteerhub -l "app.kubernetes.io/name=${selector}" --all-containers --tail=200 || true
               fi
               echo "::endgroup::"
+              
+              echo "::error::Rollout failed for ${deployment}. Initiating auto-rollback..."
+              kubectl rollout undo "deployment/${deployment}" -n volunteerhub
+              kubectl rollout status "deployment/${deployment}" -n volunteerhub --timeout=300s
               break
             fi
           done

@@ -1,4 +1,4 @@
-import tronglua from '../../assets/landing/tronglua.jpg'
+import thapsang from '../../assets/landing/thapsang.jpg'
 function Agency() {
   return (
     <section id="agency" className="agency-section section-pad">
@@ -9,7 +9,7 @@ function Agency() {
           <h2 data-animate="line-reveal">We connect people, causes, and local action in one clear place.</h2>
         </div>
         <div className="agency-device" data-animate="image-reveal" data-cursor="card">
-          <img src={tronglua} alt="Volunteers working together" />
+          <img src={thapsang} alt="Volunteers working together" />
           <span>See impact</span>
         </div>
         <div className="agency-text" data-animate>
