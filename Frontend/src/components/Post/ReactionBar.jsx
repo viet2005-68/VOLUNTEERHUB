@@ -1,6 +1,7 @@
 // ReactionBar.jsx
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ReactionButton from "./ReactionButton";
+import { X } from "lucide-react";
 import {
   FaCommentAlt,
   FaFacebookF,
@@ -15,7 +16,6 @@ import {
   useMyReaction,
   useReactions,
 } from "../../hook/useCommunity";
-import useClickOutside from "../../hook/ClickOutside";
 
 const REACTION_ICONS = {
   like: "👍",
@@ -89,7 +89,25 @@ export default function ReactionBar({
   readOnly = false,
 }) {
   const [showShareMenu, setShowShareMenu] = useState(false);
-  const shareMenuRef = useClickOutside(() => setShowShareMenu(false));
+
+  useEffect(() => {
+    if (!showShareMenu) return;
+
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        setShowShareMenu(false);
+      }
+    };
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [showShareMenu]);
 
   const embeddedCounts = post?.reactionCounts || post?.reactions;
   const hasEmbeddedCounts =
@@ -220,7 +238,7 @@ export default function ReactionBar({
       )}
 
       {onShare && !readOnly && (
-        <div className="relative" ref={shareMenuRef}>
+        <div>
           <button
             type="button"
             onClick={() => setShowShareMenu((open) => !open)}
@@ -240,25 +258,55 @@ export default function ReactionBar({
 
           {showShareMenu && (
             <div
-              role="menu"
-              className="absolute left-0 top-[calc(100%+10px)] z-[120] w-[260px] max-w-[calc(100vw-24px)] rounded-[14px] border border-ash-whisper bg-pale-canvas p-2 shadow-2xl sm:left-auto sm:right-0"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Share post"
+              className="fixed inset-0 z-[1000] flex min-h-dvh flex-col bg-pale-canvas text-deep-forest"
             >
-              <div className="px-2 pb-2 pt-1 text-xs font-bold uppercase text-deep-forest/55">
-                Share to
+              <div className="flex items-center justify-between border-b border-ash-whisper px-5 py-4 sm:px-8">
+                <div>
+                  <p className="text-xs font-bold uppercase text-deep-forest/55">
+                    Share to
+                  </p>
+                  <h3 className="mt-1 text-2xl font-bold leading-tight text-deep-forest sm:text-3xl">
+                    Chia sẻ bài viết
+                  </h3>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowShareMenu(false)}
+                  className="flex h-12 w-12 items-center justify-center rounded-full border border-ash-whisper bg-pale-canvas text-deep-forest shadow-sm transition-colors hover:bg-ash-whisper"
+                  aria-label="Close share dialog"
+                  title="Close"
+                >
+                  <X className="h-6 w-6" />
+                </button>
               </div>
-              <div className="grid grid-cols-2 gap-2">
-                {SHARE_TARGETS.map(({ key, label, icon: Icon }) => (
-                  <button
-                    key={key}
-                    type="button"
-                    role="menuitem"
-                    onClick={() => handleShareOption(key)}
-                    className="flex min-h-[46px] items-center gap-2 rounded-[10px] px-3 py-2 text-left text-sm font-bold text-deep-forest transition-colors hover:bg-ash-whisper"
-                  >
-                    <Icon className="h-5 w-5 shrink-0" />
-                    <span className="truncate">{label}</span>
-                  </button>
-                ))}
+
+              <div className="flex flex-1 items-center justify-center overflow-y-auto px-5 py-8 sm:px-8">
+                <div className="w-full max-w-[760px]">
+                  <div className="mb-6 rounded-[16px] border border-ash-whisper bg-ash-whisper/35 px-4 py-3 text-sm font-semibold leading-relaxed text-deep-forest/70">
+                    {post.text?.trim()
+                      ? post.text.trim().slice(0, 180)
+                      : "VolunteerHub post"}
+                  </div>
+
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    {SHARE_TARGETS.map(({ key, label, icon: Icon }) => (
+                      <button
+                        key={key}
+                        type="button"
+                        onClick={() => handleShareOption(key)}
+                        className="flex min-h-[72px] items-center gap-4 rounded-[14px] border border-ash-whisper bg-pale-canvas px-5 py-4 text-left text-lg font-bold text-deep-forest shadow-sm transition-colors hover:bg-ash-whisper"
+                      >
+                        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-deep-forest text-pale-canvas">
+                          <Icon className="h-5 w-5" />
+                        </span>
+                        <span>{label}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
           )}

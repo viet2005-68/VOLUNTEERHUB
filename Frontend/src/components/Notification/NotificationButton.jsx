@@ -113,7 +113,7 @@ const NotificationButton = () => {
         className={`flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all ${
           isSubscribed
             ? "bg-emerald-50 text-emerald-600 cursor-default"
-            : "bg-blue-600 text-white hover:bg-blue-700 shadow-md shadow-blue-200"
+            : "bg-deep-forest text-white hover:bg-deep-forest/90 shadow-md shadow-deep-forest/20"
         }`}
       >
         {loading ? (

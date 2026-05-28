@@ -210,12 +210,12 @@ export default function CommentItem({
             {showReplyInput && (
               <form
                 onSubmit={handleReplySubmit}
-                className="lg:mt-5 mt-2 flex gap-2 items-center relative py-0"
+                className="mt-3 flex items-start gap-3"
               >
-                <div className="h-[34px] w-[34px] rounded-full bg-deep-forest flex items-center justify-center text-white text-sm font-semibold flex-shrink-0 absolute left-0 top-2">
+                <div className="flex h-[38px] w-[38px] shrink-0 items-center justify-center rounded-full bg-deep-forest text-sm font-semibold text-pale-canvas">
                   {(currentUserName && currentUserName[0]) || "?"}
                 </div>
-                <div className="flex-1 flex gap-2 bg-ash-whisper rounded-xl px-2 py-2 pl-10 pr-5 pb-5">
+                <div className="flex min-w-0 flex-1 items-end gap-2 rounded-2xl border border-ash-whisper bg-ash-whisper/55 px-4 py-2">
                   <textarea
                     type="text"
                     value={replyText}
@@ -230,16 +230,21 @@ export default function CommentItem({
                         ? `Reply to ${replyToUser.name}...`
                         : "Write a reply..."
                     }
-                    className="flex-1 px-3 py-2 text-sm text-deep-forest focus:outline-none bg-ash-whisper resize-none overflow-auto"
-                    style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+                    className="min-h-[36px] max-h-[120px] flex-1 resize-none overflow-auto bg-transparent px-0 py-2 text-sm leading-5 text-deep-forest placeholder:text-deep-forest/45"
+                    style={{
+                      outline: "none",
+                      scrollbarWidth: "none",
+                      msOverflowStyle: "none",
+                    }}
                     autoFocus
                   />
                   <button
                     type="submit"
                     disabled={!replyText.trim()}
-                    className="text-deep-forest hover:text-foudre-pink disabled:text-deep-forest/35 text-sm font-semibold absolute bottom-2 right-2"
+                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-deep-forest text-pale-canvas transition-colors hover:bg-foudre-pink disabled:bg-deep-forest/25 disabled:text-pale-canvas"
+                    aria-label="Send reply"
                   >
-                    <Send />
+                    <Send className="h-5 w-5" />
                   </button>
                 </div>
               </form>
