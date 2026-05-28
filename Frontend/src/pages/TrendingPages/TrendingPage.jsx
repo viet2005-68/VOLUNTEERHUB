@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { Virtuoso } from "react-virtuoso";
-import { useInfiniteTrendingEvents } from "../../hook/useEvent";
+import { useTrendingEvents } from "../../hook/useEvent";
 import TrendingEventCard from "../../components/TrendingEvent/TrendingEventCard";
 import {
   TrendingUp,
   Flame,
   Calendar,
   ArrowLeft,
+  ChevronLeft,
+  ChevronRight,
   Loader2,
   SearchX,
 } from "lucide-react";
@@ -15,21 +16,27 @@ import { useNavigate } from "react-router-dom";
 function TrendingPage() {
   const navigate = useNavigate();
   const [days, setDays] = useState(30);
+  const [pageNum, setPageNum] = useState(0);
   const [isChangingFilter, setIsChangingFilter] = useState(false);
+  const pageSize = 9;
   const {
-    events,
+    data,
     isLoading,
     isFetching,
     isError,
     error,
-    hasMore,
-    loadMore,
-    totalElements,
-  } = useInfiniteTrendingEvents({ days, pageSize: 12 });
+  } = useTrendingEvents({ days, pageNum, pageSize });
+
+  const events = data?.data || [];
+  const totalElements = data?.meta?.totalElements || 0;
+  const totalPages = data?.meta?.totalPages || 0;
+  const isFirstPage = pageNum === 0;
+  const isLastPage = totalPages === 0 || pageNum >= totalPages - 1;
 
   // Reset when days filter changes
   useEffect(() => {
     setIsChangingFilter(true);
+    setPageNum(0);
     // Scroll to top smoothly
     window.scrollTo({ top: 0, behavior: "smooth" });
 
@@ -46,67 +53,30 @@ function TrendingPage() {
     setDays(newDays);
   };
 
+  const handlePageChange = (newPage) => {
+    if (newPage < 0 || newPage >= totalPages || newPage === pageNum) return;
+    setPageNum(newPage);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const getVisiblePages = () => {
+    if (totalPages <= 5) {
+      return Array.from({ length: totalPages }, (_, index) => index);
+    }
+
+    if (pageNum <= 2) return [0, 1, 2, 3, totalPages - 1];
+    if (pageNum >= totalPages - 3) {
+      return [0, totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1];
+    }
+
+    return [0, pageNum - 1, pageNum, pageNum + 1, totalPages - 1];
+  };
+
   const timeRangeOptions = [
     { value: 7, label: "Last 7 Days" },
     { value: 30, label: "Last 30 Days" },
     { value: 90, label: "Last 3 Months" },
   ];
-
-  // Group events into rows for smoother window virtualization
-  const ITEMS_PER_ROW = 2;
-  const groupedEvents = [];
-  for (let i = 0; i < events.length; i += ITEMS_PER_ROW) {
-    groupedEvents.push(events.slice(i, i + ITEMS_PER_ROW));
-  }
-
-  // Virtuoso Footer Component
-  const Footer = () => {
-    if (!hasMore && events.length > 0) {
-      return (
-        <div className="py-8 text-center">
-          <p className="text-base font-bold text-deep-forest">
-            You've reached the end
-          </p>
-          <p className="mt-2 text-sm font-medium text-deep-forest/55">
-            No more trending events to show
-          </p>
-        </div>
-      );
-    }
-
-    if (hasMore && isFetching) {
-      return (
-        <div className="flex flex-col items-center gap-3 py-6">
-          <Loader2 className="h-6 w-6 animate-spin text-deep-forest" />
-          <p className="text-sm font-bold text-deep-forest/60">
-            Loading more events...
-          </p>
-        </div>
-      );
-    }
-
-    return null;
-  };
-
-  // Virtuoso Item Component - renders a row of cards
-  const ItemContent = (index, row) => {
-    return (
-      <div className="mb-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
-        {row.map((event, idx) => (
-          <div
-            key={event.id}
-            style={{
-              animation: `fadeInUp 0.5s ease-out ${
-                (index * ITEMS_PER_ROW + idx) * 0.02
-              }s both`,
-            }}
-          >
-            <TrendingEventCard {...event} />
-          </div>
-        ))}
-      </div>
-    );
-  };
 
   if (isError) {
     return (
@@ -138,17 +108,17 @@ function TrendingPage() {
     <div className="min-h-screen bg-pale-canvas text-deep-forest">
       {/* Header Section */}
       <div className="mx-auto max-w-7xl px-4 pt-8 sm:px-6">
-        <div className="relative overflow-hidden rounded-[25px] border-2 border-ash-whisper bg-deep-forest p-6 text-pale-canvas shadow-sm sm:p-8">
+        <div className="relative overflow-hidden rounded-[25px] border-2 border-ash-whisper bg-deep-forest p-8 pt-20 text-pale-canvas shadow-sm sm:p-10 sm:pt-20 lg:p-12 lg:pt-24">
           {/* Back Button */}
           <button
             onClick={() => navigate(-1)}
-            className="absolute right-5 top-5 flex h-11 w-11 items-center justify-center rounded-[12px] bg-pale-canvas/10 text-pale-canvas transition-colors hover:bg-foudre-pink"
+            className="absolute left-6 top-6 flex h-11 w-11 items-center justify-center rounded-[12px] bg-pale-canvas/10 text-pale-canvas transition-colors hover:bg-foudre-pink sm:left-8 sm:top-8"
             aria-label="Go back"
           >
             <ArrowLeft className="h-5 w-5" />
           </button>
 
-          <div className="mb-4 flex items-center gap-4 pr-14">
+          <div className="mb-4 flex items-center gap-4">
             <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[16px] bg-ash-whisper text-deep-forest">
               <Flame className="h-7 w-7" />
             </div>
@@ -214,7 +184,7 @@ function TrendingPage() {
             {isFetching && events.length > 0 && !isChangingFilter && (
               <div className="flex animate-pulse items-center gap-2 text-deep-forest/60">
                 <Loader2 className="h-5 w-5 animate-spin text-deep-forest" />
-                <span className="text-sm">Loading more...</span>
+                <span className="text-sm">Updating page...</span>
               </div>
             )}
           </div>
@@ -248,8 +218,8 @@ function TrendingPage() {
                 </p>
               </div>
             )}
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-              {[...Array(4)].map((_, index) => (
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+              {[...Array(pageSize)].map((_, index) => (
                 <div
                   key={index}
                   className="overflow-hidden rounded-[20px] border border-deep-forest/10 bg-white/55 p-5 shadow-sm"
@@ -291,22 +261,73 @@ function TrendingPage() {
             </button>
           </div>
         ) : (
-          <Virtuoso
-            useWindowScroll
-            data={groupedEvents}
-            endReached={() => {
-              if (hasMore && !isFetching) {
-                console.log("End reached, loading more...");
-                loadMore();
-              }
-            }}
-            overscan={600}
-            increaseViewportBy={{ top: 200, bottom: 600 }}
-            itemContent={ItemContent}
-            components={{
-              Footer,
-            }}
-          />
+          <div className="space-y-8">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+              {events.map((event, index) => (
+                <div
+                  key={event.id}
+                  style={{
+                    animation: `fadeInUp 0.5s ease-out ${index * 0.03}s both`,
+                  }}
+                >
+                  <TrendingEventCard {...event} />
+                </div>
+              ))}
+            </div>
+
+            {totalPages > 1 && (
+              <div className="flex flex-col items-center justify-between gap-4 rounded-[20px] border-2 border-ash-whisper bg-pale-canvas p-4 shadow-sm sm:flex-row">
+                <p className="text-sm font-bold text-deep-forest/60">
+                  Page {pageNum + 1} of {totalPages}
+                </p>
+
+                <div className="flex flex-wrap items-center justify-center gap-2">
+                  <button
+                    onClick={() => handlePageChange(pageNum - 1)}
+                    disabled={isFirstPage || isFetching}
+                    className="flex h-10 w-10 items-center justify-center rounded-[10px] bg-ash-whisper text-deep-forest transition-colors hover:bg-bubblegum-blush disabled:cursor-not-allowed disabled:opacity-45"
+                    aria-label="Previous page"
+                  >
+                    <ChevronLeft className="h-5 w-5" />
+                  </button>
+
+                  {getVisiblePages().map((page, index, pages) => {
+                    const showEllipsis = index > 0 && page - pages[index - 1] > 1;
+
+                    return (
+                      <React.Fragment key={page}>
+                        {showEllipsis && (
+                          <span className="px-1 text-sm font-bold text-deep-forest/45">
+                            ...
+                          </span>
+                        )}
+                        <button
+                          onClick={() => handlePageChange(page)}
+                          disabled={isFetching}
+                          className={`h-10 min-w-10 rounded-[10px] px-3 text-sm font-bold transition-colors ${
+                            pageNum === page
+                              ? "bg-deep-forest text-pale-canvas"
+                              : "bg-ash-whisper text-deep-forest hover:bg-bubblegum-blush"
+                          } disabled:cursor-not-allowed disabled:opacity-60`}
+                        >
+                          {page + 1}
+                        </button>
+                      </React.Fragment>
+                    );
+                  })}
+
+                  <button
+                    onClick={() => handlePageChange(pageNum + 1)}
+                    disabled={isLastPage || isFetching}
+                    className="flex h-10 w-10 items-center justify-center rounded-[10px] bg-ash-whisper text-deep-forest transition-colors hover:bg-bubblegum-blush disabled:cursor-not-allowed disabled:opacity-45"
+                    aria-label="Next page"
+                  >
+                    <ChevronRight className="h-5 w-5" />
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         )}
       </div>
 
