@@ -7,3 +7,4 @@ resources:
   - tempo.yaml
   - otel-collector.yaml
   - promtail.yaml
+  - rate-limit-dashboard.yaml

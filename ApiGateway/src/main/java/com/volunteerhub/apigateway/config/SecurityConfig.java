@@ -1,14 +1,17 @@
 package com.volunteerhub.apigateway.config;
 
+import com.volunteerhub.apigateway.ratelimit.ProfileUpdateRateLimitFilter;
 import com.volunteerhub.apigateway.security.CustomAuthenticationManagerResolver;
 import com.volunteerhub.apigateway.security.CustomJwtAuthenticationConverter;
 import com.volunteerhub.apigateway.security.GoogleJwtAuthenticationConverter;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -30,7 +33,9 @@ public class SecurityConfig {
     private String allowedOrigins;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http,
+                                                   ProfileUpdateRateLimitFilter profileUpdateRateLimitFilter)
+            throws Exception {
         http.csrf(AbstractHttpConfigurer::disable);
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http.oauth2ResourceServer(j -> j.authenticationManagerResolver(
@@ -63,7 +68,17 @@ public class SecurityConfig {
                 c -> c.requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/api/v1/notifications/web-push/public-key").permitAll()
                         .anyRequest().authenticated());
+        http.addFilterAfter(profileUpdateRateLimitFilter, BearerTokenAuthenticationFilter.class);
         return http.build();
+    }
+
+    @Bean
+    public FilterRegistrationBean<ProfileUpdateRateLimitFilter> profileUpdateRateLimitFilterRegistration(
+            ProfileUpdateRateLimitFilter profileUpdateRateLimitFilter) {
+        FilterRegistrationBean<ProfileUpdateRateLimitFilter> registration = new FilterRegistrationBean<>();
+        registration.setFilter(profileUpdateRateLimitFilter);
+        registration.setEnabled(false);
+        return registration;
     }
 
 }

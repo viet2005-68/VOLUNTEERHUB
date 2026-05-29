@@ -30,6 +30,11 @@ spring:
 app:
   cors:
     allowed-origins: ${APP_CORS_ALLOWED_ORIGINS}
+  rate-limit:
+    user-profile-update:
+      enabled: ${USER_PROFILE_UPDATE_RATE_LIMIT_ENABLED:true}
+      max-requests: ${USER_PROFILE_UPDATE_RATE_LIMIT_MAX_REQUESTS:5}
+      window: ${USER_PROFILE_UPDATE_RATE_LIMIT_WINDOW:1m}
 
 eureka:
   client:

@@ -6,6 +6,12 @@ grafana:
     datasources:
       enabled: true
       defaultDatasourceEnabled: true
+    dashboards:
+      enabled: true
+      label: grafana_dashboard
+      labelValue: "1"
+      searchNamespace: observability
+      folder: VolunteerHub
   additionalDataSources:
     - name: Loki
       uid: Loki
