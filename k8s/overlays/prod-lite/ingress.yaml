@@ -5,6 +5,7 @@ metadata:
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-http
     nginx.ingress.kubernetes.io/proxy-body-size: "30m"
+    traefik.ingress.kubernetes.io/router.middlewares: volunteerhub-rate-limit@kubernetescrd
 spec:
   ingressClassName: traefik
   tls:
