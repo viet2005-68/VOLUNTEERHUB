@@ -55,8 +55,10 @@ function Team() {
       <article ref={cardRef} className="team-card" data-cursor="audio">
         <img src={member[2]} alt={member[0]} />
         <div>
-          <span>{member[1]}</span>
-          <h3>{member[0].split('').join(' ')}</h3>
+          <div>
+            <span>{member[1]}</span>
+            <h3>{member[0].split('').join(' ')}</h3>
+          </div>
           <button type="button" onClick={toggleAudio} className={playing ? 'is-playing' : ''} data-cursor="audio">
             {playing ? 'Pause story' : 'Hear story'}
           </button>

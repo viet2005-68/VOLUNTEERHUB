@@ -5,6 +5,7 @@ resources:
   - ../../base
   - cluster-issuer.yaml
   - ingress.yaml
+  - rate-limit.yaml
 patches:
   - path: config-patch.yaml
   - target:
