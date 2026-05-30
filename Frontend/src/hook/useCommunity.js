@@ -263,6 +263,17 @@ export const useReactions = (eventId, postId, params, options = {}) => {
     });
 };
 
+export const useReactionList = (eventId, postId, params = {}, options = {}) => {
+    const { pageNum = 0, pageSize = 50, type } = params || {};
+
+    return useQuery({
+        queryKey: [...COMMUNITY_QUERY_KEY, "reactionList", eventId, postId, type || "ALL", pageNum, pageSize],
+        queryFn: () => CommunityService.getReactionList(eventId, postId, { pageNum, pageSize, type }),
+        enabled: !!eventId && !!postId && options.enabled !== false,
+        keepPreviousData: true,
+    });
+};
+
 // Hook to get current user's reaction for a post
 // API already returns only current user's reaction
 export const useMyReaction = (eventId, postId, options = {}) => {
@@ -335,6 +346,7 @@ export const useCreateReaction = (eventId, postId, currentUserReaction = null) =
         },
         onSuccess: () => {
             queryClient.invalidateQueries([...COMMUNITY_QUERY_KEY, "reactions", eventId, postId]);
+            queryClient.invalidateQueries([...COMMUNITY_QUERY_KEY, "reactionList", eventId, postId]);
             queryClient.invalidateQueries([...COMMUNITY_QUERY_KEY, "myReaction", eventId, postId]);
             queryClient.invalidateQueries([...COMMUNITY_QUERY_KEY, "post", eventId, postId]);
             queryClient.invalidateQueries([...COMMUNITY_QUERY_KEY, "posts", eventId]);

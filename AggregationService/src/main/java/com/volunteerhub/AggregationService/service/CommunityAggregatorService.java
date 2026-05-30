@@ -6,6 +6,7 @@ import com.volunteerhub.AggregationService.dto.AggregatedCommentResponse;
 import com.volunteerhub.AggregationService.dto.AggregatedPostResponse;
 import com.volunteerhub.AggregationService.dto.AggregatedReactionResponse;
 import com.volunteerhub.common.dto.*;
+import com.volunteerhub.common.enums.ReactionType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -72,8 +73,8 @@ public class CommunityAggregatorService {
         return buildCommentTree(dtoList);
     }
 
-    public PageResponse<AggregatedReactionResponse> getAllAggregatedReaction(Long eventId, Long postId, Integer pageNum, Integer pageSize) {
-        PageResponse<ReactionResponse> posts = communityClient.findAllReactions(eventId, postId, pageNum, pageSize);
+    public PageResponse<AggregatedReactionResponse> getAllAggregatedReaction(Long eventId, Long postId, ReactionType type, Integer pageNum, Integer pageSize) {
+        PageResponse<ReactionResponse> posts = communityClient.findAllReactions(eventId, postId, type, pageNum, pageSize);
         List<String> userIds = posts.getContent().stream().map(ReactionResponse::getOwnerId).toList();
         List<UserResponse> users = userClient.findAllByIds(userIds);
         Map<String, UserResponse> usersMap = users.stream().collect(Collectors.toMap(UserResponse::getId, Function.identity()));

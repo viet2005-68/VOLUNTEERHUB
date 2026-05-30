@@ -1,7 +1,7 @@
 // ReactionBar.jsx
 import React, { useEffect, useState } from "react";
 import ReactionButton from "./ReactionButton";
-import { X } from "lucide-react";
+import { Loader2, X } from "lucide-react";
 import {
   FaCommentAlt,
   FaFacebookF,
@@ -14,8 +14,11 @@ import { FaXTwitter } from "react-icons/fa6";
 import {
   useCreateReaction,
   useMyReaction,
+  useReactionList,
   useReactions,
 } from "../../hook/useCommunity";
+
+const REACTION_ORDER = ["LIKE", "LOVE", "HAHA", "WOW", "SAD", "ANGRY"];
 
 const REACTION_ICONS = {
   like: "👍",
@@ -24,6 +27,15 @@ const REACTION_ICONS = {
   wow: "😮",
   sad: "😢",
   angry: "😡",
+};
+
+const REACTION_LABELS = {
+  LIKE: "Like",
+  LOVE: "Love",
+  HAHA: "Haha",
+  WOW: "Wow",
+  SAD: "Sad",
+  ANGRY: "Angry",
 };
 
 const SHARE_TARGETS = [
@@ -77,6 +89,189 @@ const getExternalShareUrl = (platform, shareUrl, text) => {
   return urls[platform];
 };
 
+const displayUserName = (user, fallback) =>
+  user?.fullName || user?.username || user?.email || fallback || "Unknown user";
+
+const initialsFor = (name) => {
+  const parts = String(name || "?").trim().split(/\s+/).filter(Boolean);
+  return (parts.length ? parts : ["?"])
+    .map((part) => part[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+};
+
+function ReactionListDialog({
+  open,
+  onClose,
+  eventId,
+  postId,
+  counts = {},
+  initialType = null,
+}) {
+  const [selectedType, setSelectedType] = useState(initialType);
+
+  useEffect(() => {
+    if (open) {
+      setSelectedType(initialType || null);
+    }
+  }, [initialType, open]);
+
+  useEffect(() => {
+    if (!open) return;
+
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") onClose?.();
+    };
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [onClose, open]);
+
+  const totalCount = REACTION_ORDER.reduce(
+    (sum, type) => sum + Number(counts?.[type] || 0),
+    0
+  );
+  const tabs = [
+    { type: null, label: "All", count: totalCount },
+    ...REACTION_ORDER.filter((type) => Number(counts?.[type] || 0) > 0).map(
+      (type) => ({
+        type,
+        label: REACTION_LABELS[type],
+        count: Number(counts[type] || 0),
+      })
+    ),
+  ];
+
+  const { data, isLoading, isFetching } = useReactionList(
+    eventId,
+    postId,
+    { type: selectedType || undefined, pageNum: 0, pageSize: 50 },
+    { enabled: open }
+  );
+  const reactionRows = data?.content || [];
+
+  if (!open) return null;
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label="Post reactions"
+      className="fixed inset-0 z-[1000] flex min-h-dvh flex-col bg-pale-canvas text-deep-forest"
+    >
+      <div className="flex items-center justify-between border-b border-ash-whisper px-5 py-4 sm:px-8">
+        <h3 className="text-2xl font-bold leading-tight text-deep-forest sm:text-3xl">
+          Reactions
+        </h3>
+        <button
+          type="button"
+          onClick={onClose}
+          className="flex h-12 w-12 items-center justify-center rounded-full border border-ash-whisper bg-pale-canvas text-deep-forest shadow-sm transition-colors hover:bg-ash-whisper"
+          aria-label="Close reactions"
+          title="Close"
+        >
+          <X className="h-6 w-6" />
+        </button>
+      </div>
+
+      <div className="border-b border-ash-whisper px-5 sm:px-8">
+        <div className="flex min-h-[58px] items-end gap-2 overflow-x-auto">
+          {tabs.map((tab) => {
+            const isActive = selectedType === tab.type;
+            const tabKey = tab.type || "ALL";
+            const iconKey = tab.type ? toKeyType(tab.type) : null;
+
+            return (
+              <button
+                key={tabKey}
+                type="button"
+                onClick={() => setSelectedType(tab.type)}
+                className={`flex min-h-[48px] shrink-0 items-center gap-2 border-b-4 px-3 text-sm font-bold transition-colors ${
+                  isActive
+                    ? "border-deep-forest text-deep-forest"
+                    : "border-transparent text-deep-forest/55 hover:text-deep-forest"
+                }`}
+              >
+                {iconKey && (
+                  <span className="text-lg leading-none">
+                    {REACTION_ICONS[iconKey]}
+                  </span>
+                )}
+                <span>{tab.label}</span>
+                <span>{tab.count}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="flex-1 overflow-y-auto px-5 py-4 sm:px-8">
+        {isLoading ? (
+          <div className="flex min-h-[220px] items-center justify-center text-deep-forest/60">
+            <Loader2 className="h-6 w-6 animate-spin" />
+          </div>
+        ) : reactionRows.length === 0 ? (
+          <div className="flex min-h-[220px] items-center justify-center text-sm font-semibold text-deep-forest/55">
+            No reactions yet
+          </div>
+        ) : (
+          <div className="mx-auto flex w-full max-w-[720px] flex-col">
+            {reactionRows.map((item) => {
+              const reaction = item.reaction || item;
+              const owner = item.owner || {};
+              const name = displayUserName(owner, reaction.ownerId);
+              const iconKey = toKeyType(reaction.type);
+
+              return (
+                <div
+                  key={reaction.id || `${reaction.ownerId}-${reaction.type}`}
+                  className="flex min-h-[72px] items-center gap-3 border-b border-ash-whisper/80 py-3"
+                >
+                  <div className="relative h-12 w-12 shrink-0">
+                    <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-ash-whisper text-sm font-black text-deep-forest">
+                      {owner.avatarUrl ? (
+                        <img
+                          src={owner.avatarUrl}
+                          alt={name}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <span>{initialsFor(name)}</span>
+                      )}
+                    </div>
+                    <span className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-pale-canvas text-base leading-none shadow">
+                      {REACTION_ICONS[iconKey] || "👍"}
+                    </span>
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-base font-bold text-deep-forest">
+                      {name}
+                    </p>
+                    <p className="text-sm font-semibold text-deep-forest/55">
+                      {REACTION_LABELS[reaction.type] || reaction.type}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+        {isFetching && !isLoading && (
+          <div className="py-3 text-center text-sm font-semibold text-deep-forest/45">
+            Updating...
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function ReactionBar({
   post,
   onReact,
@@ -89,6 +284,8 @@ export default function ReactionBar({
   readOnly = false,
 }) {
   const [showShareMenu, setShowShareMenu] = useState(false);
+  const [showReactionList, setShowReactionList] = useState(false);
+  const [reactionListType, setReactionListType] = useState(null);
 
   useEffect(() => {
     if (!showShareMenu) return;
@@ -149,8 +346,14 @@ export default function ReactionBar({
   const reactionEntries = resolvedReactionCounts
     ? Object.entries(resolvedReactionCounts)
         .map(([enumKey, count]) => [toKeyType(enumKey), count])
-        .filter(([, count]) => count > 0) // Only show reactions with count > 0
+        .filter(([key, count]) => key && count > 0) // Only show reactions with count > 0
     : [];
+  const totalReactionCount = resolvedReactionCounts
+    ? REACTION_ORDER.reduce(
+        (sum, type) => sum + Number(resolvedReactionCounts[type] || 0),
+        0
+      )
+    : 0;
 
   const actionButtonClass =
     "inline-flex min-h-[48px] items-center gap-3 rounded-[10px] px-5 py-2.5 font-bold text-deep-forest transition-colors hover:bg-ash-whisper";
@@ -170,6 +373,11 @@ export default function ReactionBar({
 
     onShare?.(post.id, { platform, url: shareUrl });
     setShowShareMenu(false);
+  };
+
+  const openReactionList = (type = null) => {
+    setReactionListType(type);
+    setShowReactionList(true);
   };
 
   return (
@@ -207,11 +415,20 @@ export default function ReactionBar({
           />
         )}
         {!compact && reactionEntries.length > 0 && (
-          <div className="flex min-h-[48px] flex-wrap items-center gap-2.5 rounded-[10px] border border-ash-whisper bg-ash-whisper/70 px-4 py-2">
+          <button
+            type="button"
+            onClick={() => openReactionList(null)}
+            className="flex min-h-[48px] flex-wrap items-center gap-2.5 rounded-[10px] border border-ash-whisper bg-ash-whisper/70 px-4 py-2 text-left transition-colors hover:bg-ash-whisper"
+            aria-label={`View ${totalReactionCount} reactions`}
+          >
             {reactionEntries.map(([key, count]) => (
               <span
                 key={key}
-                className="inline-flex items-center gap-1.5 text-sm font-bold text-deep-forest"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  openReactionList(toEnumType(key));
+                }}
+                className="inline-flex items-center gap-1.5 rounded-full text-sm font-bold text-deep-forest"
               >
                 <span className="text-lg leading-none">
                   {REACTION_ICONS[key] ?? "👍"}
@@ -219,7 +436,7 @@ export default function ReactionBar({
                 <span>{count}</span>
               </span>
             ))}
-          </div>
+          </button>
         )}
       </div>
 
@@ -312,6 +529,15 @@ export default function ReactionBar({
           )}
         </div>
       )}
+
+      <ReactionListDialog
+        open={showReactionList}
+        onClose={() => setShowReactionList(false)}
+        eventId={eventId}
+        postId={post?.id}
+        counts={resolvedReactionCounts}
+        initialType={reactionListType}
+      />
     </div>
   );
 }

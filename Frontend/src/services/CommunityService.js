@@ -56,6 +56,12 @@ const CommunityService = {
         return axiosClient.get(`/v1/events/${eventId}/posts/${postId}/reactions/count`);
     },
 
+    getReactionList: (eventId, postId, { pageNum = 0, pageSize = 50, type } = {}) => {
+        const params = { pageNum, pageSize };
+        if (type) params.type = type;
+        return axiosClient.get(`/v1/aggregated/events/${eventId}/posts/${postId}/reactions`, { params });
+    },
+
     // Get current user's reaction for a post
     getMyReaction: (eventId, postId) => {
         return axiosClient.get(`/v1/events/${eventId}/posts/${postId}/reactions/me`);
