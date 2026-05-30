@@ -7,6 +7,7 @@ import com.volunteerhub.common.enums.RegistrationSource;
 import com.volunteerhub.common.enums.UserEventStatus;
 import com.volunteerhub.registrationservice.dto.QrCodeCreateRequest;
 import com.volunteerhub.registrationservice.dto.QrCodeResponse;
+import com.volunteerhub.registrationservice.dto.QrCodeRevokeRequest;
 import com.volunteerhub.registrationservice.dto.QrPreviewResponse;
 import com.volunteerhub.registrationservice.mapper.UserEventMapper;
 import com.volunteerhub.registrationservice.model.EventQrCode;
@@ -38,6 +39,7 @@ import java.util.NoSuchElementException;
 public class EventQrCodeService {
 
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
+    private static final String QR_REPLACED_REASON = "Replaced by a new QR code.";
 
     private final EventQrCodeRepository eventQrCodeRepository;
     private final EventSnapshotRepository eventSnapshotRepository;
@@ -81,7 +83,7 @@ public class EventQrCodeService {
 
         eventQrCodeRepository.findByEventIdAndPurposeOrderByIdDesc(eventId, purpose).stream()
                 .filter(qrCode -> qrCode.getStatus() == QrCodeStatus.ACTIVE)
-                .forEach(qrCode -> qrCode.setStatus(QrCodeStatus.REVOKED));
+                .forEach(qrCode -> revoke(qrCode, managerId, QR_REPLACED_REASON));
 
         String secret = newSecret();
         EventQrCode qrCode = EventQrCode.builder()
@@ -91,6 +93,8 @@ public class EventQrCodeService {
                 .status(QrCodeStatus.ACTIVE)
                 .expiresAt(resolveExpiresAt(snapshot, request, purpose))
                 .maxUses(request == null ? null : request.getMaxUses())
+                .label(request == null ? null : normalizeText(request.getLabel()))
+                .note(request == null ? null : normalizeText(request.getNote()))
                 .createdBy(managerId)
                 .build();
         EventQrCode saved = eventQrCodeRepository.save(qrCode);
@@ -100,15 +104,31 @@ public class EventQrCodeService {
 
     @Transactional
     public QrCodeResponse revokeQrCode(String managerId, Long eventId, Long qrCodeId) {
-        return revokeQrCode(managerId, eventId, qrCodeId, QrCodePurpose.JOIN);
+        return revokeQrCode(managerId, eventId, qrCodeId, null);
+    }
+
+    @Transactional
+    public QrCodeResponse revokeQrCode(String managerId, Long eventId, Long qrCodeId, QrCodeRevokeRequest request) {
+        return revokeQrCode(managerId, eventId, qrCodeId, QrCodePurpose.JOIN, request);
     }
 
     @Transactional
     public QrCodeResponse revokeCompletionQrCode(String managerId, Long eventId, Long qrCodeId) {
-        return revokeQrCode(managerId, eventId, qrCodeId, QrCodePurpose.COMPLETION);
+        return revokeCompletionQrCode(managerId, eventId, qrCodeId, null);
     }
 
-    private QrCodeResponse revokeQrCode(String managerId, Long eventId, Long qrCodeId, QrCodePurpose purpose) {
+    @Transactional
+    public QrCodeResponse revokeCompletionQrCode(String managerId, Long eventId, Long qrCodeId, QrCodeRevokeRequest request) {
+        return revokeQrCode(managerId, eventId, qrCodeId, QrCodePurpose.COMPLETION, request);
+    }
+
+    private QrCodeResponse revokeQrCode(
+            String managerId,
+            Long eventId,
+            Long qrCodeId,
+            QrCodePurpose purpose,
+            QrCodeRevokeRequest request
+    ) {
         EventQrCode qrCode = eventQrCodeRepository.findById(qrCodeId)
                 .orElseThrow(() -> new NoSuchElementException("QR code with id " + qrCodeId + " does not exist."));
         if (!qrCode.getEventSnapshot().getEventId().equals(eventId)) {
@@ -120,7 +140,7 @@ public class EventQrCodeService {
         if (!qrCode.getEventSnapshot().getOwnerId().equals(managerId)) {
             throw new AccessDeniedException("Only the event manager can revoke QR codes.");
         }
-        qrCode.setStatus(QrCodeStatus.REVOKED);
+        revoke(qrCode, managerId, request == null ? null : request.getRevokeReason());
         return toResponse(eventQrCodeRepository.save(qrCode), null);
     }
 
@@ -325,9 +345,33 @@ public class EventQrCodeService {
                 .status(qrCode.getStatus())
                 .expiresAt(qrCode.getExpiresAt())
                 .maxUses(qrCode.getMaxUses())
+                .label(qrCode.getLabel())
+                .note(qrCode.getNote())
                 .useCount(qrCode.getUseCount())
+                .revokedAt(qrCode.getRevokedAt())
+                .revokedBy(qrCode.getRevokedBy())
+                .revokeReason(qrCode.getRevokeReason())
                 .createdAt(qrCode.getCreatedAt())
                 .build();
+    }
+
+    private void revoke(EventQrCode qrCode, String managerId, String reason) {
+        if (qrCode.getStatus() != QrCodeStatus.REVOKED) {
+            qrCode.setStatus(QrCodeStatus.REVOKED);
+            qrCode.setRevokedAt(LocalDateTime.now());
+            qrCode.setRevokedBy(managerId);
+        }
+        if (reason != null) {
+            qrCode.setRevokeReason(normalizeText(reason));
+        }
+    }
+
+    private String normalizeText(String value) {
+        if (value == null) {
+            return null;
+        }
+        String trimmed = value.trim();
+        return trimmed.isEmpty() ? null : trimmed;
     }
 
     private String qrPayloadBase(QrCodePurpose purpose) {

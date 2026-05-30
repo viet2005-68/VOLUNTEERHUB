@@ -201,10 +201,11 @@ export const listJoinQrCodes = async (eventId) => {
     }
 };
 
-export const revokeJoinQrCode = async (eventId, qrCodeId) => {
+export const revokeJoinQrCode = async (eventId, qrCodeId, payload = {}) => {
     try {
-        return await axiosClient.delete(
-            `${REGISTRATION_BASE_URL}/events/${eventId}/qr-codes/${qrCodeId}`
+        return await axiosClient.patch(
+            `${REGISTRATION_BASE_URL}/events/${eventId}/qr-codes/${qrCodeId}/revoke`,
+            payload
         );
     } catch (error) {
         console.error("Error revoking join QR code:", error);
@@ -317,10 +318,11 @@ export const listCompletionQrCodes = async (eventId) => {
     }
 };
 
-export const revokeCompletionQrCode = async (eventId, qrCodeId) => {
+export const revokeCompletionQrCode = async (eventId, qrCodeId, payload = {}) => {
     try {
-        return await axiosClient.delete(
-            `${REGISTRATION_BASE_URL}/events/${eventId}/completion-qr-codes/${qrCodeId}`
+        return await axiosClient.patch(
+            `${REGISTRATION_BASE_URL}/events/${eventId}/completion-qr-codes/${qrCodeId}/revoke`,
+            payload
         );
     } catch (error) {
         console.error("Error revoking completion QR code:", error);

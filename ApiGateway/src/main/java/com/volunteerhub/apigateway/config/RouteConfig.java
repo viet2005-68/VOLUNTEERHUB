@@ -102,6 +102,7 @@ public class RouteConfig {
                                 .GET(http())
                                 .POST(http())
                                 .PUT(http())
+                                .PATCH(http())
                                 .DELETE(http())
                                 .filter(lb("REGISTRATIONSERVICE"))
                                 .before(authenticationHeaderFilter.addAuthenticationHeader())

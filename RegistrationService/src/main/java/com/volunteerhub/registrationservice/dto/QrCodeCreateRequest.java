@@ -9,4 +9,6 @@ public class QrCodeCreateRequest {
 
     private LocalDateTime expiresAt;
     private Integer maxUses;
+    private String label;
+    private String note;
 }

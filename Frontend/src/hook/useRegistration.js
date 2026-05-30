@@ -326,7 +326,7 @@ export const useCreateJoinQrCode = () => {
 export const useRevokeJoinQrCode = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: ({ eventId, qrCodeId }) => revokeJoinQrCode(eventId, qrCodeId),
+        mutationFn: ({ eventId, qrCodeId, payload }) => revokeJoinQrCode(eventId, qrCodeId, payload || {}),
         onSuccess: (_, variables) => {
             toast.success("Join QR code revoked.");
             queryClient.invalidateQueries({
@@ -394,7 +394,7 @@ export const useCreateCompletionQrCode = () => {
 export const useRevokeCompletionQrCode = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: ({ eventId, qrCodeId }) => revokeCompletionQrCode(eventId, qrCodeId),
+        mutationFn: ({ eventId, qrCodeId, payload }) => revokeCompletionQrCode(eventId, qrCodeId, payload || {}),
         onSuccess: (_, variables) => {
             toast.success("Completion QR code revoked.");
             queryClient.invalidateQueries({
