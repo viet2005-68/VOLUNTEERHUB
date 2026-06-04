@@ -19,7 +19,7 @@ env:
 
 jobs:
   backend:
-    name: Backend compile
+    name: Backend tests
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -40,7 +40,7 @@ jobs:
       - name: Install common module
         run: cd Common && bash ./mvnw -q -DskipTests install
 
-      - name: Compile services
+      - name: Test services
         shell: bash
         run: |
           set -euo pipefail
@@ -59,8 +59,8 @@ jobs:
           )
 
           for service in "${services[@]}"; do
-            echo "::group::Compile ${service}"
-            (cd "${service}" && bash ./mvnw -q -DskipTests compile)
+            echo "::group::Test ${service}"
+            (cd "${service}" && bash ./mvnw -q test)
             echo "::endgroup::"
           done
 
