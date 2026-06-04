@@ -10,6 +10,7 @@ on:
   workflow_dispatch:
 
 permissions:
+  actions: read
   contents: read
   packages: write
 
@@ -24,8 +25,66 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  ci-gate:
+    name: Wait for CI
+    runs-on: ubuntu-latest
+    steps:
+      - name: Skip gate for manual deploy
+        if: github.event_name == 'workflow_dispatch'
+        run: echo "Manual deploy requested; skipping CI gate."
+
+      - name: Require CI success for this commit
+        if: github.event_name != 'workflow_dispatch'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          export TARGET_SHA="${GITHUB_SHA}"
+          echo "Waiting for CI workflow to finish for commit ${TARGET_SHA}..."
+
+          for attempt in {1..80}; do
+            run_json="$(
+              gh run list \
+                --repo "${GITHUB_REPOSITORY}" \
+                --workflow "CI" \
+                --commit "${TARGET_SHA}" \
+                --limit 10 \
+                --json databaseId,status,conclusion,headSha,createdAt \
+              | jq -c 'map(select(.headSha == env.TARGET_SHA)) | sort_by(.createdAt) | reverse | .[0] // empty'
+            )"
+
+            if [ -z "$run_json" ]; then
+              echo "CI run not found yet. Attempt ${attempt}/80."
+              sleep 15
+              continue
+            fi
+
+            status="$(jq -r '.status' <<< "$run_json")"
+            conclusion="$(jq -r '.conclusion // ""' <<< "$run_json")"
+            run_id="$(jq -r '.databaseId' <<< "$run_json")"
+            echo "CI run ${run_id}: status=${status}, conclusion=${conclusion:-pending}"
+
+            if [ "$status" = "completed" ]; then
+              if [ "$conclusion" = "success" ]; then
+                echo "CI passed; continuing deploy."
+                exit 0
+              fi
+
+              echo "::error::CI did not pass for ${TARGET_SHA}. Conclusion: ${conclusion}"
+              exit 1
+            fi
+
+            sleep 15
+          done
+
+          echo "::error::Timed out waiting for CI to complete for ${TARGET_SHA}."
+          exit 1
+
   changes:
     name: Detect frontend-only changes
+    needs: ci-gate
     runs-on: ubuntu-latest
     outputs:
       frontend_only: ${{ steps.detect.outputs.frontend_only }}
