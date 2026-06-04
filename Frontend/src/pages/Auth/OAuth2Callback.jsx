@@ -187,7 +187,12 @@ export default function OAuth2Callback() {
         // Save tokens using storage utility
         storage.setToken(finalToken);
         if (tokenData.refresh_token) {
-          localStorage.setItem("refresh_token", tokenData.refresh_token);
+          if (isGoogleOAuth) {
+            localStorage.setItem("google_refresh_token", tokenData.refresh_token);
+          } else {
+            localStorage.setItem("refresh_token", tokenData.refresh_token);
+            localStorage.setItem("refresh_token_provider", "volunteerhub");
+          }
         }
 
         // Extract role from token or set default for Google users

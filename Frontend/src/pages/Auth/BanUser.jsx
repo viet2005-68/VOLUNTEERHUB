@@ -17,6 +17,8 @@ function BanUser() {
     } finally {
       storage.clearToken();
       localStorage.removeItem("refresh_token");
+      localStorage.removeItem("refresh_token_provider");
+      localStorage.removeItem("google_refresh_token");
       localStorage.removeItem("google_access_token");
       localStorage.removeItem("user");
       window.location.href = "/";

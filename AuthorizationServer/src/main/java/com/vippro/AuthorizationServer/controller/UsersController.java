@@ -3,6 +3,8 @@ package com.vippro.AuthorizationServer.controller;
 import com.vippro.AuthorizationServer.dto.CreateUserRequest;
 import com.vippro.AuthorizationServer.dto.LoginRequest;
 import com.vippro.AuthorizationServer.dto.LoginResponse;
+import com.vippro.AuthorizationServer.dto.RefreshTokenRequest;
+import com.vippro.AuthorizationServer.repository.UsersRepository;
 import com.vippro.AuthorizationServer.security.DatabaseUserDetailsService;
 import com.vippro.AuthorizationServer.security.SecurityUsers;
 import com.vippro.AuthorizationServer.service.TokenService;
@@ -24,6 +26,7 @@ public class UsersController {
     private final DatabaseUserDetailsService userDetailsService;
     private final PasswordEncoder passwordEncoder;
     private final TokenService tokenService;
+    private final UsersRepository usersRepository;
 
     @PostMapping("/register")
     public ResponseEntity<?> createUser(@RequestBody CreateUserRequest request) {
@@ -56,20 +59,45 @@ public class UsersController {
                     .body("Invalid username or password");
         }
 
-        String token = tokenService.issue(user);
+        return ResponseEntity.ok(buildLoginResponse(user));
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refresh(@RequestBody RefreshTokenRequest request) {
+        try {
+            if (request.getRefreshToken() == null || request.getRefreshToken().isBlank()) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body("Refresh token is required");
+            }
+
+            var userId = tokenService.validateRefreshToken(request.getRefreshToken());
+            SecurityUsers user = usersRepository.findById(userId)
+                    .map(SecurityUsers::new)
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+            return ResponseEntity.ok(buildLoginResponse(user));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("Invalid refresh token");
+        }
+    }
+
+    private LoginResponse buildLoginResponse(SecurityUsers user) {
         String role = user.getAuthorities().stream()
                 .findFirst()
                 .map(a -> a.getAuthority())
                 .orElse("USER");
 
-        return ResponseEntity.ok(LoginResponse.builder()
-                .accessToken(token)
+        return LoginResponse.builder()
+                .accessToken(tokenService.issue(user))
+                .refreshToken(tokenService.issueRefreshToken(user))
                 .tokenType("Bearer")
                 .expiresIn(tokenService.getTokenValiditySeconds())
+                .refreshExpiresIn(tokenService.getRefreshTokenValiditySeconds())
                 .role(role)
                 .userId(user.getId().toString())
                 .email(user.getEmail())
                 .name(user.getName())
-                .build());
+                .build();
     }
 }

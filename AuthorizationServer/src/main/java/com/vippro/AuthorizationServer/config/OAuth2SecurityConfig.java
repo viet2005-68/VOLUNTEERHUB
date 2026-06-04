@@ -93,7 +93,7 @@ public class OAuth2SecurityConfig {
                 .authorizeHttpRequests(
                         c -> c
                                 .requestMatchers("/login", "/login.html", "/logout").permitAll()
-                                .requestMatchers("/api/v1/users/register", "/api/v1/users/login").permitAll()
+                                .requestMatchers("/api/v1/users/register", "/api/v1/users/login", "/api/v1/users/refresh").permitAll()
                                 .anyRequest().authenticated());
         http.logout(logout -> logout
                 .logoutUrl("/logout")
@@ -103,7 +103,7 @@ public class OAuth2SecurityConfig {
                     response.setStatus(HttpServletResponse.SC_OK);
                 }));
         http.csrf(csrf -> csrf
-                .ignoringRequestMatchers("/logout", "/api/v1/users/register", "/api/v1/users/login"));
+                .ignoringRequestMatchers("/logout", "/api/v1/users/register", "/api/v1/users/login", "/api/v1/users/refresh"));
         http.cors(c -> c.configurationSource(corsConfigurationSource()));
         return http.build();
     }
@@ -142,9 +142,14 @@ public class OAuth2SecurityConfig {
                 .clientSecret(passwordEncoder.encode(clientSecret))
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+                .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
                 .redirectUri(redirectUri)
                 .scope(OidcScopes.OPENID)
-                .tokenSettings(TokenSettings.builder().accessTokenTimeToLive(Duration.ofHours(24)).build())
+                .tokenSettings(TokenSettings.builder()
+                        .accessTokenTimeToLive(Duration.ofHours(24))
+                        .refreshTokenTimeToLive(Duration.ofDays(7))
+                        .reuseRefreshTokens(false)
+                        .build())
                 .build();
         return new InMemoryRegisteredClientRepository(registeredClient);
     }
