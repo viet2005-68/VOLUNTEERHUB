@@ -8,6 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 		"spring.datasource.driver-class-name=org.h2.Driver",
 		"spring.jpa.hibernate.ddl-auto=none",
 		"spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.H2Dialect",
+		"spring.rabbitmq.listener.simple.auto-startup=false",
 		"eureka.client.enabled=false"
 })
 class UserServiceApplicationTests {

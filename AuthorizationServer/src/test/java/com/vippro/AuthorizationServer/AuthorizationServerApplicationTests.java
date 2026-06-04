@@ -1,5 +1,7 @@
 package com.vippro.AuthorizationServer;
 
+import com.nimbusds.jose.jwk.source.JWKSource;
+import com.nimbusds.jose.proc.SecurityContext;
 import com.vippro.AuthorizationServer.service.TokenService;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -25,6 +27,9 @@ class AuthorizationServerApplicationTests {
 
 	@MockBean
 	private TokenService tokenService;
+
+	@MockBean
+	private JWKSource<SecurityContext> jwkSource;
 
 	@Test
 	void contextLoads() {
