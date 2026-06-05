@@ -1,6 +1,7 @@
 package com.volunteerhub.userservice.repository;
 
 import com.volunteerhub.common.enums.UserRole;
+import com.volunteerhub.common.enums.UserStatus;
 import com.volunteerhub.userservice.model.User;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -8,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,6 +19,9 @@ public interface UserRepository extends JpaRepository<User, String> {
 
     @Query("SELECT COUNT(*) FROM User u WHERE u.role = :role")
     Long countUsers(@Param("role") UserRole role);
+
+    @Query("SELECT COUNT(*) FROM User u WHERE u.status = :status")
+    Long countUsersByStatus(@Param("status") UserStatus status);
 
     @Query("SELECT u.id FROM User u WHERE u.role = :role")
     List<String> findAllIdsByRole(@Param("role") UserRole role);
@@ -34,4 +39,13 @@ public interface UserRepository extends JpaRepository<User, String> {
 
     @Query("SELECT u FROM User u LEFT JOIN FETCH u.badges")
     List<User> findAllForExport();
+
+    @Query("""
+            SELECT YEAR(u.createdAt), MONTH(u.createdAt), u.role, COUNT(u)
+            FROM User u
+            WHERE u.createdAt >= :start
+            GROUP BY YEAR(u.createdAt), MONTH(u.createdAt), u.role
+            ORDER BY YEAR(u.createdAt), MONTH(u.createdAt)
+            """)
+    List<Object[]> countCreatedUsersByMonthAndRole(@Param("start") LocalDateTime start);
 }
