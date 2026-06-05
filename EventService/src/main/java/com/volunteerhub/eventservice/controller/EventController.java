@@ -4,6 +4,9 @@ import com.volunteerhub.common.dto.EventResponse;
 import com.volunteerhub.common.dto.EventResponseCSV;
 import com.volunteerhub.eventservice.dto.request.EventRequest;
 import com.volunteerhub.eventservice.dto.request.RejectRequest;
+import com.volunteerhub.eventservice.dto.response.EventAnalyticsSummaryResponse;
+import com.volunteerhub.eventservice.dto.response.EventCategoryDistributionResponse;
+import com.volunteerhub.eventservice.dto.response.EventMonthlyCreationAnalyticsResponse;
 import com.volunteerhub.eventservice.service.EventService;
 import com.volunteerhub.eventservice.validation.OnCreate;
 import com.volunteerhub.eventservice.validation.OnUpdate;
@@ -170,5 +173,25 @@ public class EventController {
     public ResponseEntity<Map<String, Long>> countEventsByStatusByOwnerId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return ResponseEntity.ok(eventService.countEventsByStatusByOwnerId(authentication.getName()));
+    }
+
+    @GetMapping("/analytics/created-per-month")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<EventMonthlyCreationAnalyticsResponse>> countCreatedEventsPerMonth(
+            @RequestParam(defaultValue = "12") Integer months
+    ) {
+        return ResponseEntity.ok(eventService.countCreatedEventsPerMonth(months));
+    }
+
+    @GetMapping("/analytics/category-distribution")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<EventCategoryDistributionResponse>> countEventsByCategory() {
+        return ResponseEntity.ok(eventService.countEventsByCategory());
+    }
+
+    @GetMapping("/analytics/summary")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<EventAnalyticsSummaryResponse> getEventAnalyticsSummary() {
+        return ResponseEntity.ok(eventService.getEventAnalyticsSummary());
     }
 }

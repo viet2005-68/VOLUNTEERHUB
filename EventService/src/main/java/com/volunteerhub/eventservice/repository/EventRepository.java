@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -68,4 +69,25 @@ public interface EventRepository extends JpaRepository<Event, Long>, JpaSpecific
 
     @Query("SELECT e.status, COUNT(e) FROM Event e WHERE e.ownerId = :ownerId GROUP BY e.status")
     List<Object[]> countEventsByOwnerIdAndStatus(@Param("ownerId") String ownerId);
+
+    @Query("""
+            SELECT YEAR(e.createdAt), MONTH(e.createdAt), e.status, COUNT(e)
+            FROM Event e
+            WHERE e.createdAt >= :start
+            GROUP BY YEAR(e.createdAt), MONTH(e.createdAt), e.status
+            ORDER BY YEAR(e.createdAt), MONTH(e.createdAt)
+            """)
+    List<Object[]> countCreatedEventsByMonthAndStatus(@Param("start") LocalDateTime start);
+
+    @Query("""
+            SELECT c.id, c.name, COUNT(e)
+            FROM Event e
+            JOIN e.category c
+            GROUP BY c.id, c.name
+            ORDER BY COUNT(e) DESC, c.name ASC
+            """)
+    List<Object[]> countEventsByCategory();
+
+    @Query("SELECT COALESCE(SUM(e.capacity), 0) FROM Event e")
+    Long sumCapacity();
 }
