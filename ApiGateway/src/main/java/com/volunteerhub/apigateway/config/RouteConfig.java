@@ -95,6 +95,21 @@ public class RouteConfig {
     }
 
     @Bean
+    public RouterFunction<ServerResponse> donationServiceRoute() {
+        return route("donationservice")
+                .nest(RequestPredicates.path("/api/v1/donations/**"), builder ->
+                        builder
+                                .GET(http())
+                                .POST(http())
+                                .PUT(http())
+                                .DELETE(http())
+                                .filter(lb("DONATIONSERVICE"))
+                                .before(authenticationHeaderFilter.addAuthenticationHeader())
+                )
+                .build();
+    }
+
+    @Bean
     public RouterFunction<ServerResponse> registrationServiceRoute() {
         return route("registrationservice")
                 .nest(RequestPredicates.path("/api/v1/registrations/**"), builder ->

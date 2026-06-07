@@ -737,6 +737,76 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  name: donation-service
+  labels:
+    app.kubernetes.io/name: donation-service
+    app.kubernetes.io/part-of: volunteerhub
+    metrics.volunteerhub.io/scrape: "true"
+spec:
+  ports:
+    - name: http
+      port: 8088
+      targetPort: 8088
+  selector:
+    app.kubernetes.io/name: donation-service
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: donation-service
+  labels:
+    app.kubernetes.io/name: donation-service
+    app.kubernetes.io/part-of: volunteerhub
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: donation-service
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: donation-service
+        app.kubernetes.io/part-of: volunteerhub
+    spec:
+      containers:
+        - name: donation-service
+          image: localhost:5000/volunteerhub/donation-service:local
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 8088
+          envFrom:
+            - configMapRef:
+                name: volunteerhub-config
+            - secretRef:
+                name: volunteerhub-secrets
+          env:
+            - name: PORT
+              value: "8088"
+            - name: SPRING_APPLICATION_NAME
+              value: DonationService
+            - name: POSTGRES_DB
+              value: donations
+            - name: HOST
+              value: donation-service-postgres
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://donation-service-postgres:5432/donations
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: http
+            initialDelaySeconds: 35
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+            initialDelaySeconds: 70
+            periodSeconds: 20
+---
+apiVersion: v1
+kind: Service
+metadata:
   name: analytic-service
   labels:
     app.kubernetes.io/name: analytic-service
