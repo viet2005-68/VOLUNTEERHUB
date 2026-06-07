@@ -19,10 +19,12 @@ import java.time.LocalDateTime;
         indexes = {
                 @Index(name = "idx_donation_manager_id", columnList = "manager_id"),
                 @Index(name = "idx_donation_donor_id", columnList = "donor_id"),
-                @Index(name = "idx_donation_status", columnList = "status")
+                @Index(name = "idx_donation_status", columnList = "status"),
+                @Index(name = "idx_donation_provider_order_id", columnList = "provider_order_id")
         },
         uniqueConstraints = {
                 @UniqueConstraint(name = "uk_donation_donor_client", columnNames = {"donor_id", "client_donation_id"}),
+                @UniqueConstraint(name = "uk_donation_provider_order", columnNames = {"provider", "provider_order_id"}),
                 @UniqueConstraint(name = "uk_donation_provider_transaction", columnNames = {"provider_transaction_id"})
         }
 )
@@ -46,6 +48,9 @@ public class Donation {
 
     @Column(nullable = false)
     private String provider;
+
+    @Column(name = "provider_order_id")
+    private String providerOrderId;
 
     @Column(name = "provider_transaction_id")
     private String providerTransactionId;

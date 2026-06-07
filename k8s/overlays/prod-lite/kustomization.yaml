@@ -127,6 +127,10 @@ patches:
     patch: *spring-runtime
   - target:
       kind: Deployment
+      name: donation-service
+    patch: *spring-runtime
+  - target:
+      kind: Deployment
       name: aggregation-service
     patch: *spring-runtime
   - target:
@@ -160,6 +164,9 @@ images:
     newTag: latest
   - name: localhost:5000/volunteerhub/chat-service
     newName: ghcr.io/viet2005-68/volunteerhub-chat-service
+    newTag: latest
+  - name: localhost:5000/volunteerhub/donation-service
+    newName: ghcr.io/viet2005-68/volunteerhub-donation-service
     newTag: latest
   - name: localhost:5000/volunteerhub/aggregation-service
     newName: ghcr.io/viet2005-68/volunteerhub-aggregation-service

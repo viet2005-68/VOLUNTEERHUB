@@ -10,6 +10,8 @@ public interface DonationRepository extends JpaRepository<Donation, Long> {
 
     Optional<Donation> findByDonorIdAndClientDonationId(String donorId, String clientDonationId);
 
+    Optional<Donation> findByProviderAndProviderOrderId(String provider, String providerOrderId);
+
     List<Donation> findByManagerIdOrderByCreatedAtDesc(String managerId);
 
     List<Donation> findByDonorIdOrderByCreatedAtDesc(String donorId);

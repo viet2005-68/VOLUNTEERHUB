@@ -15,6 +15,7 @@ public class DonationResponse {
     private String clientDonationId;
     private Long amountVnd;
     private String provider;
+    private String providerOrderId;
     private String providerTransactionId;
     private DonationStatus status;
     private String message;

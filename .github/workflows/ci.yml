@@ -54,6 +54,7 @@ jobs:
             RegistrationService
             NotificationService
             ChatService
+            DonationService
             AggregationService
             AnalyticService
           )

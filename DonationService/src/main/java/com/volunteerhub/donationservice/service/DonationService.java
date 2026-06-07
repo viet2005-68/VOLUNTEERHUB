@@ -57,6 +57,16 @@ public class DonationService {
     }
 
     @Transactional(readOnly = true)
+    public DonationResponse getDonation(String currentUserId, String role, Long donationId) {
+        Donation donation = donationRepository.findById(donationId)
+                .orElseThrow(() -> new NoSuchElementException("Donation with id " + donationId + " does not exist."));
+        if (!isAdmin(role) && !currentUserId.equals(donation.getDonorId()) && !currentUserId.equals(donation.getManagerId())) {
+            throw new AccessDeniedException("Insufficient permission to view this donation.");
+        }
+        return toDonationResponse(donation);
+    }
+
+    @Transactional(readOnly = true)
     public List<DonationResponse> listManagerDonations(String currentUserId, String role, String managerId) {
         if (!isAdmin(role) && !currentUserId.equals(managerId)) {
             throw new AccessDeniedException("Managers can only view their own donations.");
@@ -88,6 +98,33 @@ public class DonationService {
         donation.setProviderTransactionId(providerTransactionId);
         donation.setSettledAt(LocalDateTime.now());
         creditManagerBalance(donation.getManagerId(), donation.getAmountVnd());
+        return toDonationResponse(donationRepository.save(donation));
+    }
+
+    @Transactional
+    public DonationResponse markProviderDonationSucceeded(String provider, String providerOrderId, String providerTransactionId) {
+        Donation donation = donationRepository.findByProviderAndProviderOrderId(provider, providerOrderId)
+                .orElseThrow(() -> new NoSuchElementException("Donation order " + providerOrderId + " does not exist."));
+        if (donation.getStatus() == DonationStatus.SUCCEEDED) {
+            return toDonationResponse(donation);
+        }
+        if (donation.getStatus() != DonationStatus.PENDING) {
+            throw new IllegalStateException("Only pending donations can be settled.");
+        }
+        donation.setStatus(DonationStatus.SUCCEEDED);
+        donation.setProviderTransactionId(providerTransactionId);
+        donation.setSettledAt(LocalDateTime.now());
+        creditManagerBalance(donation.getManagerId(), donation.getAmountVnd());
+        return toDonationResponse(donationRepository.save(donation));
+    }
+
+    @Transactional
+    public DonationResponse markProviderDonationFailed(String provider, String providerOrderId) {
+        Donation donation = donationRepository.findByProviderAndProviderOrderId(provider, providerOrderId)
+                .orElseThrow(() -> new NoSuchElementException("Donation order " + providerOrderId + " does not exist."));
+        if (donation.getStatus() == DonationStatus.PENDING) {
+            donation.setStatus(DonationStatus.FAILED);
+        }
         return toDonationResponse(donationRepository.save(donation));
     }
 
@@ -127,6 +164,7 @@ public class DonationService {
                 .clientDonationId(donation.getClientDonationId())
                 .amountVnd(donation.getAmountVnd())
                 .provider(donation.getProvider())
+                .providerOrderId(donation.getProviderOrderId())
                 .providerTransactionId(donation.getProviderTransactionId())
                 .status(donation.getStatus())
                 .message(donation.getMessage())

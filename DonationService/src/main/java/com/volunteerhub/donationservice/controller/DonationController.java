@@ -2,13 +2,18 @@ package com.volunteerhub.donationservice.controller;
 
 import com.volunteerhub.donationservice.dto.CreateMockDonationRequest;
 import com.volunteerhub.donationservice.dto.CreatePayoutRequest;
+import com.volunteerhub.donationservice.dto.CreateVnpayDonationRequest;
+import com.volunteerhub.donationservice.dto.CreateVnpayDonationResponse;
 import com.volunteerhub.donationservice.dto.DonationResponse;
 import com.volunteerhub.donationservice.dto.ManagerBalanceResponse;
 import com.volunteerhub.donationservice.dto.PayoutRequestResponse;
 import com.volunteerhub.donationservice.dto.ReviewPayoutRequest;
+import com.volunteerhub.donationservice.dto.VnpayCallbackResponse;
 import com.volunteerhub.donationservice.model.PayoutStatus;
 import com.volunteerhub.donationservice.service.DonationService;
 import com.volunteerhub.donationservice.service.PayoutService;
+import com.volunteerhub.donationservice.service.VnpayService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -17,6 +22,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/donations")
@@ -25,15 +31,41 @@ public class DonationController {
 
     private final DonationService donationService;
     private final PayoutService payoutService;
+    private final VnpayService vnpayService;
 
     @PostMapping("/mock-success")
     public DonationResponse createSuccessfulMockDonation(@Valid @RequestBody CreateMockDonationRequest request) {
         return donationService.createSuccessfulMockDonation(currentUserId(), request);
     }
 
+    @PostMapping("/vnpay/create")
+    public CreateVnpayDonationResponse createVnpayPayment(@Valid @RequestBody CreateVnpayDonationRequest request,
+                                                          HttpServletRequest servletRequest) {
+        return vnpayService.createPaymentUrl(currentUserId(), clientIp(servletRequest), request);
+    }
+
+    @GetMapping("/vnpay/ipn")
+    public VnpayCallbackResponse handleVnpayIpn(@RequestParam Map<String, String> params) {
+        return vnpayService.handleIpn(params);
+    }
+
+    @GetMapping("/vnpay/return")
+    public Map<String, Object> handleVnpayReturn(@RequestParam Map<String, String> params) {
+        return Map.of(
+                "orderId", params.getOrDefault("vnp_TxnRef", ""),
+                "status", vnpayService.getReturnStatus(params),
+                "responseCode", params.getOrDefault("vnp_ResponseCode", "")
+        );
+    }
+
     @GetMapping("/me")
     public List<DonationResponse> listMyDonations() {
         return donationService.listMyDonations(currentUserId());
+    }
+
+    @GetMapping("/{donationId}")
+    public DonationResponse getDonation(@PathVariable Long donationId) {
+        return donationService.getDonation(currentUserId(), currentRole(), donationId);
     }
 
     @GetMapping("/managers/me/balance")
@@ -115,5 +147,13 @@ public class DonationController {
 
     private Authentication currentAuthentication() {
         return SecurityContextHolder.getContext().getAuthentication();
+    }
+
+    private String clientIp(HttpServletRequest request) {
+        String forwardedFor = request.getHeader("X-Forwarded-For");
+        if (forwardedFor != null && !forwardedFor.isBlank()) {
+            return forwardedFor.split(",")[0].trim();
+        }
+        return request.getRemoteAddr();
     }
 }

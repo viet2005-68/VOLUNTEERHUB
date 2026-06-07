@@ -34,6 +34,8 @@ public class SecurityConfig {
                 .addFilterBefore(headerFilterAuth(), UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/actuator/health/**").permitAll()
+                        .requestMatchers("/api/v1/donations/vnpay/ipn").permitAll()
+                        .requestMatchers("/api/v1/donations/vnpay/return").permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
                         .anyRequest().authenticated())
                 .build();

@@ -50,6 +50,10 @@ data:
   USER_SERVICE_URL: "http://user-service:8081/api/v1/users/users"
   EVENT_SERVICE_URL: "http://event-service:8082/api/v1/events"
   REGISTRATION_SERVICE_URL: "http://registration-service:8084/api/v1/registrations"
+
+  VNPAY_PAYMENT_URL: "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
+  VNPAY_RETURN_URL: "https://volunteerhub.duckdns.org/api/v1/donations/vnpay/return"
+  VNPAY_IPN_URL: "https://volunteerhub.duckdns.org/api/v1/donations/vnpay/ipn"
 ---
 apiVersion: v1
 kind: Secret
@@ -64,3 +68,5 @@ stringData:
   CLIENT_SECRET: "f584278e-be8a-4f55-9c64-8e7be8f9e846"
   VAPID_PUBLIC_KEY: "BOnrlujfRMG5ucNlTsPasMCckJERQRA6S3E9TudLdpEQK8-FhboumN9H10OibSHJ7aP8xrEwnrjz3doeiUZXrfE"
   VAPID_PRIVATE_KEY: "IUu6njmriPi39MHg2uzyGSso1HruCnGdS7ITNEeGrlw"
+  VNPAY_TMN_CODE: ""
+  VNPAY_HASH_SECRET: ""

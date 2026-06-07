@@ -67,6 +67,8 @@ public class SecurityConfig {
         http.authorizeHttpRequests(
                 c -> c.requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/api/v1/notifications/web-push/public-key").permitAll()
+                        .requestMatchers("/api/v1/donations/vnpay/ipn").permitAll()
+                        .requestMatchers("/api/v1/donations/vnpay/return").permitAll()
                         .anyRequest().authenticated());
         http.addFilterAfter(profileUpdateRateLimitFilter, BearerTokenAuthenticationFilter.class);
         return http.build();
