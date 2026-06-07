@@ -4,6 +4,8 @@ import com.volunteerhub.common.enums.UserRole;
 import com.volunteerhub.userservice.mapper.UserMapper;
 import com.volunteerhub.common.enums.UserStatus;
 import com.volunteerhub.userservice.dto.request.UserRequest;
+import com.volunteerhub.userservice.dto.response.UserAnalyticsSummaryResponse;
+import com.volunteerhub.userservice.dto.response.UserMonthlyCreationAnalyticsResponse;
 import com.volunteerhub.userservice.dto.response.UserResponse;
 import com.volunteerhub.userservice.model.Address;
 import com.volunteerhub.userservice.model.User;
@@ -22,6 +24,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -107,6 +111,57 @@ public class UserService {
 
     public List<String> findAllIds(UserRole role) {
         return userRepository.findAllIdsByRole(role);
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'SYSTEM')")
+    public List<UserMonthlyCreationAnalyticsResponse> countCreatedUsersPerMonth(Integer months) {
+        int safeMonths = Math.min(Math.max(months == null ? 12 : months, 1), 24);
+        YearMonth firstMonth = YearMonth.now().minusMonths(safeMonths - 1L);
+        Map<YearMonth, UserMonthlyCreationAnalyticsResponse> monthlyCounts = new LinkedHashMap<>();
+
+        for (int i = 0; i < safeMonths; i++) {
+            YearMonth month = firstMonth.plusMonths(i);
+            monthlyCounts.put(month, UserMonthlyCreationAnalyticsResponse.builder()
+                    .month(month.format(DateTimeFormatter.ofPattern("yyyy-MM")))
+                    .users(0L)
+                    .managers(0L)
+                    .admins(0L)
+                    .total(0L)
+                    .build());
+        }
+
+        userRepository.countCreatedUsersByMonthAndRole(firstMonth.atDay(1).atStartOfDay())
+                .forEach(row -> {
+                    YearMonth month = YearMonth.of(((Number) row[0]).intValue(), ((Number) row[1]).intValue());
+                    UserMonthlyCreationAnalyticsResponse response = monthlyCounts.get(month);
+                    if (response == null) {
+                        return;
+                    }
+
+                    UserRole role = (UserRole) row[2];
+                    long count = ((Number) row[3]).longValue();
+                    switch (role) {
+                        case USER -> response.setUsers(count);
+                        case MANAGER -> response.setManagers(count);
+                        case ADMIN -> response.setAdmins(count);
+                    }
+                });
+
+        monthlyCounts.values().forEach(response ->
+                response.setTotal(response.getUsers() + response.getManagers() + response.getAdmins()));
+
+        return new ArrayList<>(monthlyCounts.values());
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'SYSTEM')")
+    public UserAnalyticsSummaryResponse getUserAnalyticsSummary() {
+        return UserAnalyticsSummaryResponse.builder()
+                .totalUsers(userRepository.countUsers(UserRole.USER))
+                .totalManagers(userRepository.countUsers(UserRole.MANAGER))
+                .totalAdmins(userRepository.countUsers(UserRole.ADMIN))
+                .activeUsers(userRepository.countUsersByStatus(UserStatus.ACTIVE))
+                .bannedUsers(userRepository.countUsersByStatus(UserStatus.BANNED))
+                .build();
     }
 
     @Transactional

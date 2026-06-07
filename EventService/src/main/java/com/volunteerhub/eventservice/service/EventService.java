@@ -6,6 +6,9 @@ import com.volunteerhub.common.utils.PageNumAndSizeResponse;
 import com.volunteerhub.common.utils.PaginationValidation;
 import com.volunteerhub.eventservice.dto.request.EventRequest;
 import com.volunteerhub.eventservice.dto.request.RejectRequest;
+import com.volunteerhub.eventservice.dto.response.EventAnalyticsSummaryResponse;
+import com.volunteerhub.eventservice.dto.response.EventCategoryDistributionResponse;
+import com.volunteerhub.eventservice.dto.response.EventMonthlyCreationAnalyticsResponse;
 import com.volunteerhub.eventservice.mapper.EventMapper;
 import com.volunteerhub.eventservice.model.Address;
 import com.volunteerhub.eventservice.model.Category;
@@ -27,6 +30,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -340,6 +345,78 @@ public class EventService {
 
     public Map<String, Long> countEventsByStatusByOwnerId(String ownerId) {
         return normalizeStatusCounts(eventRepository.countEventsByOwnerIdAndStatus(ownerId));
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<EventMonthlyCreationAnalyticsResponse> countCreatedEventsPerMonth(Integer months) {
+        return buildCreatedEventsPerMonth(months);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<EventCategoryDistributionResponse> countEventsByCategory() {
+        return mapCategoryDistribution(eventRepository.countEventsByCategory());
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    public EventAnalyticsSummaryResponse getEventAnalyticsSummary() {
+        Map<String, Long> statusCounts = countEventsByStatus();
+        return EventAnalyticsSummaryResponse.builder()
+                .totalEvents(countEvents())
+                .pendingEvents(statusCounts.getOrDefault("pending", 0L))
+                .approvedEvents(statusCounts.getOrDefault("approved", 0L))
+                .rejectedEvents(statusCounts.getOrDefault("rejected", 0L))
+                .totalCapacity(eventRepository.sumCapacity())
+                .build();
+    }
+
+    private List<EventMonthlyCreationAnalyticsResponse> buildCreatedEventsPerMonth(Integer months) {
+        int safeMonths = Math.min(Math.max(months == null ? 12 : months, 1), 24);
+        YearMonth firstMonth = YearMonth.now().minusMonths(safeMonths - 1L);
+        Map<YearMonth, EventMonthlyCreationAnalyticsResponse> monthlyCounts = new LinkedHashMap<>();
+
+        for (int i = 0; i < safeMonths; i++) {
+            YearMonth month = firstMonth.plusMonths(i);
+            monthlyCounts.put(month, EventMonthlyCreationAnalyticsResponse.builder()
+                    .month(month.format(DateTimeFormatter.ofPattern("yyyy-MM")))
+                    .pending(0L)
+                    .approved(0L)
+                    .rejected(0L)
+                    .total(0L)
+                    .build());
+        }
+
+        List<Object[]> rows = eventRepository.countCreatedEventsByMonthAndStatus(firstMonth.atDay(1).atStartOfDay());
+
+        rows.forEach(row -> {
+            YearMonth month = YearMonth.of(((Number) row[0]).intValue(), ((Number) row[1]).intValue());
+            EventMonthlyCreationAnalyticsResponse response = monthlyCounts.get(month);
+            if (response == null) {
+                return;
+            }
+
+            EventStatus status = (EventStatus) row[2];
+            long count = ((Number) row[3]).longValue();
+            switch (status) {
+                case PENDING -> response.setPending(count);
+                case APPROVED -> response.setApproved(count);
+                case REJECTED -> response.setRejected(count);
+            }
+        });
+
+        monthlyCounts.values().forEach(response ->
+                response.setTotal(response.getPending() + response.getApproved() + response.getRejected()));
+
+        return new ArrayList<>(monthlyCounts.values());
+    }
+
+    private List<EventCategoryDistributionResponse> mapCategoryDistribution(List<Object[]> rows) {
+        return rows.stream()
+                .map(row -> EventCategoryDistributionResponse.builder()
+                        .categoryId(((Number) row[0]).longValue())
+                        .categoryName((String) row[1])
+                        .events(((Number) row[2]).longValue())
+                        .build())
+                .toList();
     }
 
     private Map<String, Long> normalizeStatusCounts(List<Object[]> rows) {
