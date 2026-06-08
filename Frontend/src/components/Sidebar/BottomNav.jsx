@@ -42,9 +42,15 @@ export default function BottomNav() {
       icon: User,
       to: "/Setting",
     },
-  ];
+  ].filter((item) => user?.role !== "ADMIN" || item.key !== "messages");
 
-  const isActive = (path) => location.pathname.startsWith(path);
+  const isActive = (item) =>
+    item.key === "messages"
+      ? isMessagesPage
+      : location.pathname.startsWith(item.to);
+  const isMessagesPage =
+    location.pathname === "/dashboard/messages" ||
+    location.pathname.startsWith("/dashboard/event-chat");
 
   return (
     <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-pale-canvas/95 border-t border-deep-forest/15 backdrop-blur-xl z-50">
@@ -56,7 +62,7 @@ export default function BottomNav() {
               key={item.key}
               onClick={() => navigate(item.to)}
               className={`flex flex-col items-center text-xs font-bold focus:outline-none transition-colors ${
-                isActive(item.to) ? "text-foudre-pink" : "text-deep-forest/65"
+                isActive(item) ? "text-foudre-pink" : "text-deep-forest/65"
               }`}
             >
               <div className="relative">
@@ -74,7 +80,7 @@ export default function BottomNav() {
         })}
 
         {/* Floating action button for Manager only - Create Event */}
-        {user && user.role === "MANAGER" && (
+        {user && user.role === "MANAGER" && !isMessagesPage && (
           <button
             onClick={() => setIsCreateModalOpen(true)}
             className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-bubblegum-blush hover:bg-foudre-pink text-deep-forest hover:text-pale-canvas rounded-full w-14 h-14 flex items-center justify-center border border-foudre-pink/30 transition-all duration-200 active:scale-95"

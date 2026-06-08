@@ -1,16 +1,17 @@
-import { BellDot, MessageSquare } from "lucide-react";
-import React, { useState } from "react";
+import { BellDot } from "lucide-react";
+import { useMemo, useState } from "react";
 import { useAuth } from "../../hook/useAuth";
 import { ROLES } from "../../constant/role";
-import { useNavigate } from "react-router-dom";
-import { Logo } from "../../assets/img/index";
+import { useLocation, useNavigate } from "react-router-dom";
+import { VolunteerHubIcon } from "../../assets/img/index";
 import DropDown from "../Dropdown/DropDown";
 import DropDownItem from "../Dropdown/DropDownItem";
 import { LOGIN_LINK } from "../../constant/constNavigate";
 export default function NavBar() {
   const navigate = useNavigate();
-  const [navChoice, setNavChoice] = useState("Dashboard");
+  const location = useLocation();
   const { user, logout } = useAuth();
+  const [avatarFailed, setAvatarFailed] = useState(false);
 
   console.log("==== NavBar Check ====");
   console.log("NavBar user:", user);
@@ -29,13 +30,47 @@ export default function NavBar() {
 
   const displayName = user?.name ?? "Guest";
   const roleLabel = user?.role ? normalizeRole(user.role) : "Guest";
+  const canUseChat = user?.role !== ROLES.ADMIN;
+  const avatarSrc = useMemo(() => {
+    if (avatarFailed) return "";
+
+    return (
+      user?.avatarUrl ||
+      user?.urlAvatar ||
+      user?.urlAvartar ||
+      `https://api.dicebear.com/9.x/avataaars/svg?seed=${encodeURIComponent(
+        displayName
+      )}`
+    );
+  }, [avatarFailed, displayName, user?.avatarUrl, user?.urlAvatar, user?.urlAvartar]);
+  const avatarInitial = displayName?.trim()?.charAt(0)?.toUpperCase() || "G";
+  const isActiveNav = (key) => {
+    if (key === "Dashboard") return location.pathname === "/dashboard";
+    if (key === "Opportunities") return location.pathname.startsWith("/opportunities");
+    if (key === "Messages") {
+      return location.pathname === "/dashboard/messages" || location.pathname.startsWith("/dashboard/event-chat");
+    }
+    return false;
+  };
+  const navItemClass = (key) =>
+    [
+      "cursor-pointer rounded-[10px] px-4 py-3 text-deep-forest transition-colors",
+      "hover:bg-ash-whisper hover:text-deep-forest",
+      isActiveNav(key) ? "bg-bubblegum-blush/35" : "",
+    ]
+      .filter(Boolean)
+      .join(" ");
   return (
     <div className="flex flex-row justify-between w-full text-deep-forest">
-      <div className="flex items-center -space-x-1">
-        <span className="w-12">
-          <img src={Logo} alt="logo" className="max-h-max" />
+      <div className="flex items-center gap-2">
+        <span className="flex h-[40px] w-[40px] shrink-0 items-center justify-center overflow-hidden rounded-[10px] bg-pale-canvas">
+          <img
+            src={VolunteerHubIcon}
+            alt="VolunteerHub logo"
+            className="h-full w-full object-cover"
+          />
         </span>
-        <span className="max-sm:hidden font-beni text-4xl leading-[0.7] text-foudre-pink uppercase max-sm:text-3xl">
+        <span className="max-sm:hidden font-beni text-4xl leading-[0.7] text-deep-forest uppercase max-sm:text-3xl">
           VolunteerHub
         </span>
       </div>
@@ -44,50 +79,33 @@ export default function NavBar() {
           <li
             onClick={() => {
               navigate("/dashboard");
-              setNavChoice("Dashboard");
             }}
-            className={`cursor-pointer rounded-[10px] px-4 py-3 transition-colors hover:bg-ash-whisper ${
-              navChoice === "Dashboard"
-                ? "bg-deep-forest text-pale-canvas"
-                : "text-deep-forest"
-            }`}
+            className={navItemClass("Dashboard")}
           >
             DashBoard
           </li>
           <li
             onClick={() => {
               navigate("/opportunities");
-              setNavChoice("Opportunities");
             }}
-            className={`cursor-pointer rounded-[10px] px-4 py-3 transition-colors hover:bg-ash-whisper ${
-              navChoice === "Opportunities"
-                ? "bg-deep-forest text-pale-canvas"
-                : "text-deep-forest"
-            }`}
+            className={navItemClass("Opportunities")}
           >
             Opportunities
           </li>
 
-          <li
-            onClick={() => {
-              navigate("/dashboard/messages");
-              setNavChoice("Messages");
-            }}
-            className={`cursor-pointer rounded-[10px] px-4 py-3 transition-colors hover:bg-ash-whisper ${
-              navChoice === "Messages"
-                ? "bg-deep-forest text-pale-canvas"
-                : "text-deep-forest"
-            }`}
-          >
-            Messages
-          </li>
+          {canUseChat && (
+            <li
+              onClick={() => {
+                navigate("/dashboard/messages");
+              }}
+              className={navItemClass("Messages")}
+            >
+              Messages
+            </li>
+          )}
         </ul>
       </div>
       <div className="flex items-center gap-8">
-        <MessageSquare
-          className="cursor-pointer text-deep-forest transition-colors hover:text-foudre-pink"
-          onClick={() => navigate("/dashboard/messages")}
-        />
         <BellDot
           className="cursor-pointer text-deep-forest transition-colors hover:text-foudre-pink"
           onClick={() => navigate("/dashboard/notifications")}
@@ -95,12 +113,19 @@ export default function NavBar() {
         <DropDown
           trigger={
             <div className="flex flex-row items-center gap-3">
-              <div className="flex h-10 w-10 flex-col items-center justify-center rounded-full border-2 border-ash-whisper bg-pale-canvas">
-                <img
-                  src={`https://api.dicebear.com/9.x/avataaars/svg?seed=${displayName}`}
-                  alt="avatar"
-                  className="w-6 h-6 object-container"
-                />
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-ash-whisper bg-pale-canvas">
+                {avatarSrc ? (
+                  <img
+                    src={avatarSrc}
+                    alt={displayName}
+                    className="h-full w-full object-cover"
+                    onError={() => setAvatarFailed(true)}
+                  />
+                ) : (
+                  <span className="text-sm font-black text-deep-forest">
+                    {avatarInitial}
+                  </span>
+                )}
               </div>
               <div className="flex flex-col text-left">
                 <span className="font-bold text-deep-forest">{displayName}</span>

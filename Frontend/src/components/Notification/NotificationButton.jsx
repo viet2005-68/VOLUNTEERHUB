@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Bell, Check, Trash2, ShieldCheck, ShieldAlert } from "lucide-react";
+import { Bell, ShieldCheck } from "lucide-react";
 
 const NotificationButton = () => {
-  const [notifications, setNotifications] = useState([]);
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -10,27 +9,7 @@ const NotificationButton = () => {
   const API_BASE_URL =
     import.meta.env.VITE_API_URL || "http://localhost:8080/api";
 
-  // 1. Fetch danh sách thông báo
-  const fetchNotifications = async () => {
-    try {
-      const response = await fetch(
-        `${API_BASE_URL}/v1/notifications?pageNum=0&pageSize=10`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
-      setNotifications(data);
-    } catch (error) {
-      console.error("Failed to fetch notifications", error);
-    }
-  };
-
   useEffect(() => {
-    fetchNotifications();
     // Kiểm tra xem trình duyệt đã đăng ký Push chưa
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.ready
@@ -126,7 +105,7 @@ const NotificationButton = () => {
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div>
       {/* Nút bật/tắt Web Push trong Settings */}
       <button
         onClick={handleSubscribe}
@@ -134,7 +113,7 @@ const NotificationButton = () => {
         className={`flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all ${
           isSubscribed
             ? "bg-emerald-50 text-emerald-600 cursor-default"
-            : "bg-blue-600 text-white hover:bg-blue-700 shadow-md shadow-blue-200"
+            : "bg-deep-forest text-white hover:bg-deep-forest/90 shadow-md shadow-deep-forest/20"
         }`}
       >
         {loading ? (
@@ -149,34 +128,6 @@ const NotificationButton = () => {
           </>
         )}
       </button>
-
-      {/* Icon Chuông thông báo (Thường dùng trên Navbar, nhưng có thể để ở đây để test) */}
-      <div className="relative inline-block mt-4">
-        <h4 className="text-sm font-medium text-slate-700 mb-2">
-          Recent Notifications
-        </h4>
-        <div className="border rounded-xl divide-y divide-slate-100 overflow-hidden bg-slate-50">
-          {notifications.length > 0 ? (
-            notifications.map((n) => (
-              <div
-                key={n.id}
-                className={`p-3 text-sm ${
-                  !n.isRead
-                    ? "bg-white border-l-4 border-blue-500"
-                    : "opacity-60"
-                }`}
-              >
-                <div className="font-semibold">{n.title}</div>
-                <div className="text-slate-600 text-xs">{n.body}</div>
-              </div>
-            ))
-          ) : (
-            <div className="p-4 text-center text-xs text-slate-400">
-              No recent activities
-            </div>
-          )}
-        </div>
-      </div>
     </div>
   );
 };

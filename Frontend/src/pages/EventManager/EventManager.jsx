@@ -17,7 +17,7 @@ import Pagination from "@mui/material/Pagination";
 import EventManagerCard from "../../components/Project/eventManagerCard";
 import { EVENT_STATUS, STATUS_CONFIG } from "../../constant/eventStatus";
 import DropdownSelect from "../../components/Dropdown/DropdownSelect";
-import CreateEvent from "../../components/Form/CreateEvent";
+import CreateEventModal from "../../components/Modal/CreateEventModal";
 import useClickOutside from "../../hook/ClickOutside";
 import {
   useOwnedEventsPagination,
@@ -131,9 +131,6 @@ function EventManager() {
   const handleCreateNew = () => {
     setOpenCreateForm(true);
   };
-  const modalRef = useClickOutside(() => {
-    setOpenCreateForm(false);
-  });
   // New: edit modal ref
   const editModalRef = useClickOutside(() => {
     setOpenEditForm(false);
@@ -322,9 +319,9 @@ function EventManager() {
   }
 
   return (
-    <div className="flex flex-col gap-8 rounded-[25px] border-2 border-ash-whisper bg-pale-canvas p-6 text-deep-forest md:p-8">
+    <div className="flex flex-col gap-6 rounded-[25px] border border-ash-whisper bg-pale-canvas/90 px-7 pb-7 pt-10 text-deep-forest sm:gap-8 sm:border-2 sm:px-8 sm:pb-8 sm:pt-12 md:px-10 md:pb-10 md:pt-14">
       {/* Header */}
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-3 pl-1">
         <h2 className="font-beni text-[56px] font-black uppercase leading-[0.75] text-deep-forest md:text-[80px]">
           {isSearchMode ? `Search: "${searchTerm}"` : "Your Events"}
         </h2>
@@ -345,7 +342,7 @@ function EventManager() {
             placeholder="Search events by name..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full rounded-[10px] border-2 border-ash-whisper bg-white px-4 py-4 pl-12 pr-10 text-sm font-medium leading-[1.2] text-deep-forest placeholder:text-deep-forest/55 focus:border-foudre-pink focus:outline-none"
+            className="w-full rounded-[10px] border-2 border-ash-whisper bg-pale-canvas/80 px-4 py-4 pl-[48px] pr-10 text-sm font-medium leading-[1.2] text-deep-forest placeholder:text-deep-forest/55 focus:border-foudre-pink focus:outline-none"
           />
           {/* Loading indicator for search */}
           {isSearchMode && isFetching && (
@@ -455,7 +452,7 @@ function EventManager() {
             />
           ))
         ) : (
-          <div className="rounded-[20px] border-2 border-ash-whisper bg-white px-6 py-12 text-center">
+          <div className="rounded-[20px] border border-deep-forest/10 bg-pale-canvas/70 px-6 py-12 text-center">
             <p className="text-sm font-medium leading-[1.2] text-deep-forest/65">
               No events found
             </p>
@@ -471,9 +468,9 @@ function EventManager() {
 
       {/* Pagination & Stats Footer */}
       {data?.data && data.data.length > 0 && (
-        <div className="flex flex-col items-center justify-between gap-4 border-t-2 border-ash-whisper pt-5 sm:flex-row">
+        <div className="flex flex-col items-center justify-between gap-4 border-t border-deep-forest/10 pt-5 sm:flex-row">
           <p className="text-sm font-medium leading-[1.2] text-deep-forest/70">
-            Showing {data.data.length} of {data.meta?.totalElements || 0} events
+            Showing {data.data.length} of {data.meta?.totalElements ?? data.data.length} events
           </p>
           <Pagination
             count={data.meta?.totalPages || 0}
@@ -484,7 +481,7 @@ function EventManager() {
                 "&.Mui-selected": {
                   backgroundColor: "#00522d",
                   color: "#fff8f6",
-                  "&:hover": { backgroundColor: "#db3c8a" },
+                  "&:hover": { backgroundColor: "#00522d" },
                 },
               },
             }}
@@ -492,32 +489,10 @@ function EventManager() {
         </div>
       )}
 
-      {openCreateForm && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-          <div
-            ref={modalRef}
-            className="w-full max-w-3xl max-h-[calc(100vh-2rem)] flex flex-col"
-          >
-            <div className="relative flex max-h-full flex-col overflow-hidden rounded-[25px] border-2 border-ash-whisper bg-pale-canvas">
-              <button
-                onClick={() => setOpenCreateForm(false)}
-                className="absolute right-4 top-4 z-10 rounded-full bg-ash-whisper p-2 text-deep-forest transition hover:bg-foudre-pink hover:text-pale-canvas"
-                aria-label="Close"
-              >
-                <span className="text-xl font-bold leading-none">
-                  <X />
-                </span>
-              </button>
-              <div className="overflow-y-auto">
-                <CreateEvent
-                  onSuccess={() => setOpenCreateForm(false)}
-                  onCancel={() => setOpenCreateForm(false)}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <CreateEventModal
+        isOpen={openCreateForm}
+        onClose={() => setOpenCreateForm(false)}
+      />
 
       {/* Edit Event Modal */}
       {openEditForm && (
@@ -571,10 +546,10 @@ function EventManager() {
                 {editData && (
                   <div className="space-y-5">
                     {/* Event Name and Category */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
                       <div className="flex flex-col gap-2">
-                        <label className="font-semibold text-gray-900">
-                          Event Title <span className="text-red-500">*</span>
+                        <label className="text-sm font-bold leading-[1.2] text-deep-forest">
+                          Event Title <span className="text-foudre-pink">*</span>
                         </label>
                         <input
                           type="text"
@@ -582,14 +557,14 @@ function EventManager() {
                           onChange={(e) =>
                             handleInputChange("name", e.target.value)
                           }
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full rounded-[10px] border-2 border-ash-whisper bg-pale-canvas px-4 py-4 text-sm font-bold leading-[0.85] text-deep-forest transition-colors placeholder:text-deep-forest/50 focus:border-foudre-pink focus:outline-none"
                           placeholder="Enter event title"
                         />
                       </div>
 
                       <div className="flex flex-col gap-2">
-                        <label className="font-semibold text-gray-900">
-                          Category <span className="text-red-500">*</span>
+                        <label className="text-sm font-bold leading-[1.2] text-deep-forest">
+                          Category <span className="text-foudre-pink">*</span>
                         </label>
                         <DropdownSelect
                           value={editData.categoryName}
@@ -711,12 +686,12 @@ function EventManager() {
 
                     {/* Location */}
                     <div className="flex flex-col gap-2">
-                      <label className="font-semibold text-gray-900">
-                        Location <span className="text-red-500">*</span>
+                      <label className="text-sm font-bold leading-[1.2] text-deep-forest">
+                        Location <span className="text-foudre-pink">*</span>
                       </label>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                         <div className="flex flex-col gap-2">
-                          <label className="text-sm text-gray-600">
+                          <label className="text-sm font-bold leading-[1.2] text-deep-forest/70">
                             Province
                           </label>
                           <DropdownSelect
@@ -734,7 +709,7 @@ function EventManager() {
                           />
                         </div>
                         <div className="flex flex-col gap-2">
-                          <label className="text-sm text-gray-600">
+                          <label className="text-sm font-bold leading-[1.2] text-deep-forest/70">
                             District
                           </label>
                           <DropdownSelect
@@ -759,7 +734,7 @@ function EventManager() {
                           />
                         </div>
                         <div className="flex flex-col gap-2">
-                          <label className="text-sm text-gray-600">
+                          <label className="text-sm font-bold leading-[1.2] text-deep-forest/70">
                             Street
                           </label>
                           <input
@@ -769,7 +744,7 @@ function EventManager() {
                               handleInputChange("street", e.target.value)
                             }
                             placeholder="123 Beach St"
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full rounded-[10px] border-2 border-ash-whisper bg-pale-canvas px-4 py-4 text-sm font-bold leading-[0.85] text-deep-forest transition-colors placeholder:text-deep-forest/50 focus:border-foudre-pink focus:outline-none"
                           />
                         </div>
                       </div>
@@ -817,9 +792,9 @@ function EventManager() {
                         />
                         <label
                           htmlFor="editImageUpload"
-                          className="w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition cursor-pointer"
+                          className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border-2 border-dashed border-deep-forest/20 px-4 py-3 transition hover:border-foudre-pink hover:bg-ash-whisper/45"
                         >
-                          <span className="text-gray-600">
+                          <span className="text-deep-forest/70">
                             {previewImage ? "Change Image" : "Select Image"}
                           </span>
                         </label>
@@ -827,14 +802,14 @@ function EventManager() {
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="flex gap-3 pt-4 border-t border-gray-200">
+                    <div className="flex gap-3 border-t border-deep-forest/10 pt-4">
                       <button
                         type="button"
                         onClick={() => {
                           setOpenEditForm(false);
                           setIsInitialLoad(true);
                         }}
-                        className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition font-medium"
+                        className="flex-1 rounded-lg border border-deep-forest/20 px-4 py-2 font-medium text-deep-forest/75 transition hover:border-deep-forest/35 hover:bg-deep-forest/5"
                       >
                         Cancel
                       </button>
@@ -842,7 +817,7 @@ function EventManager() {
                         type="button"
                         onClick={handleSave}
                         disabled={updateEventMutation.isPending}
-                        className="flex-1 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                        className="flex-1 rounded-lg bg-foudre-pink px-4 py-2 font-bold text-pale-canvas transition hover:bg-deep-forest disabled:cursor-not-allowed disabled:opacity-50"
                       >
                         {updateEventMutation.isPending
                           ? "Saving..."

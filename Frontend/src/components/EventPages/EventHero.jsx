@@ -1,9 +1,16 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { FaEarthAfrica } from "react-icons/fa6";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import VolunteerHero from "./VolunteerHero";
 import { useConstUserApprovedList } from "../../hook/useRegistration";
+
+const VIETNAMESE_TITLE_STYLE = {
+  fontFamily:
+    '"Clash Grotesk", "Be Vietnam Pro", ui-sans-serif, system-ui, "Segoe UI", Arial, sans-serif',
+  fontWeight: 700,
+  letterSpacing: "-0.015em",
+};
 
 function EventHero({ id, imgURL, organizerName, eventName }) {
   const navigate = useNavigate();
@@ -38,14 +45,17 @@ function EventHero({ id, imgURL, organizerName, eventName }) {
         {/* Back Button */}
         <button
           onClick={() => navigate("/opportunities")}
-          className="absolute left-4 top-4 flex items-center gap-2 rounded-full bg-pale-canvas p-3 text-deep-forest transition-colors hover:bg-bubblegum-blush"
+          className="absolute left-6 top-6 flex items-center gap-2 rounded-full bg-deep-forest px-4 py-3 text-pale-canvas transition-colors hover:bg-foudre-pink shadow-lg"
           title="Back to Opportunities"
         >
           <ArrowLeft size={20} />
         </button>
       </div>
       <div className="mb-6 text-deep-forest">
-        <p className="mb-2 text-3xl font-bold leading-[1.2] max-sm:px-3">
+        <p
+          className="mb-2 text-3xl font-bold leading-[1.2] max-sm:px-3"
+          style={VIETNAMESE_TITLE_STYLE}
+        >
           {eventName}
         </p>
 

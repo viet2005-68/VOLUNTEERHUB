@@ -4,71 +4,149 @@ import axiosClient from "./axiosClient";
 const EVENT_BASE_URL = "/v1/events";
 const EVENT_AGGREGATED_BASE_URL = "/v1/aggregated/events";
 
+const getNumber = (...values) => {
+    for (const value of values) {
+        if (value === null || value === undefined || value === "") continue;
+        const numberValue = Number(value);
+        if (Number.isFinite(numberValue)) return numberValue;
+    }
+
+    return undefined;
+};
+
+const getPositiveNumber = (...values) => {
+    for (const value of values) {
+        const numberValue = getNumber(value);
+        if (numberValue !== undefined && numberValue > 0) return numberValue;
+    }
+
+    return undefined;
+};
+
+const getBoolean = (...values) => {
+    for (const value of values) {
+        if (typeof value === "boolean") return value;
+    }
+
+    return undefined;
+};
+
+const normalizePaginatedResponse = (response, params = {}) => {
+    const payload = response?.data?.content !== undefined ? response.data : response;
+    const pageMeta = payload?.page || payload?.meta || {};
+    const content = Array.isArray(payload?.content)
+        ? payload.content
+        : Array.isArray(payload?.data?.content)
+            ? payload.data.content
+            : Array.isArray(payload)
+                ? payload
+                : Array.isArray(payload?.data)
+                    ? payload.data
+                    : [];
+    const isSimpleArrayResponse =
+        Array.isArray(payload) ||
+        (Array.isArray(payload?.data) &&
+            payload?.content === undefined &&
+            payload?.page === undefined &&
+            payload?.meta === undefined);
+
+    const pageSize =
+        getPositiveNumber(
+            payload?.size,
+            payload?.pageSize,
+            payload?.pageable?.pageSize,
+            pageMeta?.size,
+            pageMeta?.pageSize,
+            params.pageSize,
+            content.length,
+            10
+        ) ?? 10;
+    const payloadCurrentPage = getNumber(
+        payload?.number,
+        payload?.pageNum,
+        payload?.currentPage,
+        payload?.pageable?.pageNumber
+    );
+    const currentPage =
+        getNumber(
+            pageMeta?.number,
+            pageMeta?.pageNum,
+            pageMeta?.currentPage,
+            payloadCurrentPage > 0 ? payloadCurrentPage : undefined,
+            params.pageNum,
+            payloadCurrentPage,
+            0
+        ) ?? 0;
+    const rawTotalElements = getNumber(
+        payload?.totalElements,
+        payload?.totalElement,
+        payload?.totalItems,
+        payload?.total,
+        pageMeta?.totalElements,
+        pageMeta?.totalItems,
+        pageMeta?.total,
+        isSimpleArrayResponse ? content.length : undefined
+    );
+    const rawTotalPages = getNumber(
+        payload?.totalPages,
+        payload?.totalPage,
+        pageMeta?.totalPages,
+        pageMeta?.totalPage,
+        isSimpleArrayResponse ? (content.length > 0 ? 1 : 0) : undefined
+    );
+    const last = getBoolean(payload?.last, pageMeta?.last);
+    const hasNext = getBoolean(payload?.hasNext, pageMeta?.hasNext);
+    const minSeenElements = currentPage * pageSize + content.length;
+    const hasExactTotal =
+        rawTotalElements !== undefined &&
+        !(rawTotalElements === 0 && content.length > 0);
+
+    let totalElements = hasExactTotal ? rawTotalElements : minSeenElements;
+    let totalPages;
+
+    if (rawTotalPages && rawTotalPages > 0) {
+        totalPages = rawTotalPages;
+    } else if (content.length === 0) {
+        totalPages = currentPage === 0 ? 0 : currentPage;
+    } else if (last === true || content.length < pageSize) {
+        totalPages = currentPage + 1;
+    } else if (hasNext === true || last === false || content.length === pageSize) {
+        totalPages = currentPage + 2;
+    } else {
+        totalPages = Math.ceil(totalElements / pageSize);
+    }
+
+    if (content.length > 0) {
+        totalElements = Math.max(totalElements, minSeenElements);
+        totalPages = Math.max(totalPages, currentPage + 1);
+    }
+
+    return {
+        data: content,
+        meta: {
+            totalPages,
+            totalElements,
+            currentPage,
+            pageSize,
+            hasExactTotal,
+        },
+    };
+};
+
 
 export const getEvents = async (params = {}) => {
     console.log("params", params);
     const response = await axiosClient.get(EVENT_AGGREGATED_BASE_URL, { params });
     console.log('Events API response:', response);
 
-    // Handle paginated response structure from API
-
-    if (response.content !== undefined) {
-        return {
-            data: response.content,
-            meta: {
-                totalPages: response.totalPages || 0,
-                totalElements: response.totalElements || 0,
-                currentPage: response.number || 0,
-                pageSize: response.size || params.pageSize || 10
-            }
-        };
-    }
-
-    // Fallback for simple array response
-    const data = Array.isArray(response) ? response : (response.data || []);
-
-
-    return {
-        data: data,
-        meta: {
-            totalPages: 1,
-            totalElements: data.length,
-            currentPage: 0,
-            pageSize: data.length
-        }
-    };
+    return normalizePaginatedResponse(response, params);
 };
 
 export const getOwnedEvents = async (params = {}) => {
     const response = await axiosClient.get(`${EVENT_AGGREGATED_BASE_URL}/owned`, { params });
     console.log('Owned Events API response:', response);
 
-    // Handle paginated response: { content, totalElements, totalPages, number, size }
-    if (response.content !== undefined) {
-        return {
-            data: response.content,
-            meta: {
-                totalPages: response.totalPages || 0,
-                totalElements: response.totalElements || 0,
-                currentPage: response.number || 0,
-                pageSize: response.size || params.pageSize || 10
-            }
-        };
-    }
-
-    // Fallback for simple array response
-    const data = Array.isArray(response) ? response : (response.data || []);
-    console.log('Processed owned data:', data);
-
-    return {
-        data: data,
-        meta: {
-            totalPages: 1,
-            totalElements: data.length,
-            currentPage: 0,
-            pageSize: data.length
-        }
-    };
+    return normalizePaginatedResponse(response, params);
 };
 
 export const getEventById = async (eventId) => {
@@ -153,24 +231,7 @@ export const searchEventByName = async (params = {}) => {
     });
     console.log('Search API response:', response);
 
-    // API trả về: { content, totalElements, totalPages, number, size }
-    // Transform thành format thống nhất với getEvents
-    if (response.content !== undefined) {
-        return {
-            data: response.content,
-            meta: {
-                totalPages: response.totalPages || 0,
-                totalElements: response.totalElements || 0,
-                currentPage: response.number || 0,
-                pageSize: response.size || pageSize
-            }
-        };
-    }
-
-    return {
-        data: [],
-        meta: { totalPages: 0, totalElements: 0, currentPage: 0, pageSize }
-    };
+    return normalizePaginatedResponse(response, { ...params, pageNum, pageSize });
 };
 
 export const searchEventByNameForManager = async (params = {}) => {
@@ -180,24 +241,7 @@ export const searchEventByNameForManager = async (params = {}) => {
     });
     console.log('Search API response:', response);
 
-    // API trả về: { content, totalElements, totalPages, number, size }
-    // Transform thành format thống nhất với getEvents
-    if (response.content !== undefined) {
-        return {
-            data: response.content,
-            meta: {
-                totalPages: response.totalPages || 0,
-                totalElements: response.totalElements || 0,
-                currentPage: response.number || 0,
-                pageSize: response.size || pageSize
-            }
-        };
-    }
-
-    return {
-        data: [],
-        meta: { totalPages: 0, totalElements: 0, currentPage: 0, pageSize }
-    };
+    return normalizePaginatedResponse(response, { ...params, pageNum, pageSize });
 };
 
 export const cancelEventRegistration = async (eventId) => {
@@ -240,29 +284,5 @@ export const getTrendingEvents = async (params = {}) => {
     });
     console.log('Trending Events API response:', response);
 
-    // Handle paginated response structure
-    if (response.content !== undefined) {
-        return {
-            data: response.content,
-            meta: {
-                totalPages: response.totalPages || 0,
-                totalElements: response.totalElements || 0,
-                currentPage: response.number || 0,
-                pageSize: response.size || pageSize
-            }
-        };
-    }
-
-    // Fallback for simple array response
-    const data = Array.isArray(response) ? response : (response.data || []);
-
-    return {
-        data: data,
-        meta: {
-            totalPages: 1,
-            totalElements: data.length,
-            currentPage: 0,
-            pageSize: data.length
-        }
-    };
+    return normalizePaginatedResponse(response, { ...params, pageNum, pageSize });
 };

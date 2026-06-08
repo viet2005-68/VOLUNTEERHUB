@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
+import java.util.Map;
 
 @FeignClient(name = "REGISTRATIONSERVICE", path = "/api/v1/registrations", configuration = FeignConfig.class)
 public interface RegistrationClient {
@@ -49,4 +50,7 @@ public interface RegistrationClient {
                                                          @RequestParam("pageNum") Integer pageNum,
                                                          @RequestParam("pageSize") Integer pageSize
     );
+
+    @GetMapping("/internal/owner-volunteer-counts")
+    Map<String, Long> countUniqueVolunteersByOwnerIds(@RequestParam List<String> ownerIds);
 }

@@ -8,6 +8,7 @@ import com.volunteerhub.common.dto.message.registration.RegistrationApprovedMess
 import com.volunteerhub.common.dto.message.registration.RegistrationCompletedMessage;
 import com.volunteerhub.registrationservice.dto.QrCodeCreateRequest;
 import com.volunteerhub.registrationservice.dto.QrCodeResponse;
+import com.volunteerhub.registrationservice.dto.QrCodeRevokeRequest;
 import com.volunteerhub.registrationservice.mapper.UserEventMapper;
 import com.volunteerhub.registrationservice.model.EventQrCode;
 import com.volunteerhub.registrationservice.model.EventSnapshot;
@@ -62,7 +63,7 @@ class EventQrCodeServiceTest {
                 userEventMapper,
                 registrationPublisher
         );
-        ReflectionTestUtils.setField(eventQrCodeService, "deepLinkBase", "volunteerhub://events/join");
+        ReflectionTestUtils.setField(eventQrCodeService, "joinQrBase", "http://localhost:5173/qr/join");
         ReflectionTestUtils.setField(eventQrCodeService, "completionQrBase", "http://localhost:5173/qr/complete");
 
         when(eventQrCodeRepository.findByEventIdOrderByIdDesc(1L)).thenReturn(List.of());
@@ -82,6 +83,56 @@ class EventQrCodeServiceTest {
             }
             return userEvent;
         });
+    }
+
+    @Test
+    void createQrCodeReturnsLabelAndNoteForMobileDisplay() {
+        EventSnapshot snapshot = approvedSnapshot(QrJoinPolicy.REQUIRE_APPROVAL);
+        QrCodeCreateRequest request = new QrCodeCreateRequest();
+        request.setLabel("QR join main gate");
+        request.setNote("Morning shift");
+        when(eventSnapshotRepository.findById(1L)).thenReturn(Optional.of(snapshot));
+
+        QrCodeResponse qrCode = eventQrCodeService.createQrCode("manager-1", 1L, request);
+
+        assertThat(qrCode.getLabel()).isEqualTo("QR join main gate");
+        assertThat(qrCode.getNote()).isEqualTo("Morning shift");
+        assertThat(savedQrCode.get().getLabel()).isEqualTo("QR join main gate");
+        assertThat(savedQrCode.get().getNote()).isEqualTo("Morning shift");
+    }
+
+    @Test
+    void revokeQrCodeAllowsOptionalReasonAndStoresAuditFields() {
+        EventSnapshot snapshot = approvedSnapshot(QrJoinPolicy.REQUIRE_APPROVAL);
+        when(eventSnapshotRepository.findById(1L)).thenReturn(Optional.of(snapshot));
+
+        eventQrCodeService.createQrCode("manager-1", 1L, new QrCodeCreateRequest());
+        when(eventQrCodeRepository.findById(99L)).thenReturn(Optional.of(savedQrCode.get()));
+        QrCodeRevokeRequest request = new QrCodeRevokeRequest();
+        request.setRevokeReason("Created by mistake");
+
+        QrCodeResponse revoked = eventQrCodeService.revokeQrCode("manager-1", 1L, 99L, request);
+
+        assertThat(revoked.getStatus()).isEqualTo(com.volunteerhub.registrationservice.model.QrCodeStatus.REVOKED);
+        assertThat(revoked.getRevokedAt()).isNotNull();
+        assertThat(revoked.getRevokedBy()).isEqualTo("manager-1");
+        assertThat(revoked.getRevokeReason()).isEqualTo("Created by mistake");
+    }
+
+    @Test
+    void revokeQrCodeWorksWithoutReason() {
+        EventSnapshot snapshot = approvedSnapshot(QrJoinPolicy.REQUIRE_APPROVAL);
+        when(eventSnapshotRepository.findById(1L)).thenReturn(Optional.of(snapshot));
+
+        eventQrCodeService.createQrCode("manager-1", 1L, new QrCodeCreateRequest());
+        when(eventQrCodeRepository.findById(99L)).thenReturn(Optional.of(savedQrCode.get()));
+
+        QrCodeResponse revoked = eventQrCodeService.revokeQrCode("manager-1", 1L, 99L);
+
+        assertThat(revoked.getStatus()).isEqualTo(com.volunteerhub.registrationservice.model.QrCodeStatus.REVOKED);
+        assertThat(revoked.getRevokedAt()).isNotNull();
+        assertThat(revoked.getRevokedBy()).isEqualTo("manager-1");
+        assertThat(revoked.getRevokeReason()).isNull();
     }
 
     @Test

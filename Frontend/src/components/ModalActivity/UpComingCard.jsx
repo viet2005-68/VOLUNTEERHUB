@@ -36,15 +36,26 @@ function UpComingCard({
   // Status color mapping for better visual cues
   const statusKey = String(status || "").toUpperCase();
   const statusClassMap = {
-    APPROVED: "bg-green-600 text-white",
-    PENDING: "bg-yellow-200 text-yellow-800",
-    REJECTED: "bg-red-100 text-red-800",
-    COMPLETED: "bg-blue-600 text-white",
-    CONFIRMED: "bg-gray-900 text-white",
-    VERIFY: "bg-gray-900 text-white",
-    DEFAULT: "bg-gray-200 text-gray-800",
+    APPROVED: "bg-deep-forest text-pale-canvas",
+    PENDING: "border border-foudre-pink/20 bg-ash-whisper text-foudre-pink",
+    REJECTED: "border border-foudre-pink/20 bg-foudre-pink/10 text-foudre-pink",
+    COMPLETED: "bg-deep-forest text-pale-canvas",
+    CONFIRMED: "bg-deep-forest text-pale-canvas",
+    VERIFY: "bg-deep-forest text-pale-canvas",
+    DEFAULT: "border border-deep-forest/15 bg-ash-whisper text-deep-forest",
+  };
+  const statusDotClassMap = {
+    APPROVED: "bg-deep-forest",
+    PENDING: "bg-foudre-pink",
+    REJECTED: "bg-foudre-pink",
+    COMPLETED: "bg-deep-forest",
+    CONFIRMED: "bg-deep-forest",
+    VERIFY: "bg-deep-forest",
+    DEFAULT: "bg-deep-forest",
   };
   const statusClass = statusClassMap[statusKey] || statusClassMap.DEFAULT;
+  const statusDotClass =
+    statusDotClassMap[statusKey] || statusDotClassMap.DEFAULT;
 
   return (
     <div
@@ -53,34 +64,34 @@ function UpComingCard({
         navigate(`/opportunities/overview/${eventId || id}`);
       }}
     >
-      <Card>
+      <Card className="border-2 border-ash-whisper bg-pale-canvas shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-bubblegum-blush hover:shadow-md">
         <div className="flex justify-between gap-3 p-0">
           {/* Content */}
           <div className="flex-1 min-w-0 flex flex-col gap-2">
             {/* Title with ping indicator */}
             <div className="flex items-center gap-2">
-              <span className="flex h-2 w-2 shrink-0">
+              <span className="relative flex h-2 w-2 shrink-0">
                 <span
-                  className={`absolute inline-flex h-2 w-2 rounded-full ${statusClass} opacity-75 animate-ping`}
+                  className={`absolute inline-flex h-2 w-2 rounded-full ${statusDotClass} opacity-75 animate-ping`}
                 ></span>
                 <span
-                  className={`relative inline-flex rounded-full h-2 w-2 ${statusClass}`}
+                  className={`relative inline-flex rounded-full h-2 w-2 ${statusDotClass}`}
                 ></span>
               </span>
-              <p className="font-semibold text-gray-900 text-base line-clamp-2">
+              <p className="text-base font-bold leading-[1.15] text-deep-forest line-clamp-2">
                 {title}
               </p>
             </div>
 
             {/* Category pill */}
             {subtile && (
-              <span className="inline-flex items-center justify-center px-2 py-0.5 text-xs font-medium bg-gray-900 text-white rounded-full w-fit max-w-[140px] truncate">
+              <span className="inline-flex w-fit max-w-[140px] items-center justify-center truncate rounded-full bg-deep-forest px-2 py-0.5 text-xs font-bold text-pale-canvas">
                 {subtile}
               </span>
             )}
 
             {/* Date and Time */}
-            <div className="flex flex-wrap items-center gap-3 text-xs text-gray-600">
+            <div className="flex flex-wrap items-center gap-3 text-xs font-medium text-deep-forest/70">
               <div className="flex items-center gap-1">
                 <FiCalendar className="w-3.5 h-3.5" />
                 <span>{dateNorm}</span>
@@ -95,7 +106,7 @@ function UpComingCard({
 
             {/* Location */}
             {location && (
-              <div className="flex items-start gap-1 text-xs text-gray-600">
+              <div className="flex items-start gap-1 text-xs font-medium text-deep-forest/70">
                 <TfiLocationPin className="w-3.5 h-3.5 mt-0.5 shrink-0" />
                 <span className="line-clamp-2">{location}</span>
               </div>
@@ -103,14 +114,14 @@ function UpComingCard({
 
             {/* Status badge */}
             <div
-              className={`${statusClass} w-fit rounded-full px-2.5 py-1 text-xs font-medium`}
+              className={`${statusClass} w-fit rounded-full px-2.5 py-1 text-xs font-bold`}
             >
               {status}
             </div>
           </div>
 
           {/* Image */}
-          <div className="shrink-0 w-28 h-28 rounded-xl overflow-hidden border border-gray-200 shadow-sm">
+          <div className="h-[112px] w-[112px] shrink-0 overflow-hidden rounded-xl border border-ash-whisper shadow-sm">
             <img
               src={urlImg}
               alt={title}

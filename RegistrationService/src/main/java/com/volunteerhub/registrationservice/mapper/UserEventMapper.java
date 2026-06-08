@@ -52,6 +52,7 @@ public class UserEventMapper {
                 .registrationId(userEvent.getId())
                 .userId(userEvent.getUserId())
                 .eventId(userEvent.getEventId())
+                .imageUrl(eventImageUrl(userEvent))
                 .eventOwnerId(eventOwnerId)
                 .status(userEvent.getStatus())
                 .createdAt(userEvent.getCreatedAt())
@@ -63,6 +64,7 @@ public class UserEventMapper {
                 .registrationId(userEvent.getId())
                 .userId(userEvent.getUserId())
                 .eventId(userEvent.getEventId())
+                .imageUrl(eventImageUrl(userEvent))
                 .status(userEvent.getStatus())
                 .reviewedAt(userEvent.getReviewedAt())
                 .build();
@@ -73,6 +75,7 @@ public class UserEventMapper {
                 .registrationId(userEvent.getId())
                 .userId(userEvent.getUserId())
                 .eventId(userEvent.getEventId())
+                .imageUrl(eventImageUrl(userEvent))
                 .status(userEvent.getStatus())
                 .note(userEvent.getNote())
                 .reviewedAt(userEvent.getReviewedAt())
@@ -83,12 +86,21 @@ public class UserEventMapper {
         return RegistrationCompletedMessage.builder()
                 .registrationId(userEvent.getId())
                 .eventId(userEvent.getEventId())
+                .imageUrl(eventImageUrl(userEvent))
                 .userId(userEvent.getUserId())
                 .status(userEvent.getStatus())
                 .note(userEvent.getNote())
                 .completedAt(userEvent.getCompletedAt())
+                .completionBadgeId(userEvent.getEventSnapshot() == null
+                        ? null
+                        : userEvent.getEventSnapshot().getCompletionBadgeId())
                 .build();
     }
+
+    private String eventImageUrl(UserEvent userEvent) {
+        return userEvent.getEventSnapshot() == null ? null : userEvent.getEventSnapshot().getImageUrl();
+    }
+
     public RegistrationResponse toAggregatorDto(UserEvent userEvent) {
         if (userEvent == null) return null;
 

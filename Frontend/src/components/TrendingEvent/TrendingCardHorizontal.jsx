@@ -31,55 +31,55 @@ function TrendingCardHorizontal({
   return (
     <div
       onClick={handleClick}
-      className="flex flex-col sm:flex-row bg-gradient-to-br from-red-100 via-orange-100 to-pink-100 transition-all duration-300 shadow-md hover:shadow-xl min-w-[280px] sm:min-w-[400px] md:min-w-[450px] p-4 sm:space-x-5 space-y-3 sm:space-y-0 rounded-2xl border-2 border-red-300 snap-start cursor-pointer hover:border-orange-400"
+      className="group flex min-w-[280px] cursor-pointer snap-start flex-col rounded-[20px] border border-deep-forest/18 bg-pale-canvas p-4 text-deep-forest shadow-[0_14px_34px_rgba(0,82,45,0.16)] ring-1 ring-pale-canvas/80 transition-all duration-300 hover:-translate-y-0.5 hover:border-bubblegum-blush hover:shadow-[0_18px_42px_rgba(0,82,45,0.24)] sm:min-w-[420px] sm:max-w-[520px] sm:flex-row sm:space-x-4 sm:space-y-0"
       ref={ref}
     >
-      <div className="w-full sm:w-32 sm:h-32 h-48 rounded-xl overflow-hidden shadow-sm flex-shrink-0 items-center justify-center flex self-center">
+      <div className="flex h-44 w-full flex-shrink-0 items-center justify-center self-center overflow-hidden rounded-[12px] border border-deep-forest/12 bg-ash-whisper sm:h-[118px] sm:w-[118px]">
         <img
           src={thumbnail || futureVolunteer}
           alt={name}
-          className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
         />
       </div>
       <div className="flex flex-col justify-between flex-1 py-1">
         <div className="space-y-1">
-          <p className="text-lg font-semibold text-gray-800 line-clamp-1 text-center sm:text-left">
+          <p className="line-clamp-1 text-center text-base font-bold leading-[1.1] text-deep-forest sm:text-left">
             {name}
           </p>
-          <div className="flex flex-col sm:gap-4 text-sm text-gray-700 justify-start">
+          <div className="flex flex-col justify-start gap-1 text-sm font-medium text-deep-forest/70">
             <p className="flex items-center justify-center sm:justify-start gap-1">
-              <span className="text-red-600 w-4">
-                <MapPin className="w-full" />
+              <span className="inline-flex h-[18px] w-[18px] text-foudre-pink">
+                <MapPin className="h-full w-full" />
               </span>
               <span className="truncate">{location}</span>
             </p>
             <p className="flex items-center justify-center sm:justify-start gap-1">
-              <span className="text-orange-600 w-4">
-                <Calendar className="w-full" />
+              <span className="inline-flex h-[18px] w-[18px] text-foudre-pink">
+                <Calendar className="h-full w-full" />
               </span>
               {date}
             </p>
           </div>
         </div>
-        <div className="flex flex-row mt-3 sm:mt-2 justify-around gap-2">
-          <div className="flex items-center gap-2 bg-white px-3 py-2 rounded-lg shadow-sm basis-1/2 min-w-0 border border-red-200">
-            <TrendingUp className="w-4 h-4 text-red-600" />
+        <div className="mt-3 grid grid-cols-2 gap-2">
+          <div className="flex min-w-0 basis-1/2 items-center gap-2 rounded-[10px] border border-deep-forest/12 bg-ash-whisper/55 px-3 py-2 shadow-[inset_0_1px_0_rgba(255,248,246,0.9)]">
+            <TrendingUp className="h-[18px] w-[18px] text-foudre-pink" />
             <div className="flex flex-col">
-              <span className="text-xs text-gray-600 text-center">Posts</span>
-              <span className="text-sm font-semibold text-red-600">
+              <span className="text-center text-xs text-deep-forest/60">Posts</span>
+              <span className="text-sm font-bold text-deep-forest">
                 +{post}
               </span>
             </div>
           </div>
-          <div className="flex items-center gap-2 bg-white px-3 py-2 rounded-lg shadow-sm basis-1/2 min-w-0 border border-orange-200">
-            <span className="text-orange-600">
-              <MessageCircle className="w-4 h-4" />
+          <div className="flex min-w-0 basis-1/2 items-center gap-2 rounded-[10px] border border-deep-forest/12 bg-ash-whisper/55 px-3 py-2 shadow-[inset_0_1px_0_rgba(255,248,246,0.9)]">
+            <span className="text-foudre-pink">
+              <MessageCircle className="h-[18px] w-[18px]" />
             </span>
             <div className="flex flex-col">
-              <span className="text-xs text-gray-600 text-center">
+              <span className="text-center text-xs text-deep-forest/60">
                 Comments
               </span>
-              <span className="text-sm font-semibold text-orange-600">
+              <span className="text-sm font-bold text-deep-forest">
                 +{comment}
               </span>
             </div>

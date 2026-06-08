@@ -14,6 +14,7 @@ public class EventCreatedMessage implements EventMessage {
 
     private Long id;
     private String name;
+    private String imageUrl;
     private CategoryResponse category;
     private String ownerId;
     private EventStatus status;
@@ -22,4 +23,5 @@ public class EventCreatedMessage implements EventMessage {
     private LocalDateTime registrationDeadline;
     private int capacity;
     private QrJoinPolicy qrJoinPolicy;
+    private Long completionBadgeId;
 }

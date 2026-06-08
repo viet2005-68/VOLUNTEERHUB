@@ -130,7 +130,10 @@ const AnalysisService = {
     getEventParticipantsJson: async (eventId) => {
         try {
             const response = await axiosClient.get(
-                `/v1/aggregated/registrations/export/participants?eventId=${eventId}&format=json`
+                `/v1/aggregated/registrations/export/participants`,
+                {
+                    params: { eventId, format: "json" },
+                }
             );
             return response;
         } catch (error) {
@@ -141,12 +144,12 @@ const AnalysisService = {
 
     // Export participants của một event (CSV format)
     getEventParticipantsCsv: async (eventId) => {
-        console.log("eventId", eventId);
         try {
             const response = await axiosClient.get(
-                `/v1/aggregated/registrations/export/participants?eventId=${eventId}`,
+                `/v1/aggregated/registrations/export/participants`,
                 {
-                    responseType: 'blob',
+                    params: { eventId, format: "csv" },
+                    responseType: "blob",
                 }
             );
             return response;
@@ -155,8 +158,6 @@ const AnalysisService = {
             throw error;
         }
     },
-
-
 
     // Export all events (JSON format)
     exportAllEventsJson: async () => {
@@ -175,7 +176,7 @@ const AnalysisService = {
     exportAllEventsCsv: async () => {
         try {
             const response = await axiosClient.get(
-                `/v1/aggregated/events/export`,
+                `/v1/analytics/export/events`,
                 {
                     responseType: 'blob',
                 }
@@ -193,7 +194,10 @@ const AnalysisService = {
     exportAllUsersJson: async () => {
         try {
             const response = await axiosClient.get(
-                `/v1/aggregated/export/users?format=json`
+                `/v1/aggregated/export/users`,
+                {
+                    params: { format: "json" },
+                }
             );
             return response;
         } catch (error) {
@@ -208,7 +212,8 @@ const AnalysisService = {
             const response = await axiosClient.get(
                 `/v1/aggregated/export/users`,
                 {
-                    responseType: 'blob',
+                    params: { format: "csv" },
+                    responseType: "blob",
                 }
             );
             return response;

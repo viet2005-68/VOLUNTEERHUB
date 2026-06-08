@@ -3,7 +3,7 @@ import { FiCalendar } from "react-icons/fi";
 import Card from "../Card.jsx/Card";
 import { FaLocationPin } from "react-icons/fa6";
 import { formatDateTime } from "../../utils/date";
-import { Book, BookOpen } from "lucide-react";
+import { Book } from "lucide-react";
 
 function EventOverview({ description, location, startTime, endTime }) {
   const [showMore, setShowMore] = useState(false);
@@ -24,16 +24,16 @@ function EventOverview({ description, location, startTime, endTime }) {
   const toggleShowMore = () => setShowMore(!showMore);
 
   return (
-    <div className="p-4 flex gap-4 flex-col">
+    <div className="flex flex-col gap-4 p-4">
       {/* Make cards equal height */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-stretch">
-        <Card className="h-full">
-          <div className="flex items-start gap-3 h-full flex-col justify-between">
-            <div className="flex items-start gap-3">
-              <FiCalendar className="text-blue-500 text-2xl flex-shrink-0" />
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <Card className="h-full border-deep-forest/10 bg-pale-canvas p-6">
+          <div className="flex h-full flex-col justify-between gap-3">
+            <div className="flex items-start gap-4">
+              <FiCalendar className="h-[34px] w-[34px] flex-shrink-0 text-deep-forest" />
               <div className="flex flex-col">
-                <p className="text-sm text-gray-600">Start Time</p>
-                <p className="font-semibold">
+                <p className="text-sm font-medium leading-[1.2] text-deep-forest/65">Start Time</p>
+                <p className="text-lg font-bold leading-[1.1] text-deep-forest">
                   {startTime ? formatDateTime(startTime) : "N/A"}
                 </p>
               </div>
@@ -41,13 +41,13 @@ function EventOverview({ description, location, startTime, endTime }) {
           </div>
         </Card>
 
-        <Card className="h-full">
-          <div className="flex items-start gap-3 h-full flex-col justify-between">
-            <div className="flex items-start gap-3">
-              <FiCalendar className="text-red-500 text-2xl flex-shrink-0" />
+        <Card className="h-full border-deep-forest/10 bg-pale-canvas p-6">
+          <div className="flex h-full flex-col justify-between gap-3">
+            <div className="flex items-start gap-4">
+              <FiCalendar className="h-[34px] w-[34px] flex-shrink-0 text-foudre-pink" />
               <div className="flex flex-col">
-                <p className="text-sm text-gray-600">End Time</p>
-                <p className="font-semibold">
+                <p className="text-sm font-medium leading-[1.2] text-deep-forest/65">End Time</p>
+                <p className="text-lg font-bold leading-[1.1] text-deep-forest">
                   {endTime ? formatDateTime(endTime) : "N/A"}
                 </p>
               </div>
@@ -55,13 +55,13 @@ function EventOverview({ description, location, startTime, endTime }) {
           </div>
         </Card>
 
-        <Card className="h-full">
-          <div className="flex items-start gap-3 h-full flex-col justify-between">
-            <div className="flex items-start gap-3">
-              <FaLocationPin className="text-yellow-400 text-2xl flex-shrink-0" />
+        <Card className="h-full border-deep-forest/10 bg-pale-canvas p-6">
+          <div className="flex h-full flex-col justify-between gap-3">
+            <div className="flex items-start gap-4">
+              <FaLocationPin className="h-[34px] w-[34px] flex-shrink-0 text-deep-forest" />
               <div className="flex flex-col">
-                <p className="text-sm text-gray-600">Location</p>
-                <p className="font-semibold text-sm break-words">
+                <p className="text-sm font-medium leading-[1.2] text-deep-forest/65">Location</p>
+                <p className="max-w-[28ch] break-words text-base font-bold leading-[1.18] text-deep-forest">
                   {location || "N/A"}
                 </p>
               </div>
@@ -70,10 +70,10 @@ function EventOverview({ description, location, startTime, endTime }) {
         </Card>
       </div>
 
-      <div className="flex flex-col gap-5 border border-gray-300 p-4 rounded-2xl duration-300 mt-5">
+      <div className="flex flex-col gap-5 border border-deep-forest/15 p-4 rounded-2xl duration-300 mt-5">
         <p className="text-md font-semibold  flex items-center gap-1">
-          <span className="text-blue-500 w-4">
-            <Book className="w-full" />
+          <span className="inline-flex h-[18px] w-[18px] text-deep-forest">
+            <Book className="h-full w-full" />
           </span>
           Description
         </p>
@@ -88,7 +88,7 @@ function EventOverview({ description, location, startTime, endTime }) {
         {shouldShowButton && (
           <span
             onClick={toggleShowMore}
-            className="text-blue-500 cursor-pointer"
+            className="cursor-pointer font-bold text-foudre-pink"
           >
             {showMore ? "Show less ↑" : "Show more ↓"}
           </span>

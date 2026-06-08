@@ -37,6 +37,7 @@ public class EventMapper {
                 .approvedBy(event.getApprovedBy())
                 .optional(event.getOptional())
                 .qrJoinPolicy(event.getQrJoinPolicy())
+                .completionBadgeId(event.getCompletionBadgeId())
                 .build();
     }
 
@@ -55,6 +56,7 @@ public class EventMapper {
         return EventCreatedMessage.builder()
                 .id(event.getId())
                 .name(event.getName())
+                .imageUrl(event.getImageUrl())
                 .category(categoryMapper.toDto(event.getCategory()))
                 .ownerId(event.getOwnerId())
                 .status(event.getStatus())
@@ -63,6 +65,7 @@ public class EventMapper {
                 .registrationDeadline(event.getRegistrationDeadline())
                 .capacity(event.getCapacity())
                 .qrJoinPolicy(event.getQrJoinPolicy())
+                .completionBadgeId(event.getCompletionBadgeId())
                 .build();
     }
 
@@ -70,6 +73,7 @@ public class EventMapper {
         return EventApprovedMessage.builder()
                 .eventId(event.getId())
                 .eventName(event.getName())
+                .imageUrl(event.getImageUrl())
                 .category(categoryMapper.toDto(event.getCategory()))
                 .capacity(event.getCapacity())
                 .ownerId(event.getOwnerId())
@@ -79,6 +83,7 @@ public class EventMapper {
                 .endTime(event.getEndTime())
                 .registrationDeadline(event.getRegistrationDeadline())
                 .qrJoinPolicy(event.getQrJoinPolicy())
+                .completionBadgeId(event.getCompletionBadgeId())
                 .build();
     }
 
@@ -86,6 +91,7 @@ public class EventMapper {
         return EventRejectedMessage.builder()
                 .eventId(event.getId())
                 .eventName(event.getName())
+                .imageUrl(event.getImageUrl())
                 .category(categoryMapper.toDto(event.getCategory()))
                 .ownerId(event.getOwnerId())
                 .approvedBy(event.getApprovedBy())

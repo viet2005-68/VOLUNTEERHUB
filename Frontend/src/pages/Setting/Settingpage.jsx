@@ -297,9 +297,9 @@ export default function Settingpage() {
 
   if (isLoading || !formData) {
     return (
-      <div className="flex min-h-[60vh] items-center justify-center bg-slate-100">
-        <div className="flex items-center gap-3 rounded-full border border-slate-200 bg-white px-6 py-3 text-slate-500 shadow-sm">
-          <Loader2 className="h-5 w-5 animate-spin" />
+      <div className="flex min-h-[60vh] items-center justify-center bg-pale-canvas">
+        <div className="flex items-center gap-3 rounded-full border border-deep-forest/15 bg-pale-canvas px-6 py-3 text-deep-forest/65 shadow-sm">
+          <Loader2 className="h-5 w-5 animate-spin text-deep-forest" />
           <span>Loading profile...</span>
         </div>
       </div>
@@ -636,7 +636,7 @@ export default function Settingpage() {
         setErrors({});
         setSkillInput("");
       }}
-      className="inline-flex items-center gap-2 rounded-xl bg-red-400 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-blue-500/30 transition hover:bg-red-400/70"
+      className="inline-flex items-center gap-2 rounded-xl bg-deep-forest px-5 py-2.5 text-sm font-semibold text-pale-canvas shadow-lg shadow-deep-forest/20 transition hover:bg-foudre-pink"
     >
       <Edit2 className="h-4 w-4" />
       Edit Profile
@@ -645,13 +645,13 @@ export default function Settingpage() {
     <div className="flex flex-wrap items-center gap-3">
       <button
         onClick={handleCancelEdit}
-        className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-600 transition hover:border-slate-300 hover:bg-slate-50"
+        className="inline-flex items-center gap-2 rounded-xl border border-deep-forest/15 bg-pale-canvas px-5 py-2.5 text-sm font-semibold text-deep-forest transition hover:border-deep-forest/30 hover:bg-ash-whisper"
       >
         Cancel
       </button>
       <button
         onClick={handleSaveChanges}
-        className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-500/30 transition hover:bg-emerald-500"
+        className="inline-flex items-center gap-2 rounded-xl bg-deep-forest px-5 py-2.5 text-sm font-semibold text-pale-canvas shadow-lg shadow-deep-forest/20 transition hover:bg-foudre-pink"
       >
         <Save className="h-4 w-4" />
         Save Changes
@@ -663,33 +663,30 @@ export default function Settingpage() {
     `rounded-xl border ${
       errors[field]
         ? "border-red-300 focus:border-red-400 focus:ring-red-200"
-        : "border-slate-200 focus:border-blue-400 focus:ring-blue-200"
-    } bg-white px-4 py-3 text-sm text-slate-700 shadow-sm transition focus:outline-none disabled:bg-slate-50 disabled:text-slate-400`;
+        : "border-deep-forest/15 focus:border-deep-forest focus:ring-deep-forest/15"
+    } bg-pale-canvas px-4 py-3 text-sm text-deep-forest shadow-sm transition focus:outline-none disabled:bg-ash-whisper/60 disabled:text-deep-forest/45`;
 
   return (
-    <div className="relative min-h-screen bg-slate-100 pb-16 pt-12">
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-96 bg-gradient-to-br from-blue-100 via-transparent to-transparent" />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(59,130,246,0.15),transparent_55%)]" />
-
+    <div className="relative min-h-screen bg-[linear-gradient(180deg,#fff8f6_0%,#f2faf5_100%)] pb-16 pt-12 font-clash-grotesk text-deep-forest">
       <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-8">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex flex-col gap-3">
               <button
                 onClick={() => navigate(-1)}
-                className="inline-flex w-fit items-center gap-2 text-sm font-medium text-white transition  bg-red-400 p-2 rounded-lg hover:bg-red-400/90 active:scale-95 duration-150 ease-in-out"
+                className="inline-flex w-fit items-center gap-2 rounded-lg bg-deep-forest p-2 text-sm font-medium text-pale-canvas transition duration-150 ease-in-out hover:bg-foudre-pink active:scale-95"
               >
                 <ArrowLeft className="h-4 w-4" />
                 Back
               </button>
               <div>
-                <p className="text-xs uppercase tracking-[0.2em] text-slate-500">
+                <p className="text-xs uppercase tracking-[0.2em] text-deep-forest/55">
                   Settings
                 </p>
-                <h1 className="mt-2 text-3xl font-semibold text-slate-900 sm:text-4xl">
+                <h1 className="mt-2 font-clash-grotesk text-3xl font-bold leading-[1.05] text-deep-forest sm:text-4xl">
                   Profile & Preferences
                 </h1>
-                <p className="mt-1 text-sm text-slate-600">
+                <p className="mt-2 max-w-2xl text-sm leading-[1.35] text-deep-forest/70">
                   Manage how volunteers see you and keep your information up to
                   date across VolunteerHub.
                 </p>
@@ -700,12 +697,12 @@ export default function Settingpage() {
 
           <Card
             animate={false}
-            className="relative overflow-hidden border border-white/60 bg-white/80 px-6 py-8 shadow-xl shadow-blue-200/60 backdrop-blur"
+            className="relative overflow-hidden border border-deep-forest/10 bg-pale-canvas/95 px-6 py-8 shadow-xl shadow-deep-forest/10 backdrop-blur"
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-50 via-transparent to-purple-50 opacity-70" />
+            <div className="absolute inset-0 bg-gradient-to-r from-ash-whisper/65 via-pale-canvas to-deep-forest/5" />
             <div className="relative flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
               <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
-                <div className="relative mx-auto h-28 w-28 overflow-hidden rounded-3xl border border-blue-200 bg-gradient-to-br from-blue-500 to-blue-600 shadow-xl shadow-blue-500/30 sm:mx-0">
+                <div className="relative mx-auto h-28 w-28 overflow-hidden rounded-3xl border border-deep-forest/15 bg-deep-forest shadow-xl shadow-deep-forest/20 sm:mx-0">
                   {avatarPreview || formData.avatarUrl ? (
                     <LazyLoadImage
                       src={avatarPreview || formData.avatarUrl}
@@ -720,12 +717,12 @@ export default function Settingpage() {
                 </div>
                 <div className="text-center sm:text-left">
                   <div className="flex flex-col items-center gap-2 sm:flex-row sm:items-center">
-                    <h2 className="text-2xl font-semibold text-slate-900 sm:text-3xl">
+                    <h2 className="font-clash-grotesk text-2xl font-bold leading-[1.05] text-deep-forest sm:text-3xl">
                       {formData.fullName || formData.name}
                     </h2>
                     <div className="flex gap-2">
                       {formData.role && (
-                        <span className="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-600">
+                        <span className="inline-flex items-center rounded-full bg-deep-forest/10 px-3 py-1 text-xs font-medium text-deep-forest">
                           {formData.role}
                         </span>
                       )}
@@ -736,7 +733,7 @@ export default function Settingpage() {
                       )}
                     </div>
                   </div>
-                  <p className="mt-3 text-sm leading-relaxed text-slate-600">
+                  <p className="mt-3 text-sm leading-relaxed text-deep-forest/70">
                     {isEditing ? (
                       <textarea
                         name="bio"
@@ -746,8 +743,8 @@ export default function Settingpage() {
                         className={`w-full rounded-xl border ${
                           errors.bio
                             ? "border-red-300 focus:border-red-400 focus:ring-2 focus:ring-red-200"
-                            : "border-slate-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-200"
-                        } bg-white px-4 py-3 text-left text-sm text-slate-700 shadow-sm focus:outline-none`}
+                            : "border-deep-forest/15 focus:border-deep-forest focus:ring-2 focus:ring-deep-forest/15"
+                        } bg-pale-canvas px-4 py-3 text-left text-sm text-deep-forest shadow-sm focus:outline-none`}
                         placeholder="Share a short introduction about yourself"
                       />
                     ) : formData.bio ? (
@@ -762,37 +759,37 @@ export default function Settingpage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 gap-4 text-sm text-slate-600 sm:grid-cols-3 sm:gap-6 lg:grid-cols-1">
-                <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
-                  <MapPin className="h-5 w-5 text-blue-500" />
+              <div className="grid grid-cols-1 gap-4 text-sm text-deep-forest/70 sm:grid-cols-3 sm:gap-6 lg:grid-cols-1">
+                <div className="flex items-center gap-3 rounded-2xl border border-deep-forest/10 bg-pale-canvas px-4 py-3 shadow-sm">
+                  <MapPin className="h-5 w-5 text-deep-forest" />
                   <div>
-                    <p className="text-xs uppercase tracking-wide text-slate-400">
+                    <p className="text-xs uppercase tracking-wide text-deep-forest/45">
                       Location
                     </p>
-                    <p className="font-medium text-slate-700">
+                    <p className="font-medium text-deep-forest">
                       {formatAddressDisplay(formData.address) ||
                         "No location set"}
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
-                  <Calendar className="h-5 w-5 text-blue-500" />
+                <div className="flex items-center gap-3 rounded-2xl border border-deep-forest/10 bg-pale-canvas px-4 py-3 shadow-sm">
+                  <Calendar className="h-5 w-5 text-deep-forest" />
                   <div>
-                    <p className="text-xs uppercase tracking-wide text-slate-400">
+                    <p className="text-xs uppercase tracking-wide text-deep-forest/45">
                       Member Since
                     </p>
-                    <p className="font-medium text-slate-700">
+                    <p className="font-medium text-deep-forest">
                       {formatDate(formData.createdAt) || "--"}
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
-                  <Award className="h-5 w-5 text-blue-500" />
+                <div className="flex items-center gap-3 rounded-2xl border border-deep-forest/10 bg-pale-canvas px-4 py-3 shadow-sm">
+                  <Award className="h-5 w-5 text-deep-forest" />
                   <div>
-                    <p className="text-xs uppercase tracking-wide text-slate-400">
+                    <p className="text-xs uppercase tracking-wide text-deep-forest/45">
                       Events Joined
                     </p>
-                    <p className="font-medium text-slate-700">
+                    <p className="font-medium text-deep-forest">
                       {formData.totalEvents ?? 0}
                     </p>
                   </div>
@@ -804,13 +801,13 @@ export default function Settingpage() {
           <div className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
             <Card
               animate={false}
-              className="border border-slate-200 bg-white px-6 py-6 shadow-lg shadow-slate-200/70"
+              className="border border-deep-forest/10 bg-pale-canvas px-6 py-6 shadow-lg shadow-deep-forest/5"
             >
               <div className="flex flex-col gap-2 pb-6">
-                <h2 className="text-xl font-semibold text-slate-900">
+                <h2 className="font-clash-grotesk text-xl font-bold leading-[1.1] text-deep-forest">
                   Personal Information
                 </h2>
-                <p className="text-sm text-slate-500">
+                <p className="text-sm leading-[1.35] text-deep-forest/65">
                   Update your basic details so organizers can reach you when you
                   join or host events.
                 </p>
@@ -818,13 +815,13 @@ export default function Settingpage() {
 
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div className="flex flex-col gap-2 md:col-span-2">
-                  <label className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                  <label className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-deep-forest/60">
                     <User className="h-4 w-4" />
                     Profile Photo
                     <span className="ml-1 text-red-500">*</span>
                   </label>
-                  <div className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4 sm:flex-row sm:items-center">
-                    <div className="h-20 w-20 overflow-hidden rounded-xl border border-slate-200 bg-white">
+                  <div className="flex flex-col gap-3 rounded-xl border border-deep-forest/10 bg-ash-whisper/35 p-4 sm:flex-row sm:items-center">
+                    <div className="h-20 w-20 overflow-hidden rounded-xl border border-deep-forest/10 bg-pale-canvas">
                       {avatarPreview || formData.avatarUrl ? (
                         <img
                           src={avatarPreview || formData.avatarUrl}
@@ -833,7 +830,7 @@ export default function Settingpage() {
                         />
                       ) : (
                         <div className="flex h-full w-full items-center justify-center">
-                          <User className="h-8 w-8 text-slate-400" />
+                          <User className="h-8 w-8 text-deep-forest/35" />
                         </div>
                       )}
                     </div>
@@ -848,9 +845,9 @@ export default function Settingpage() {
                       />
                       <label
                         htmlFor="avatarUpload"
-                        className={`inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition ${
+                        className={`inline-flex items-center gap-2 rounded-lg border border-deep-forest/15 bg-pale-canvas px-4 py-2 text-sm font-semibold text-deep-forest transition ${
                           isEditing
-                            ? "cursor-pointer hover:border-blue-300 hover:bg-blue-50"
+                            ? "cursor-pointer hover:border-deep-forest/30 hover:bg-ash-whisper"
                             : "cursor-not-allowed opacity-60"
                         }`}
                       >
@@ -868,7 +865,7 @@ export default function Settingpage() {
                         </button>
                       )}
                       {avatarFile && (
-                        <span className="flex min-w-0 items-center text-sm text-slate-500">
+                        <span className="flex min-w-0 items-center text-sm text-deep-forest/55">
                           {avatarFile.name}
                         </span>
                       )}
@@ -882,25 +879,7 @@ export default function Settingpage() {
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  <label className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
-                    <User className="h-4 w-4" />
-                    Username
-                  </label>
-                  <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    disabled={true}
-                    className={
-                      getInputClasses("name") + " disabled:cursor-not-allowed"
-                    }
-                    placeholder="Enter your username"
-                  />
-                </div>
-
-                <div className="flex flex-col gap-2">
-                  <label className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                  <label className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-deep-forest/60">
                     <User className="h-4 w-4" />
                     Full Name
                   </label>
@@ -915,7 +894,7 @@ export default function Settingpage() {
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  <label className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                  <label className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-deep-forest/60">
                     <Mail className="h-4 w-4" />
                     Email
                   </label>
@@ -930,7 +909,7 @@ export default function Settingpage() {
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  <label className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                  <label className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-deep-forest/60">
                     <Phone className="h-4 w-4" />
                     Phone<span className="ml-1 text-red-500">*</span>
                   </label>
@@ -948,7 +927,7 @@ export default function Settingpage() {
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  <label className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                  <label className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-deep-forest/60">
                     <Calendar className="h-4 w-4" />
                     Date of Birth<span className="ml-1 text-red-500">*</span>
                   </label>
@@ -967,7 +946,7 @@ export default function Settingpage() {
                 </div>
 
                 <div className="flex flex-col gap-3 md:col-span-2">
-                  <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                  <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-deep-forest/60">
                     <Home className="h-4 w-4" />
                     Location<span className="ml-1 text-red-500">*</span>
                   </div>
@@ -975,7 +954,7 @@ export default function Settingpage() {
                     <div className="flex flex-col gap-2">
                       <label
                         htmlFor="province"
-                        className="text-xs font-semibold uppercase tracking-wide text-slate-400"
+                        className="text-xs font-semibold uppercase tracking-wide text-deep-forest/45"
                       >
                         Province / City
                       </label>
@@ -1013,7 +992,7 @@ export default function Settingpage() {
                     <div className="flex flex-col gap-2">
                       <label
                         htmlFor="district"
-                        className="text-xs font-semibold uppercase tracking-wide text-slate-400"
+                        className="text-xs font-semibold uppercase tracking-wide text-deep-forest/45"
                       >
                         District
                       </label>
@@ -1053,7 +1032,7 @@ export default function Settingpage() {
                   <div className="flex flex-col gap-2">
                     <label
                       htmlFor="street"
-                      className="text-xs font-semibold uppercase tracking-wide text-slate-400"
+                      className="text-xs font-semibold uppercase tracking-wide text-deep-forest/45"
                     >
                       Street / Address Line
                     </label>
@@ -1090,7 +1069,7 @@ export default function Settingpage() {
               </div>
 
               <div className="mt-8 flex flex-col gap-3">
-                <label className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                <label className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-deep-forest/60">
                   <Award className="h-4 w-4" />
                   Skills & Interests<span className="ml-1 text-red-500">*</span>
                 </label>
@@ -1113,7 +1092,7 @@ export default function Settingpage() {
                       <button
                         type="button"
                         onClick={handleAddSkill}
-                        className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-500"
+                        className="inline-flex items-center justify-center gap-2 rounded-xl bg-deep-forest px-4 py-2 text-sm font-semibold text-pale-canvas shadow-sm transition hover:bg-foudre-pink"
                       >
                         <Plus className="h-4 w-4" />
                         Add Skill
@@ -1129,14 +1108,14 @@ export default function Settingpage() {
                     formData.skills.map((skill, index) => (
                       <span
                         key={`${skill}-${index}`}
-                        className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-4 py-1.5 text-xs font-medium text-blue-700"
+                        className="inline-flex items-center gap-2 rounded-full border border-deep-forest/15 bg-deep-forest/10 px-4 py-1.5 text-xs font-medium text-deep-forest"
                       >
                         {skill}
                         {isEditing && (
                           <button
                             type="button"
                             onClick={() => handleRemoveSkill(skill)}
-                            className="rounded-full bg-blue-100 p-1 text-blue-600 transition hover:bg-blue-200"
+                            className="rounded-full bg-pale-canvas p-1 text-deep-forest transition hover:bg-ash-whisper"
                             aria-label={`Remove ${skill}`}
                           >
                             <X className="h-3 w-3" />
@@ -1145,7 +1124,7 @@ export default function Settingpage() {
                       </span>
                     ))
                   ) : (
-                    <span className="text-sm text-slate-400">
+                    <span className="text-sm text-deep-forest/45">
                       No skills added yet
                     </span>
                   )}
@@ -1156,19 +1135,19 @@ export default function Settingpage() {
             <div className="flex flex-col gap-6">
               <Card
                 animate={false}
-                className="border border-slate-200 bg-white px-6 py-6 shadow-lg shadow-blue-100/70"
+                className="border border-deep-forest/10 bg-pale-canvas px-6 py-6 shadow-lg shadow-deep-forest/5"
               >
                 <div className="flex items-center justify-between">
-                  <h4 className="text-base font-semibold text-slate-900">
+                  <h4 className="text-base font-bold text-deep-forest">
                     Profile Health
                   </h4>
-                  <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-600">
+                  <span className="rounded-full bg-deep-forest/10 px-3 py-1 text-xs font-semibold text-deep-forest">
                     {profileCompletion}% complete
                   </span>
                 </div>
-                <div className="mt-4 h-2 rounded-full bg-slate-200">
+                <div className="mt-4 h-2 rounded-full bg-deep-forest/10">
                   <div
-                    className="h-full rounded-full bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 transition-all"
+                    className="h-full rounded-full bg-gradient-to-r from-deep-forest to-foudre-pink transition-all"
                     style={{ width: `${profileCompletion}%` }}
                   />
                 </div>
@@ -1176,16 +1155,18 @@ export default function Settingpage() {
                   {completionSteps.map((step) => (
                     <li
                       key={step.id}
-                      className="flex items-center gap-3 text-sm text-slate-600"
+                      className="flex items-center gap-3 text-sm text-deep-forest/65"
                     >
                       {step.complete ? (
-                        <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                        <CheckCircle2 className="h-4 w-4 text-deep-forest" />
                       ) : (
-                        <Circle className="h-4 w-4 text-slate-300" />
+                        <Circle className="h-4 w-4 text-deep-forest/25" />
                       )}
                       <span
                         className={
-                          step.complete ? "text-slate-700" : "text-slate-500"
+                          step.complete
+                            ? "text-deep-forest"
+                            : "text-deep-forest/55"
                         }
                       >
                         {step.label}
@@ -1197,42 +1178,42 @@ export default function Settingpage() {
 
               <Card
                 animate={false}
-                className="border border-slate-200 bg-white px-6 py-6 shadow-lg shadow-slate-200/70"
+                className="border border-deep-forest/10 bg-pale-canvas px-6 py-6 shadow-lg shadow-deep-forest/5"
               >
-                <h4 className="text-base font-semibold text-slate-900">
+                <h4 className="text-base font-bold text-deep-forest">
                   Contact Summary
                 </h4>
-                <div className="mt-4 space-y-4 text-sm text-slate-600">
+                <div className="mt-4 space-y-4 text-sm text-deep-forest/70">
                   <div className="flex items-center gap-3">
-                    <Mail className="h-4 w-4 text-blue-500" />
+                    <Mail className="h-4 w-4 text-deep-forest" />
                     <span>{formData.email || "No email set"}</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <Phone className="h-4 w-4 text-blue-500" />
+                    <Phone className="h-4 w-4 text-deep-forest" />
                     <span>{formData.phoneNumber || "No phone number"}</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <Home className="h-4 w-4 text-blue-500" />
+                    <Home className="h-4 w-4 text-deep-forest" />
                     <span>
                       {formatAddressDisplay(formData.address) ||
                         "No address provided"}
                     </span>
                   </div>
                 </div>
-                <div className="mt-6 rounded-xl bg-slate-50 px-4 py-3 text-xs text-slate-500">
+                <div className="mt-6 rounded-xl bg-ash-whisper/45 px-4 py-3 text-xs text-deep-forest/60">
                   Last updated {formatDate(formData.updatedAt) || "recently"}
                 </div>
               </Card>
 
               <Card
                 animate={false}
-                className="border border-slate-200 bg-white px-6 py-6 shadow-lg shadow-slate-200/70"
+                className="border border-deep-forest/10 bg-pale-canvas px-6 py-6 shadow-lg shadow-deep-forest/5"
               >
-                <h5 className="flex items-center gap-2 text-base font-semibold text-slate-900">
-                  <Bell className="h-4 w-4 text-blue-500" />
+                <h5 className="flex items-center gap-2 text-base font-bold text-deep-forest">
+                  <Bell className="h-4 w-4 text-deep-forest" />
                   Notification Settings
                 </h5>
-                <p className="mt-2 text-sm text-slate-500">
+                <p className="mt-2 text-sm leading-[1.35] text-deep-forest/65">
                   Enable push notifications to receive updates about your
                   upcoming events and activities.
                 </p>

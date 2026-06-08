@@ -2,6 +2,12 @@ import { Client } from "@stomp/stompjs";
 import axiosClient from "./axiosClient";
 
 const CHAT_BASE_URL = "/v1/chats";
+const AGGREGATED_CHAT_BASE_URL = "/v1/aggregated/chats";
+
+const shouldFallbackToChatService = (error) => {
+  const status = error?.response?.status;
+  return status === 404 || status === 503 || (status >= 500 && status < 600);
+};
 
 const resolveWsUrl = () => {
   const explicit = import.meta.env.VITE_CHAT_WS_URL;
@@ -20,8 +26,16 @@ const resolveWsUrl = () => {
   return `${protocol}//${window.location.host}/ws/chat`;
 };
 
-export const listConversations = async () => {
-  return axiosClient.get(`${CHAT_BASE_URL}/conversations`);
+export const listConversations = async ({ eventId } = {}) => {
+  const params = eventId ? { eventId: Number(eventId) } : undefined;
+  try {
+    return await axiosClient.get(`${AGGREGATED_CHAT_BASE_URL}/conversations`, { params });
+  } catch (error) {
+    if (shouldFallbackToChatService(error)) {
+      return axiosClient.get(`${CHAT_BASE_URL}/conversations`, { params });
+    }
+    throw error;
+  }
 };
 
 export const openConversation = async ({ eventId, volunteerId }) => {
@@ -32,19 +46,43 @@ export const openConversation = async ({ eventId, volunteerId }) => {
 };
 
 export const listMessages = async ({ conversationId, before, limit = 50 }) => {
-  return axiosClient.get(`${CHAT_BASE_URL}/conversations/${conversationId}/messages`, {
-    params: { before, limit },
-  });
+  try {
+    return await axiosClient.get(`${AGGREGATED_CHAT_BASE_URL}/conversations/${conversationId}/messages`, {
+      params: { before, limit },
+    });
+  } catch (error) {
+    if (shouldFallbackToChatService(error)) {
+      return axiosClient.get(`${CHAT_BASE_URL}/conversations/${conversationId}/messages`, {
+        params: { before, limit },
+      });
+    }
+    throw error;
+  }
 };
 
-export const sendMessage = async ({ conversationId, body, attachments = [] }) => {
+export const uploadChatMedia = async (file) => {
+  const formData = new FormData();
+  formData.append("file", file);
+  return axiosClient.post(`${CHAT_BASE_URL}/media`, formData);
+};
+
+const createClientMessageId = () => {
+  if (typeof crypto !== "undefined" && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+};
+
+export const sendMessage = async ({
+  conversationId,
+  body,
+  attachments = [],
+  clientMessageId,
+}) => {
   return axiosClient.post(`${CHAT_BASE_URL}/conversations/${conversationId}/messages`, {
-    body,
+    body: body || "",
     attachments,
-    clientMessageId:
-      typeof crypto !== "undefined" && crypto.randomUUID
-        ? crypto.randomUUID()
-        : `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+    clientMessageId: clientMessageId || createClientMessageId(),
   });
 };
 
@@ -54,7 +92,7 @@ export const markConversationRead = async ({ conversationId, lastReadMessageId }
   });
 };
 
-export const createChatClient = ({ onConversationMessage, onUserMessage }) => {
+export const createChatClient = ({ onConnect, onConversationMessage, onUserMessage }) => {
   const token = localStorage.getItem("token");
   const baseUrl = resolveWsUrl();
   const brokerURL = token
@@ -72,6 +110,7 @@ export const createChatClient = ({ onConversationMessage, onUserMessage }) => {
           onUserMessage(JSON.parse(frame.body));
         });
       }
+      onConnect?.(client);
     },
   });
 

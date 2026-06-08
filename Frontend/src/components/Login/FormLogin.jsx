@@ -1,7 +1,6 @@
 import React from "react";
 import { FcGoogle } from "react-icons/fc";
 import { FaFacebook, FaHome } from "react-icons/fa";
-import { FaBackward } from "react-icons/fa6";
 import { pandaclosed, pandaopen } from "../../assets/Login";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
@@ -53,7 +52,7 @@ function FormLogin() {
                 type="text"
                 id="email"
                 name="email"
-                className="border-2 border-gray-300 rounded-md p-1 focus:outline-none focus:border-red-300 focus:ring-blue-500"
+                className="rounded-[10px] border-2 border-ash-whisper bg-pale-canvas p-2 text-deep-forest outline-none transition placeholder:text-deep-forest/50 focus:border-foudre-pink focus:ring-4 focus:ring-foudre-pink/20"
               />
             </div>
             <div className="flex flex-col gap-2 max-md:flex-col">
@@ -62,7 +61,7 @@ function FormLogin() {
                 type="password"
                 id="password"
                 name="password"
-                className="border-2 border-gray-300 rounded-md p-1 focus:outline-none focus:border-red-300 focus:ring-blue-500"
+                className="rounded-[10px] border-2 border-ash-whisper bg-pale-canvas p-2 text-deep-forest outline-none transition placeholder:text-deep-forest/50 focus:border-foudre-pink focus:ring-4 focus:ring-foudre-pink/20"
                 onFocus={() => setIsPasswordFocused(true)}
                 onBlur={() => setIsPasswordFocused(false)}
               />
@@ -73,7 +72,7 @@ function FormLogin() {
                 <label htmlFor="remember">Remember me</label>
               </div>
               <div>
-                <a href="#" className="text-red-400">
+                <a href="#" className="font-bold text-foudre-pink transition hover:text-deep-forest">
                   Forgot password?
                 </a>
               </div>
@@ -81,30 +80,30 @@ function FormLogin() {
             <input
               type="submit"
               value="Login"
-              className="bg-red-400 text-white p-2 rounded-md min-w-full cursor-pointer hover:bg-red-450 transition-all duration-200 ease-in-out mt-4"
+              className="mt-4 min-w-full cursor-pointer rounded-[10px] bg-foudre-pink p-3 font-bold text-pale-canvas transition-all duration-200 ease-in-out hover:bg-deep-forest"
             />
           </div>
           <div className="text-center">
             <div>Or login with</div>
           </div>
           <div className="flex flex-row gap-5 justify-between items-center mt-2">
-            <div className="basis-1/2 border-gray-300 border-1 flex justify-center items-center p-2 shadow-2xs rounded-xl cursor-pointer">
+            <div className="flex basis-1/2 cursor-pointer items-center justify-center rounded-[10px] border-2 border-ash-whisper bg-pale-canvas p-2 text-deep-forest shadow-2xs transition hover:border-foudre-pink">
               <FcGoogle className="text-2xl" />
             </div>
-            <div className="basis-1/2 border-gray-300 border-1 flex justify-center items-center p-2 shadow-2xs rounded-xl cursor-pointer">
-              <FaFacebook className="text-blue-500 text-2xl" />
+            <div className="flex basis-1/2 cursor-pointer items-center justify-center rounded-[10px] border-2 border-ash-whisper bg-pale-canvas p-2 text-deep-forest shadow-2xs transition hover:border-foudre-pink">
+              <FaFacebook className="text-2xl text-foudre-pink" />
             </div>
           </div>
           <div className="flex flex-col max-md:flex-col justify-center items-center gap-2">
             <div className="flex flex-row gap-2">
               <div>Don't have an account?</div>
               <div>
-                <a href="#" className="text-indigo-500">
+                <a href="#" className="font-bold text-foudre-pink transition hover:text-deep-forest">
                   Register
                 </a>
               </div>
             </div>
-            <div className="flex flex-rows justify-center items-center gap-2 mt-4 cursor-pointer">
+            <div className="mt-4 flex cursor-pointer flex-rows items-center justify-center gap-2 text-deep-forest/70 transition hover:text-deep-forest">
               <FaHome />
               <button>Back to home</button>
             </div>

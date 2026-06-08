@@ -14,7 +14,7 @@ spring:
   security:
     oauth2:
       authorizationserver:
-        issuer-uri: http://${HOST}:${PORT}
+        issuer-uri: ${VOLUNTEER_HUB_AS_URI:http://${HOST}:${PORT}}
       client:
         client-id: ${CLIENT_ID}
         client-secret: ${CLIENT_SECRET}

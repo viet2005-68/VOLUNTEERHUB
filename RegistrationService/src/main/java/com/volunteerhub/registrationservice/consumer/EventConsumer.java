@@ -33,10 +33,12 @@ public class EventConsumer {
                             .capacity(((EventApprovedMessage) eventMessage).getCapacity())
                             .status(((EventApprovedMessage) eventMessage).getStatus())
                             .ownerId(((EventApprovedMessage) eventMessage).getOwnerId())
+                            .imageUrl(((EventApprovedMessage) eventMessage).getImageUrl())
                             .startTime(((EventApprovedMessage) eventMessage).getStartTime())
                             .endTime(((EventApprovedMessage) eventMessage).getEndTime())
                             .registrationDeadline(((EventApprovedMessage) eventMessage).getRegistrationDeadline())
                             .qrJoinPolicy(((EventApprovedMessage) eventMessage).getQrJoinPolicy())
+                            .completionBadgeId(((EventApprovedMessage) eventMessage).getCompletionBadgeId())
                             .build();
                     eventSnapshotService.create(eventSnapshotRequest);
                 }
@@ -47,17 +49,21 @@ public class EventConsumer {
                         || updatedMessage.getUpdatedFields().containsKey("name")
                         || updatedMessage.getUpdatedFields().containsKey("start_time")
                         || updatedMessage.getUpdatedFields().containsKey("end_time")
+                        || updatedMessage.getUpdatedFields().containsKey("image_url")
                         || updatedMessage.getUpdatedFields().containsKey("registration_deadline")
-                        || updatedMessage.getUpdatedFields().containsKey("qr_join_policy")) {
+                        || updatedMessage.getUpdatedFields().containsKey("qr_join_policy")
+                        || updatedMessage.getUpdatedFields().containsKey("completion_badge_id")) {
                     EventSnapshotRequest eventSnapshotRequest = EventSnapshotRequest
                             .builder()
                             .eventId(updatedMessage.getId())
                             .capacity((Integer) updatedMessage.getUpdatedFields().get("capacity"))
                             .eventName((String) updatedMessage.getUpdatedFields().get("name"))
+                            .imageUrl((String) updatedMessage.getUpdatedFields().get("image_url"))
                             .startTime(toLocalDateTime(updatedMessage.getUpdatedFields().get("start_time")))
                             .endTime(toLocalDateTime(updatedMessage.getUpdatedFields().get("end_time")))
                             .registrationDeadline(toLocalDateTime(updatedMessage.getUpdatedFields().get("registration_deadline")))
                             .qrJoinPolicy(toQrJoinPolicy(updatedMessage.getUpdatedFields().get("qr_join_policy")))
+                            .completionBadgeId(toLong(updatedMessage.getUpdatedFields().get("completion_badge_id")))
                             .build();
                     eventSnapshotService.update(eventSnapshotRequest);
                 }
@@ -106,6 +112,16 @@ public class EventConsumer {
             return qrJoinPolicy;
         }
         return QrJoinPolicy.valueOf(String.valueOf(value));
+    }
+
+    private Long toLong(Object value) {
+        if (value == null) {
+            return null;
+        }
+        if (value instanceof Number number) {
+            return number.longValue();
+        }
+        return Long.valueOf(String.valueOf(value));
     }
 
 }

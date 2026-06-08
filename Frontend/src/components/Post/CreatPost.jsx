@@ -1,13 +1,13 @@
 import { useState, useRef } from "react";
-import { Camera, Smile, Tag, Heart, Loader2, X } from "lucide-react";
+import { Camera, Loader2, X } from "lucide-react";
 import { useCreatePost } from "../../hook/useCommunity";
-import toast from "react-hot-toast";
 
 const CreatPost = ({ user, onCreate, eventId }) => {
   const [text, setText] = useState("");
   const [images, setImages] = useState([]); // {file, url}
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef(null);
+  const textareaRef = useRef(null);
 
   const { mutate: createPost, isLoading, isPending } = useCreatePost(eventId);
   const loading = isLoading || isPending;
@@ -56,6 +56,15 @@ const CreatPost = ({ user, onCreate, eventId }) => {
     images.forEach((img) => img?.url && URL.revokeObjectURL(img.url));
     setImages([]);
     if (fileInputRef.current) fileInputRef.current.value = null;
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "";
+    }
+  };
+
+  const handleTextChange = (e) => {
+    setText(e.target.value);
+    e.target.style.height = "auto";
+    e.target.style.height = `${Math.min(e.target.scrollHeight, 260)}px`;
   };
 
   const handleSubmit = () => {
@@ -81,17 +90,13 @@ const CreatPost = ({ user, onCreate, eventId }) => {
           }
           resetForm();
         },
-        onError: () => {
-          // Error and try again
-          toast.error("Error when create post. Please try again.");
-        },
       }
     );
   };
 
   return (
     <div
-      className="w-full bg-white rounded-md p-2 shadow-sm relative focus-within:outline-none focus-within:ring-2 focus-within:ring-blue-300 ring-1 ring-blue-300 duration-150 transition-all"
+      className="w-full bg-pale-canvas rounded-[20px] p-2 shadow-sm relative focus-within:outline-none focus-within:ring-2 focus-within:ring-bubblegum-blush border-2 border-ash-whisper duration-150 transition-all"
       aria-busy={loading}
     >
       <div
@@ -101,11 +106,12 @@ const CreatPost = ({ user, onCreate, eventId }) => {
       >
         <div className="flex-1 px-5 py-5">
           <textarea
+            ref={textareaRef}
             value={text}
-            onChange={(e) => setText(e.target.value)}
+            onChange={handleTextChange}
             placeholder="Enter your post content..."
-            className="w-full resize-none rounded-md p-2 focus:outline-none border-none"
-            rows={3}
+            className="max-h-[260px] min-h-[156px] w-full resize-none overflow-y-auto rounded-xl border-2 border-bubblegum-blush bg-pale-canvas px-5 py-4 text-base font-medium leading-[1.45] text-deep-forest placeholder-deep-forest/45 focus:border-foudre-pink focus:outline-none"
+            rows={6}
           />
 
           {images.length > 0 && (
@@ -132,7 +138,7 @@ const CreatPost = ({ user, onCreate, eventId }) => {
           <div className="mt-3 flex items-center justify-between">
             <div
               className={`flex items-center gap-2 ${
-                isDragging ? "ring-2 ring-blue-300 rounded-md p-1" : ""
+                isDragging ? "ring-2 ring-bubblegum-blush rounded-md p-1" : ""
               }`}
               onDragEnter={() => setIsDragging(true)}
               onDragLeave={() => setIsDragging(false)}
@@ -141,7 +147,7 @@ const CreatPost = ({ user, onCreate, eventId }) => {
             >
               <button
                 type="button"
-                className="rounded px-2 py-1 text-sm text-blue-500 hover:text-blue-600 focus:outline-none"
+                className="rounded px-2 py-1 text-sm text-deep-forest hover:text-foudre-pink focus:outline-none"
                 onClick={() => fileInputRef.current?.click()}
               >
                 <span className="inline-flex items-center self-center">
@@ -156,7 +162,7 @@ const CreatPost = ({ user, onCreate, eventId }) => {
                 onChange={handleImageChange}
                 className="hidden"
               />
-              <span className="text-xs text-gray-500 max-sm:hidden">
+              <span className="text-xs font-medium text-deep-forest/60 max-sm:hidden">
                 Drag and drop images here or click to select
               </span>
             </div>
@@ -169,13 +175,13 @@ const CreatPost = ({ user, onCreate, eventId }) => {
               disabled={
                 loading || (!text.trim() && images.length === 0) || !eventId
               }
-              className="px-5 py-1 rounded-md bg-blue-600 text-white disabled:bg-gray-300 disabled:cursor-not-allowed cursor-pointer"
+              className="px-5 py-2 rounded-lg bg-deep-forest text-white font-bold hover:bg-foudre-pink disabled:bg-ash-whisper disabled:text-deep-forest/40 disabled:cursor-not-allowed cursor-pointer transition-colors"
             >
               {loading ? "Posting..." : "Post"}
             </button>
             {loading && (
-              <div className="absolute inset-0 bg-white/70 backdrop-blur-sm rounded-md flex items-center justify-center z-10">
-                <div className="flex items-center gap-2 text-gray-700">
+              <div className="absolute inset-0 bg-pale-canvas/75 backdrop-blur-sm rounded-[18px] flex items-center justify-center z-10">
+                <div className="flex items-center gap-2 text-deep-forest">
                   <Loader2 className="w-5 h-5 animate-spin" />
                   <span>Posting...</span>
                 </div>

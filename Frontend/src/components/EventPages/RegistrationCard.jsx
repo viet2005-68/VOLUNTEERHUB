@@ -48,7 +48,7 @@ function RegistrationCard({
       return {
         text: "Checking...",
         disabled: true,
-        className: "bg-gray-500/80 cursor-not-allowed",
+        className: "bg-deep-forest/35 cursor-not-allowed",
       };
     }
 
@@ -58,28 +58,28 @@ function RegistrationCard({
         return {
           text: "Registration Closed",
           disabled: true,
-          className: "bg-gray-500/80 cursor-not-allowed",
+          className: "bg-deep-forest/35 cursor-not-allowed",
         };
       }
       if (registedVolunteer >= totalSpots) {
         return {
           text: "Event Full",
           disabled: true,
-          className: "bg-gray-500/80 cursor-not-allowed",
+          className: "bg-deep-forest/35 cursor-not-allowed",
         };
       }
       if (registerMutation.isPending) {
         return {
           text: "Joining...",
           disabled: true,
-          className: "bg-purple-500/80 cursor-not-allowed",
+          className: "bg-deep-forest/60 cursor-not-allowed",
         };
       }
       return {
         text: "Join",
         disabled: false,
         className:
-          "bg-gradient-to-r from-purple-400 via-fuchsia-400 to-pink-400 cursor-pointer hover:from-purple-500 hover:via-fuchsia-500 hover:to-pink-500",
+          "bg-foudre-pink cursor-pointer hover:bg-deep-forest",
       };
     }
 
@@ -89,32 +89,32 @@ function RegistrationCard({
         return {
           text: "Pending Approval",
           disabled: true,
-          className: "bg-yellow-400 cursor-not-allowed",
+          className: "bg-amber-100 !text-deep-forest border-2 border-amber-300 cursor-not-allowed",
         };
       case "APPROVED":
         return {
           text: "✓ You're Participating",
           disabled: true,
-          className: "bg-green-500/80 cursor-not-allowed",
+          className: "bg-deep-forest cursor-not-allowed",
         };
       case "COMPLETED":
         return {
           text: "✓ Event Completed",
           disabled: true,
-          className: "bg-blue-500/80 cursor-not-allowed",
+          className: "bg-deep-forest cursor-not-allowed",
         };
       case "REJECTED":
         return {
           text: "Registration Rejected",
           disabled: true,
-          className: "bg-red-500/80 cursor-not-allowed",
+          className: "bg-foudre-pink/75 cursor-not-allowed",
         };
       default:
         return {
           text: "Join",
           disabled: false,
           className:
-            "bg-gradient-to-r from-purple-400 via-fuchsia-400 to-pink-400 cursor-pointer hover:from-purple-500 hover:via-fuchsia-500 hover:to-pink-500",
+            "bg-foudre-pink cursor-pointer hover:bg-deep-forest",
         };
     }
   };

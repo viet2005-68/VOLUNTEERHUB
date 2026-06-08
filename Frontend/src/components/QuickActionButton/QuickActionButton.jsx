@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 function QuickActionButton({
   label,
   onClick,
-  icon: Icon,
+  icon,
   active,
   navigate: navigateTo,
 }) {
@@ -20,15 +20,15 @@ function QuickActionButton({
 
   return (
     <div
-      className={`flex cursor-pointer flex-col items-center justify-center gap-3 rounded-[10px] border-2 p-5 transition-colors ${
+      className={`flex min-h-[124px] cursor-pointer flex-col items-center justify-center gap-4 rounded-[12px] border-2 px-5 py-7 transition-colors ${
         active
           ? "border-deep-forest bg-deep-forest text-pale-canvas"
           : "border-ash-whisper bg-pale-canvas text-deep-forest hover:border-bubblegum-blush hover:bg-ash-whisper"
       }`}
       onClick={handleClick}
     >
-      <Icon size={24} />
-      <div className="mt-1 text-sm font-bold leading-[0.85]">{label}</div>
+      {React.createElement(icon, { size: 26 })}
+      <div className="text-sm font-bold leading-[1.05]">{label}</div>
     </div>
   );
 }

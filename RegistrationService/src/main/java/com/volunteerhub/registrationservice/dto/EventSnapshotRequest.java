@@ -16,8 +16,10 @@ public class EventSnapshotRequest {
     private EventStatus status;
     private String ownerId;
     private String eventName;
+    private String imageUrl;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private LocalDateTime registrationDeadline;
     private QrJoinPolicy qrJoinPolicy;
+    private Long completionBadgeId;
 }

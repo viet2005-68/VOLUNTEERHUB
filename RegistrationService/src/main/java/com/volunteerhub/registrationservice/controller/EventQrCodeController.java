@@ -3,6 +3,7 @@ package com.volunteerhub.registrationservice.controller;
 import com.volunteerhub.common.dto.UserEventResponse;
 import com.volunteerhub.registrationservice.dto.QrCodeCreateRequest;
 import com.volunteerhub.registrationservice.dto.QrCodeResponse;
+import com.volunteerhub.registrationservice.dto.QrCodeRevokeRequest;
 import com.volunteerhub.registrationservice.dto.QrJoinRequest;
 import com.volunteerhub.registrationservice.dto.QrPreviewResponse;
 import com.volunteerhub.registrationservice.service.EventQrCodeService;
@@ -37,9 +38,18 @@ public class EventQrCodeController {
 
     @DeleteMapping("/events/{eventId}/qr-codes/{qrCodeId}")
     public ResponseEntity<QrCodeResponse> revokeQrCode(@PathVariable Long eventId,
-                                                       @PathVariable Long qrCodeId) {
+                                                       @PathVariable Long qrCodeId,
+                                                       @RequestBody(required = false) QrCodeRevokeRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return ResponseEntity.ok(eventQrCodeService.revokeQrCode(authentication.getName(), eventId, qrCodeId));
+        return ResponseEntity.ok(eventQrCodeService.revokeQrCode(authentication.getName(), eventId, qrCodeId, request));
+    }
+
+    @PatchMapping("/events/{eventId}/qr-codes/{qrCodeId}/revoke")
+    public ResponseEntity<QrCodeResponse> revokeQrCodeWithReason(@PathVariable Long eventId,
+                                                                 @PathVariable Long qrCodeId,
+                                                                 @RequestBody(required = false) QrCodeRevokeRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return ResponseEntity.ok(eventQrCodeService.revokeQrCode(authentication.getName(), eventId, qrCodeId, request));
     }
 
     @PostMapping("/events/{eventId}/completion-qr-codes")
@@ -57,9 +67,18 @@ public class EventQrCodeController {
 
     @DeleteMapping("/events/{eventId}/completion-qr-codes/{qrCodeId}")
     public ResponseEntity<QrCodeResponse> revokeCompletionQrCode(@PathVariable Long eventId,
-                                                                 @PathVariable Long qrCodeId) {
+                                                                 @PathVariable Long qrCodeId,
+                                                                 @RequestBody(required = false) QrCodeRevokeRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return ResponseEntity.ok(eventQrCodeService.revokeCompletionQrCode(authentication.getName(), eventId, qrCodeId));
+        return ResponseEntity.ok(eventQrCodeService.revokeCompletionQrCode(authentication.getName(), eventId, qrCodeId, request));
+    }
+
+    @PatchMapping("/events/{eventId}/completion-qr-codes/{qrCodeId}/revoke")
+    public ResponseEntity<QrCodeResponse> revokeCompletionQrCodeWithReason(@PathVariable Long eventId,
+                                                                           @PathVariable Long qrCodeId,
+                                                                           @RequestBody(required = false) QrCodeRevokeRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return ResponseEntity.ok(eventQrCodeService.revokeCompletionQrCode(authentication.getName(), eventId, qrCodeId, request));
     }
 
     @GetMapping("/qr/preview")

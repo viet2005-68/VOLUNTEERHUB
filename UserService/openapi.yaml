@@ -1,0 +1,702 @@
+openapi: 3.0.3
+info:
+  title: VolunteerHub User Service API
+  version: 0.0.1
+  description: |
+    OpenAPI specification for the VolunteerHub UserService.
+
+    The service is protected by gateway-provided identity headers. Requests are
+    authenticated by `X-USER-ID` and authorized by `X-USER-ROLE`.
+servers:
+  - url: http://localhost:{port}
+    description: Local UserService instance
+    variables:
+      port:
+        default: "8081"
+        description: Value of the PORT environment variable.
+tags:
+  - name: Users
+    description: User profile endpoints.
+  - name: Admin
+    description: Administrative user-management endpoints.
+  - name: System
+    description: Internal service-to-service endpoints.
+  - name: Diagnostics
+    description: Test and diagnostic endpoints.
+
+security:
+  - userIdHeader: []
+    userRoleHeader: []
+
+paths:
+  /api/v1/users/users/me:
+    get:
+      tags:
+        - Users
+      summary: Get current user profile
+      operationId: getCurrentUser
+      responses:
+        "200":
+          description: Current user profile.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/v1/users/users/{userId}:
+    get:
+      tags:
+        - Users
+      summary: Get user by id
+      operationId: getUserById
+      parameters:
+        - $ref: "#/components/parameters/UserIdPath"
+      responses:
+        "200":
+          description: User profile.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      tags:
+        - Users
+      summary: Update current user profile
+      description: |
+        Updates the authenticated user's profile. Although `userId` is present
+        in the path, the controller updates the user identified by `X-USER-ID`.
+      operationId: updateUser
+      parameters:
+        - $ref: "#/components/parameters/UserIdPath"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserRequest"
+      responses:
+        "200":
+          description: Updated user profile.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/v1/users/users/by-ids:
+    get:
+      tags:
+        - Users
+      summary: Get users by ids
+      operationId: getUsersByIds
+      parameters:
+        - name: userIds
+          in: query
+          required: true
+          description: Repeated query parameter or comma-separated list, depending on client encoding.
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
+          example:
+            - 550e8400-e29b-41d4-a716-446655440000
+            - 550e8400-e29b-41d4-a716-446655440001
+      responses:
+        "200":
+          description: Matching users.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserResponse"
+
+  /api/v1/users/users/badges:
+    get:
+      tags:
+        - Users
+      summary: Get current user's badges
+      operationId: getCurrentUserBadges
+      responses:
+        "200":
+          description: Current user's badges.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserBadge"
+
+  /api/v1/users/users/{userId}/badges:
+    get:
+      tags:
+        - Users
+      summary: Get badges by user id
+      operationId: getUserBadges
+      parameters:
+        - $ref: "#/components/parameters/UserIdPath"
+      responses:
+        "200":
+          description: User badges.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserBadge"
+
+  /api/v1/users/users/login-history:
+    get:
+      tags:
+        - Users
+      summary: Get current user's login history
+      operationId: getCurrentUserLoginHistory
+      responses:
+        "200":
+          description: Current user's login history.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserLoginHistory"
+
+  /api/v1/users/users:
+    post:
+      tags:
+        - Users
+      summary: Create current user's profile
+      description: |
+        Creates a user profile using `X-USER-ID` as the profile id and
+        `X-USER-ROLE` as the profile role.
+      operationId: createUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserCreateRequest"
+            examples:
+              default:
+                value:
+                  authProvider: google
+                  fullName: Nguyen Van A
+                  username: nguyenvana
+                  email: user@example.com
+                  bio: Volunteer coordinator
+                  avatarUrl: https://example.com/avatar.png
+                  dateOfBirth: "1998-08-20"
+                  phoneNumber: "+84901234567"
+                  address:
+                    province: Ho Chi Minh
+                    district: District 1
+                    street: Nguyen Hue
+                  skills:
+                    - teaching
+                    - logistics
+                  darkMode: false
+      responses:
+        "201":
+          description: Created user profile.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  /api/v1/users/users/total_users:
+    get:
+      tags:
+        - Users
+      summary: Count normal users
+      operationId: countUsers
+      description: "Requires `X-USER-ROLE: ADMIN`."
+      responses:
+        "200":
+          description: Number of users with role USER.
+          content:
+            application/json:
+              schema:
+                type: integer
+                format: int64
+                example: 42
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /api/v1/users/users/total_managers:
+    get:
+      tags:
+        - Users
+      summary: Count managers
+      operationId: countManagers
+      description: "Requires `X-USER-ROLE: ADMIN`."
+      responses:
+        "200":
+          description: Number of users with role MANAGER.
+          content:
+            application/json:
+              schema:
+                type: integer
+                format: int64
+                example: 8
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /api/v1/users/users/me/validate-profile:
+    get:
+      tags:
+        - Users
+      summary: Validate current profile completeness
+      operationId: validateCurrentProfile
+      responses:
+        "200":
+          description: Profile completeness result.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProfileValidationResponse"
+
+  /api/v1/users/admin/users/all:
+    get:
+      tags:
+        - Admin
+      summary: List all users
+      operationId: adminListUsers
+      description: "Requires `X-USER-ROLE: ADMIN`."
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+          example: 0
+        - name: pageSize
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+          example: 20
+      responses:
+        "200":
+          description: Users. If pagination parameters are omitted, returns all users.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserResponse"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /api/v1/users/admin/{userId}/login-history:
+    get:
+      tags:
+        - Admin
+      summary: Get a user's login history
+      operationId: adminGetUserLoginHistory
+      description: "Requires `X-USER-ROLE: ADMIN`."
+      parameters:
+        - $ref: "#/components/parameters/UserIdPath"
+      responses:
+        "200":
+          description: User login history.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserLoginHistory"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /api/v1/users/admin/{userId}/ban:
+    put:
+      tags:
+        - Admin
+      summary: Ban a user
+      operationId: adminBanUser
+      description: "Requires `X-USER-ROLE: ADMIN`."
+      parameters:
+        - $ref: "#/components/parameters/UserIdPath"
+      responses:
+        "200":
+          description: Banned user profile.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/v1/users/admin/{userId}/unban:
+    put:
+      tags:
+        - Admin
+      summary: Unban a user
+      operationId: adminUnbanUser
+      description: "Requires `X-USER-ROLE: ADMIN`."
+      parameters:
+        - $ref: "#/components/parameters/UserIdPath"
+      responses:
+        "200":
+          description: Unbanned user profile.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/v1/users/system/user-ids:
+    get:
+      tags:
+        - System
+      summary: List user ids by role
+      operationId: systemListUserIdsByRole
+      description: "Requires `X-USER-ROLE: SYSTEM`."
+      parameters:
+        - name: role
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/UserRole"
+      responses:
+        "200":
+          description: User ids for the requested role.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /api/v1/users/system/{userId}:
+    get:
+      tags:
+        - System
+      summary: Get user status
+      operationId: systemGetUserStatus
+      description: "Requires `X-USER-ROLE: SYSTEM`."
+      parameters:
+        - $ref: "#/components/parameters/UserIdPath"
+      responses:
+        "200":
+          description: User status as plain text.
+          content:
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/UserStatus"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /test:
+    get:
+      tags:
+        - Diagnostics
+      summary: Test authenticated identity
+      operationId: testAuthenticatedIdentity
+      responses:
+        "200":
+          description: Text containing the current authorities and user id.
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Hello [ROLE_USER] with id 550e8400-e29b-41d4-a716-446655440000
+
+components:
+  securitySchemes:
+    userIdHeader:
+      type: apiKey
+      in: header
+      name: X-USER-ID
+      description: Authenticated user id injected by the API gateway.
+    userRoleHeader:
+      type: apiKey
+      in: header
+      name: X-USER-ROLE
+      description: User role injected by the API gateway. Accepted values are USER, MANAGER, ADMIN, and SYSTEM for internal calls.
+
+  parameters:
+    UserIdPath:
+      name: userId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: 550e8400-e29b-41d4-a716-446655440000
+
+  responses:
+    BadRequest:
+      description: Invalid input or invalid state transition.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorDetails"
+    Forbidden:
+      description: Access denied.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorDetails"
+    NotFound:
+      description: Entity not found.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorDetails"
+    Conflict:
+      description: Database constraint violation.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorDetails"
+
+  schemas:
+    UserRole:
+      type: string
+      enum:
+        - USER
+        - MANAGER
+        - ADMIN
+
+    UserStatus:
+      type: string
+      enum:
+        - ACTIVE
+        - BANNED
+
+    HeaderRole:
+      type: string
+      enum:
+        - USER
+        - MANAGER
+        - ADMIN
+        - SYSTEM
+
+    AddressRequest:
+      type: object
+      properties:
+        province:
+          type: string
+          example: Ho Chi Minh
+        district:
+          type: string
+          example: District 1
+        street:
+          type: string
+          example: Nguyen Hue
+      additionalProperties: false
+
+    AddressCreateRequest:
+      allOf:
+        - $ref: "#/components/schemas/AddressRequest"
+        - type: object
+          required:
+            - province
+            - district
+            - street
+
+    UserRequest:
+      type: object
+      properties:
+        authProvider:
+          type: string
+          example: google
+        fullName:
+          type: string
+          example: Nguyen Van A
+        username:
+          type: string
+          example: nguyenvana
+        email:
+          type: string
+          format: email
+          example: user@example.com
+        bio:
+          type: string
+          example: Volunteer coordinator
+        avatarUrl:
+          type: string
+          format: uri
+          example: https://example.com/avatar.png
+        dateOfBirth:
+          type: string
+          format: date
+          description: Must be a past date.
+          example: "1998-08-20"
+        phoneNumber:
+          type: string
+          pattern: "^\\+?[0-9]{10,15}$"
+          example: "+84901234567"
+        address:
+          $ref: "#/components/schemas/AddressRequest"
+        skills:
+          type: array
+          maxItems: 10
+          items:
+            type: string
+            maxLength: 50
+          example:
+            - teaching
+            - logistics
+        darkMode:
+          type: boolean
+          default: false
+      additionalProperties: false
+
+    UserCreateRequest:
+      allOf:
+        - $ref: "#/components/schemas/UserRequest"
+        - type: object
+          required:
+            - authProvider
+            - fullName
+            - email
+          properties:
+            address:
+              $ref: "#/components/schemas/AddressCreateRequest"
+
+    AddressResponse:
+      type: object
+      properties:
+        province:
+          type: string
+        district:
+          type: string
+        street:
+          type: string
+        fullAddress:
+          type: string
+          example: Nguyen Hue, District 1, Ho Chi Minh
+
+    UserResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 550e8400-e29b-41d4-a716-446655440000
+        fullName:
+          type: string
+          example: Nguyen Van A
+        email:
+          type: string
+          format: email
+          example: user@example.com
+        role:
+          $ref: "#/components/schemas/UserRole"
+        status:
+          $ref: "#/components/schemas/UserStatus"
+        authProvider:
+          type: string
+          example: google
+        bio:
+          type: string
+        totalEvents:
+          type: integer
+          format: int32
+          example: 0
+        badgeCount:
+          type: integer
+          format: int32
+          nullable: true
+        avatarUrl:
+          type: string
+          format: uri
+        dateOfBirth:
+          type: string
+          format: date
+        phoneNumber:
+          type: string
+        address:
+          $ref: "#/components/schemas/AddressResponse"
+        skills:
+          type: array
+          items:
+            type: string
+        darkMode:
+          type: boolean
+
+    UserBadge:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        badgeId:
+          type: integer
+          format: int64
+        createdAt:
+          type: string
+          format: date-time
+
+    UserLoginHistory:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        ipAddress:
+          type: string
+          example: 203.0.113.10
+        createdAt:
+          type: string
+          format: date-time
+
+    ProfileValidationResponse:
+      type: object
+      properties:
+        isComplete:
+          type: boolean
+          example: false
+        missingFields:
+          type: array
+          items:
+            type: string
+            enum:
+              - fullName
+              - dateOfBirth
+              - address
+          example:
+            - dateOfBirth
+            - address
+      required:
+        - isComplete
+        - missingFields
+
+    ErrorDetails:
+      type: object
+      properties:
+        message:
+          type: string
+          example: No such user with id 550e8400-e29b-41d4-a716-446655440000
+      required:
+        - message

@@ -20,6 +20,9 @@ public class LoginController {
 
     @GetMapping("/login")
     public String login(Model model) {
+        String normalizedClientUri = clientAppUri.replaceAll("/+$", "");
+        model.addAttribute("clientAppUri", normalizedClientUri);
+        model.addAttribute("signupUrl", normalizedClientUri + "/signup");
         model.addAttribute("googleAuthUrl", buildGoogleAuthUrl());
         return "login";
     }

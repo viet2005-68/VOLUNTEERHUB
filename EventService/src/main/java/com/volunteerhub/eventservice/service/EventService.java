@@ -6,6 +6,9 @@ import com.volunteerhub.common.utils.PageNumAndSizeResponse;
 import com.volunteerhub.common.utils.PaginationValidation;
 import com.volunteerhub.eventservice.dto.request.EventRequest;
 import com.volunteerhub.eventservice.dto.request.RejectRequest;
+import com.volunteerhub.eventservice.dto.response.EventAnalyticsSummaryResponse;
+import com.volunteerhub.eventservice.dto.response.EventCategoryDistributionResponse;
+import com.volunteerhub.eventservice.dto.response.EventMonthlyCreationAnalyticsResponse;
 import com.volunteerhub.eventservice.mapper.EventMapper;
 import com.volunteerhub.eventservice.model.Address;
 import com.volunteerhub.eventservice.model.Category;
@@ -27,12 +30,20 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class EventService {
+    private static final Long DEFAULT_COMPLETION_BADGE_ID = 8L;
+    private static final Long EDUCATION_BADGE_ID = 2L;
+    private static final Long ENVIRONMENT_BADGE_ID = 4L;
+    private static final Long ANIMAL_BADGE_ID = 11L;
+    private static final Long HEALTH_BADGE_ID = 13L;
 
     private final EventRepository eventRepository;
     private final CategoryService categoryService;
@@ -113,6 +124,7 @@ public class EventService {
                 .qrJoinPolicy(eventRequest.getQrJoinPolicy() == null
                         ? QrJoinPolicy.REQUIRE_APPROVAL
                         : eventRequest.getQrJoinPolicy())
+                .completionBadgeId(resolveCompletionBadgeId(eventRequest.getCategoryName()))
                 .build();
 
         Event savedEvent = eventRepository.save(event);
@@ -153,7 +165,10 @@ public class EventService {
             Category category = categoryService.findByNameOrCreate(eventRequest.getCategoryName());
             event.setCategory(category);
             event.setCategoryId(category.getId());
+            Long completionBadgeId = resolveCompletionBadgeId(eventRequest.getCategoryName());
+            event.setCompletionBadgeId(completionBadgeId);
             updatedFields.put("category", eventRequest.getCategoryName());
+            updatedFields.put("completion_badge_id", completionBadgeId);
         }
 
         if (eventRequest.getAddress() != null && eventRequest.getAddress().getDistrict() != null &&
@@ -300,6 +315,26 @@ public class EventService {
         return eventRepository.countEventsByOwnerId(ownerId);
     }
 
+    public Map<String, Long> countEventsByOwnerIds(List<String> ownerIds) {
+        if (ownerIds == null || ownerIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        Map<String, Long> counts = ownerIds.stream()
+                .filter(Objects::nonNull)
+                .distinct()
+                .collect(Collectors.toMap(Function.identity(), id -> 0L, (left, right) -> left, LinkedHashMap::new));
+
+        if (counts.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        eventRepository.countEventsByOwnerIds(counts.keySet())
+                .forEach(row -> counts.put((String) row[0], ((Number) row[1]).longValue()));
+
+        return counts;
+    }
+
     public Long countActiveEventsByOwnerId(String ownerId) {
         return eventRepository.countByOwnerIdAndStatus(ownerId, EventStatus.APPROVED);
     }
@@ -310,6 +345,78 @@ public class EventService {
 
     public Map<String, Long> countEventsByStatusByOwnerId(String ownerId) {
         return normalizeStatusCounts(eventRepository.countEventsByOwnerIdAndStatus(ownerId));
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<EventMonthlyCreationAnalyticsResponse> countCreatedEventsPerMonth(Integer months) {
+        return buildCreatedEventsPerMonth(months);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<EventCategoryDistributionResponse> countEventsByCategory() {
+        return mapCategoryDistribution(eventRepository.countEventsByCategory());
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    public EventAnalyticsSummaryResponse getEventAnalyticsSummary() {
+        Map<String, Long> statusCounts = countEventsByStatus();
+        return EventAnalyticsSummaryResponse.builder()
+                .totalEvents(countEvents())
+                .pendingEvents(statusCounts.getOrDefault("pending", 0L))
+                .approvedEvents(statusCounts.getOrDefault("approved", 0L))
+                .rejectedEvents(statusCounts.getOrDefault("rejected", 0L))
+                .totalCapacity(eventRepository.sumCapacity())
+                .build();
+    }
+
+    private List<EventMonthlyCreationAnalyticsResponse> buildCreatedEventsPerMonth(Integer months) {
+        int safeMonths = Math.min(Math.max(months == null ? 12 : months, 1), 24);
+        YearMonth firstMonth = YearMonth.now().minusMonths(safeMonths - 1L);
+        Map<YearMonth, EventMonthlyCreationAnalyticsResponse> monthlyCounts = new LinkedHashMap<>();
+
+        for (int i = 0; i < safeMonths; i++) {
+            YearMonth month = firstMonth.plusMonths(i);
+            monthlyCounts.put(month, EventMonthlyCreationAnalyticsResponse.builder()
+                    .month(month.format(DateTimeFormatter.ofPattern("yyyy-MM")))
+                    .pending(0L)
+                    .approved(0L)
+                    .rejected(0L)
+                    .total(0L)
+                    .build());
+        }
+
+        List<Object[]> rows = eventRepository.countCreatedEventsByMonthAndStatus(firstMonth.atDay(1).atStartOfDay());
+
+        rows.forEach(row -> {
+            YearMonth month = YearMonth.of(((Number) row[0]).intValue(), ((Number) row[1]).intValue());
+            EventMonthlyCreationAnalyticsResponse response = monthlyCounts.get(month);
+            if (response == null) {
+                return;
+            }
+
+            EventStatus status = (EventStatus) row[2];
+            long count = ((Number) row[3]).longValue();
+            switch (status) {
+                case PENDING -> response.setPending(count);
+                case APPROVED -> response.setApproved(count);
+                case REJECTED -> response.setRejected(count);
+            }
+        });
+
+        monthlyCounts.values().forEach(response ->
+                response.setTotal(response.getPending() + response.getApproved() + response.getRejected()));
+
+        return new ArrayList<>(monthlyCounts.values());
+    }
+
+    private List<EventCategoryDistributionResponse> mapCategoryDistribution(List<Object[]> rows) {
+        return rows.stream()
+                .map(row -> EventCategoryDistributionResponse.builder()
+                        .categoryId(((Number) row[0]).longValue())
+                        .categoryName((String) row[1])
+                        .events(((Number) row[2]).longValue())
+                        .build())
+                .toList();
     }
 
     private Map<String, Long> normalizeStatusCounts(List<Object[]> rows) {
@@ -330,5 +437,18 @@ public class EventService {
             counts.put(status.name().toLowerCase(), count);
         }
         return counts;
+    }
+
+    private Long resolveCompletionBadgeId(String categoryName) {
+        if (categoryName == null) {
+            return DEFAULT_COMPLETION_BADGE_ID;
+        }
+        return switch (categoryName.trim().toLowerCase()) {
+            case "education" -> EDUCATION_BADGE_ID;
+            case "environment" -> ENVIRONMENT_BADGE_ID;
+            case "animals", "animal" -> ANIMAL_BADGE_ID;
+            case "health" -> HEALTH_BADGE_ID;
+            default -> DEFAULT_COMPLETION_BADGE_ID;
+        };
     }
 }

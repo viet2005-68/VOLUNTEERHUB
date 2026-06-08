@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getProfileCompleteness, getUserInfo, updateUserInfo, getAllUsers, banUser, unbanUser } from "../services/userService";
+import { getProfileCompleteness, getUserInfo, updateUserInfo, getMyBadges, getAllUsers, banUser, unbanUser } from "../services/userService";
 import { useMemo } from "react";
 import toast from "react-hot-toast";
 
@@ -42,6 +42,15 @@ export const useProfileCompleteness = () => {
             missingFields: [],
             message: "Checking profile..."
         },
+    });
+};
+
+export const useMyBadges = () => {
+    return useQuery({
+        queryKey: ["myBadges"],
+        queryFn: getMyBadges,
+        staleTime: 1000 * 60 * 5,
+        refetchOnWindowFocus: false,
     });
 };
 

@@ -15,4 +15,6 @@ public class AggregatedEventResponse {
     private UserResponse owner;
     private Long registrationCount;
     private Long participantCount;
+    private Long ownerTotalEvents;
+    private Long ownerTotalVolunteers;
 }

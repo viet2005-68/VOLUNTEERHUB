@@ -1,74 +1,77 @@
-import { CircleCheckBig, ClockFading, Pencil, ArrowLeft } from "lucide-react";
-import React from "react";
+import { ArrowLeft, CircleCheckBig, ClockFading, Image as ImageIcon, Pencil } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-function ManagerDbHero({
-  thumbnail,
-  title,
-  subtitle,
-  status = "pending",
-  onEditImage,
-}) {
+const VIETNAMESE_TITLE_STYLE = {
+  fontFamily:
+    '"Clash Grotesk", "Be Vietnam Pro", ui-sans-serif, system-ui, "Segoe UI", Arial, sans-serif',
+  fontWeight: 700,
+  letterSpacing: "-0.02em",
+};
+
+function ManagerDbHero({ thumbnail, title, status = "pending", onEditImage }) {
   const navigate = useNavigate();
-  const icon =
-    status === "PENDING" ? (
-      <ClockFading className="w-full h-full" />
-    ) : (
-      <CircleCheckBig />
-    );
-  const color =
-    status === "PENDING"
-      ? "text-yellow-500 bg-yellow-500/20"
-      : "text-green-600 bg-green-500/20 ";
+  const normalizedStatus = String(status || "pending").toUpperCase();
+  const isPending = normalizedStatus === "PENDING";
+  const isApproved = normalizedStatus === "APPROVED";
+
+  const StatusIcon = isPending ? ClockFading : CircleCheckBig;
+  const statusLabel = isPending ? "Pending" : isApproved ? "Approved" : normalizedStatus;
+  const statusClass = isPending
+    ? "border-amber-200 bg-amber-100 text-amber-800"
+    : "border-emerald-200 bg-emerald-100 text-emerald-800";
+
   return (
-    <div className="p-0 flex flex-col w-full shadow-2xl rounded-2xl">
-      <div className="w-full aspect-[16/5] max-h-[380px] md:max-h-[280px] overflow-hidden rounded-t-xl bg-gray-100 mb-4 relative group">
-        <img
-          src={thumbnail}
-          alt={title}
-          className="w-full h-full object-cover object-top"
-        />
-        {/* Back Button */}
+    <section className="overflow-hidden rounded-lg border border-deep-forest/15 bg-pale-canvas shadow-[0_18px_45px_rgba(0,82,45,0.10)]">
+      <div className="relative aspect-[16/5] min-h-[240px] w-full overflow-hidden bg-deep-forest/10 max-sm:aspect-[4/3] max-sm:min-h-[260px]">
+        {thumbnail ? (
+          <img
+            src={thumbnail}
+            alt={title}
+            className="h-full w-full object-cover object-center"
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center text-deep-forest/45">
+            <ImageIcon className="h-16 w-16" />
+          </div>
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-deep-forest/78 via-deep-forest/18 to-transparent" />
+
         <button
           onClick={() => navigate(-1)}
-          className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm text-gray-800 p-3 rounded-full shadow-lg hover:bg-white transition-all flex items-center gap-2"
+          className="absolute left-4 top-4 inline-flex h-11 w-11 items-center justify-center rounded-full bg-pale-canvas/95 text-deep-forest shadow-lg transition hover:bg-deep-forest hover:text-pale-canvas"
           title="Go back"
+          aria-label="Go back"
         >
-          <ArrowLeft size={20} />
+          <ArrowLeft className="h-5 w-5" />
         </button>
-        {/* Edit Button Overlay */}
+
         <button
           onClick={onEditImage}
-          className="absolute top-4 right-4 bg-blue-500 text-white p-3 rounded-full shadow-lg hover:bg-blue-600 transition-all opacity-0 group-hover:opacity-100"
+          className="absolute right-4 top-4 inline-flex h-11 w-11 items-center justify-center rounded-full bg-pale-canvas/95 text-deep-forest shadow-lg transition hover:bg-deep-forest hover:text-pale-canvas"
           title="Edit image"
+          aria-label="Edit image"
         >
-          <Pencil size={20} />
+          <Pencil className="h-5 w-5" />
         </button>
-      </div>
-      <div className="flex flex-row max-lg:flex-col items-start max-sm:gap-2 max-sm:text-sm justify-between px-4 pb-5">
-        <div className="flex flex-col gap-2 flex-1 min-w-0">
-          <div
-            className={`text-2xl font-bold flex gap-5 items-center flex-wrap`}
-          >
-            <p className="text-4xl not-only:max-md:text-[1rem] break-all line-clamp-2 min-w-0">
-              {title}
-            </p>
 
-            <div
-              className={`${color} flex items-center gap-3 rounded-2xl py-1 px-2 self-centere  flex-shrink-0`}
+        <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <h1
+              className="max-w-4xl break-words text-5xl uppercase leading-[0.82] !text-pale-canvas drop-shadow-sm sm:text-6xl md:text-7xl lg:text-8xl"
+              style={VIETNAMESE_TITLE_STYLE}
             >
-              <span className="w-4">{icon}</span>
-              <span className="text-sm">
-                {status === "PENDING" ? "Pending" : "Approved"}
-              </span>
-            </div>
-          </div>
-          <div>
-            <p className="text-gray-500 text-sm break-all">{subtitle}</p>
+              {title}
+            </h1>
+            <span
+              className={`inline-flex w-fit shrink-0 items-center gap-2 rounded-full border px-3 py-2 text-sm font-bold uppercase leading-none shadow-sm ${statusClass}`}
+            >
+              <StatusIcon className="h-4 w-4" />
+              {statusLabel}
+            </span>
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 }
 

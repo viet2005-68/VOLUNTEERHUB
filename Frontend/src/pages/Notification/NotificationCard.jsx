@@ -3,10 +3,8 @@ import {
   Bell,
   Calendar,
   Check,
-  CheckLine,
   Tag,
   Trash,
-  View,
   MessageCircle,
   Heart,
   UserCheck,
@@ -26,11 +24,27 @@ import {
 } from "../../utils/confirmDialog";
 
 function NotificationCard({ noti }) {
-  console.log("Rendering NotificationCard for:", noti);
-
   const navigate = useNavigate();
   const markAsReadMutation = useMarkAsRead();
   const deleteNotificationMutation = useDeleteNotification();
+
+  const getNotificationImage = () => {
+    const payload = noti?.payload || {};
+    const imageCandidates = [
+      payload.imageUrl,
+      payload.image_url,
+      payload.thumbnail,
+      payload.thumbnailUrl,
+      payload.eventImageUrl,
+      payload.coverImage,
+      payload.avatarUrl,
+      payload.updated_fields?.imageUrl,
+      payload.updated_fields?.image_url,
+      Array.isArray(payload.imageUrls) ? payload.imageUrls[0] : null,
+    ];
+
+    return imageCandidates.find((value) => typeof value === "string" && value.trim());
+  };
 
   // Format time from array [year, month, day, hour, minute]
   const formatTime = (timeArray) => {
@@ -56,12 +70,9 @@ function NotificationCard({ noti }) {
   };
 
   const handleDelete = async (id) => {
-    const result = await confirmDelete(
-      "this notification",
-      "This action cannot be undone."
-    );
+    const confirmed = await confirmDelete("this notification");
 
-    if (result.isConfirmed) {
+    if (confirmed) {
       try {
         await deleteNotificationMutation.mutateAsync(id);
         showSuccess("Deleted!", "Notification has been deleted successfully.");
@@ -135,7 +146,7 @@ function NotificationCard({ noti }) {
             payload?.end_time
           )}`,
           icon: AlertCircle,
-          iconColor: "bg-orange-500",
+          iconColor: "bg-foudre-pink",
         };
 
       case "EVENT_APPROVED":
@@ -146,7 +157,7 @@ function NotificationCard({ noti }) {
             ? `Approved at ${formatTime(payload.approved_time)}`
             : null,
           icon: CheckCircle,
-          iconColor: "bg-green-500",
+          iconColor: "bg-deep-forest",
         };
 
       case "EVENT_REJECTED":
@@ -155,7 +166,7 @@ function NotificationCard({ noti }) {
           content: `Your event "${payload?.name}" was rejected`,
           detail: null,
           icon: AlertCircle,
-          iconColor: "bg-red-500",
+          iconColor: "bg-foudre-pink",
         };
 
       case "EVENT_UPDATED":
@@ -166,7 +177,7 @@ function NotificationCard({ noti }) {
             ? `"${payload.updated_fields.name}"`
             : null,
           icon: Bell,
-          iconColor: "bg-blue-500",
+          iconColor: "bg-deep-forest",
         };
 
       case "EVENT_DELETED":
@@ -175,7 +186,7 @@ function NotificationCard({ noti }) {
           content: `An event has been deleted`,
           detail: null,
           icon: Trash,
-          iconColor: "bg-red-500",
+          iconColor: "bg-foudre-pink",
         };
 
       case "USER_EVENT_APPROVED":
@@ -186,7 +197,7 @@ function NotificationCard({ noti }) {
             ? `Reviewed at ${formatTime(payload.reviewed_at)}`
             : null,
           icon: CheckCircle,
-          iconColor: "bg-green-500",
+          iconColor: "bg-deep-forest",
         };
 
       case "USER_EVENT_REJECTED":
@@ -195,7 +206,7 @@ function NotificationCard({ noti }) {
           content: `Your registration has been rejected`,
           detail: null,
           icon: AlertCircle,
-          iconColor: "bg-red-500",
+          iconColor: "bg-foudre-pink",
         };
 
       case "USER_EVENT_COMPLETED":
@@ -204,7 +215,7 @@ function NotificationCard({ noti }) {
           content: `You have completed an event`,
           detail: null,
           icon: CheckCircle,
-          iconColor: "bg-green-500",
+          iconColor: "bg-deep-forest",
         };
 
       case "USER_EVENT_REQUESTED":
@@ -215,7 +226,7 @@ function NotificationCard({ noti }) {
             ? `Requested at ${formatTime(payload.requested_at)}`
             : null,
           icon: UserCheck,
-          iconColor: "bg-blue-500",
+          iconColor: "bg-deep-forest",
         };
 
       case "COMMENT":
@@ -224,7 +235,7 @@ function NotificationCard({ noti }) {
           content: payload?.content || "Someone commented on a post",
           detail: null,
           icon: MessageCircle,
-          iconColor: "bg-purple-500",
+          iconColor: "bg-foudre-pink",
         };
 
       case "REACTION":
@@ -233,7 +244,7 @@ function NotificationCard({ noti }) {
           content: "Someone reacted to your post",
           detail: null,
           icon: Heart,
-          iconColor: "bg-pink-500",
+          iconColor: "bg-foudre-pink",
         };
 
       case "POST_CREATED":
@@ -242,7 +253,7 @@ function NotificationCard({ noti }) {
           content: "A new post has been created",
           detail: null,
           icon: Bell,
-          iconColor: "bg-blue-500",
+          iconColor: "bg-deep-forest",
         };
 
       case "POST_UPDATED":
@@ -251,7 +262,7 @@ function NotificationCard({ noti }) {
           content: "A post has been updated",
           detail: null,
           icon: Bell,
-          iconColor: "bg-blue-500",
+          iconColor: "bg-deep-forest",
         };
 
       case "USER_ACTIVE":
@@ -260,7 +271,7 @@ function NotificationCard({ noti }) {
           content: "Your account has been activated",
           detail: null,
           icon: CheckCircle,
-          iconColor: "bg-green-500",
+          iconColor: "bg-deep-forest",
         };
 
       case "USER_BANNED":
@@ -269,7 +280,7 @@ function NotificationCard({ noti }) {
           content: "Your account has been suspended",
           detail: null,
           icon: AlertCircle,
-          iconColor: "bg-red-500",
+          iconColor: "bg-foudre-pink",
         };
 
       default:
@@ -278,7 +289,7 @@ function NotificationCard({ noti }) {
           content: "You have a new notification",
           detail: null,
           icon: Bell,
-          iconColor: "bg-gray-500",
+          iconColor: "bg-deep-forest",
         };
     }
   };
@@ -296,92 +307,98 @@ function NotificationCard({ noti }) {
   };
 
   const message = getNotificationMessage();
-  console.log("Notification message:", message);
-
   const IconComponent = message.icon || Bell;
+  const notificationImage = getNotificationImage();
 
   return (
     <div
       onClick={handleCardClick}
-      className={`w-full px-4 py-5 max-sm:py-2 rounded-xl mb-4 border-gray-200 border shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.01] cursor-pointer ${
-        !noti?.isRead ? "bg-blue-50 border-blue-200" : "bg-white"
+      className={`mb-3 w-full cursor-pointer rounded-[20px] border p-3 text-deep-forest shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-bubblegum-blush hover:shadow-md sm:p-4 ${
+        !noti?.isRead
+          ? "border-foudre-pink/35 bg-pale-canvas ring-1 ring-foudre-pink/15"
+          : "border-deep-forest/10 bg-pale-canvas"
       }`}
     >
-      <div className="flex items-start gap-3">
-        {/* Icon */}
-        <div
-          className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
-            !noti?.isRead ? message.iconColor : "bg-gray-300"
-          }`}
-        >
-          <IconComponent className="w-5 h-5 text-white" />
+      <div className="flex items-start gap-3 sm:gap-4">
+        <div className="relative aspect-square w-[76px] shrink-0 overflow-hidden rounded-[16px] border border-deep-forest/10 bg-ash-whisper sm:w-[88px]">
+          {notificationImage ? (
+            <img
+              src={notificationImage}
+              alt={noti?.payload?.name || message.title}
+              className="h-full w-full object-cover"
+              loading="lazy"
+            />
+          ) : (
+            <div className={`flex h-full w-full items-center justify-center ${message.iconColor}`}>
+              <IconComponent className="h-6 w-6 text-pale-canvas" />
+            </div>
+          )}
         </div>
 
-        {/* Content */}
         <div className="flex-1 min-w-0">
-          {/* Title & Badge */}
-          <div className="flex items-center gap-2 mb-1">
-            <h4 className="text-sm font-semibold text-gray-900">
+          <div className="mb-1.5 flex flex-wrap items-center gap-2">
+            <h4 className="line-clamp-1 text-base font-bold leading-[1.15] text-deep-forest">
               {message.title}
             </h4>
             {!noti?.isRead && (
-              <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></div>
+              <span className="inline-flex items-center gap-1 rounded-full bg-foudre-pink/10 px-2 py-1 text-[11px] font-bold leading-none text-foudre-pink">
+                <span className="h-1.5 w-1.5 rounded-full bg-foudre-pink" />
+                New
+              </span>
             )}
           </div>
 
-          {/* Content */}
-          <p className="text-sm text-gray-600 mb-2">{message.content}</p>
+          <p className="mb-2 line-clamp-2 text-sm font-medium leading-[1.25] text-deep-forest/70">
+            {message.content}
+          </p>
 
-          {/* Detail */}
           {message.detail && (
-            <div className="flex items-center gap-1 text-xs text-gray-500 mb-2">
-              <Calendar className="w-3 h-3" />
-              <span>{message.detail}</span>
+            <div className="mb-2 flex items-center gap-1.5 text-xs font-medium text-deep-forest/55">
+              <Calendar className="h-3.5 w-3.5 shrink-0" />
+              <span className="truncate">{message.detail}</span>
             </div>
           )}
 
-          {/* Category */}
           {noti?.payload?.category && (
-            <div className="flex items-center gap-1 text-xs text-gray-500 mb-2">
-              <Tag className="w-3 h-3" />
+            <div className="mb-2 inline-flex items-center gap-1.5 rounded-lg bg-deep-forest/8 px-2.5 py-1 text-xs font-bold text-deep-forest/70">
+              <Tag className="h-3.5 w-3.5" />
               <span className="capitalize">{noti.payload.category}</span>
             </div>
           )}
 
-          {/* Timestamp */}
-          <p className="text-xs text-gray-400">
+          <p className="text-xs font-medium text-deep-forest/45">
             {formatCreatedAt(noti?.createdAt)}
           </p>
         </div>
-        {/* Actions */}
-        <div className="flex flex-col items-start min-w-[80px]">
+
+        <div className="flex w-[44px] shrink-0 flex-col items-end gap-2 sm:w-[112px]">
+          {!noti?.isRead && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleMarkAsRead(noti?.id);
+              }}
+              disabled={markAsReadMutation.isPending}
+              className="inline-flex min-h-[40px] w-[44px] items-center justify-center rounded-[10px] border border-deep-forest bg-deep-forest px-3 py-2 text-pale-canvas font-bold shadow-sm transition-colors hover:bg-foudre-pink disabled:cursor-not-allowed disabled:opacity-50 sm:w-full sm:gap-2"
+              title="Mark as read"
+            >
+              <Check className="h-4 w-4 shrink-0" />
+              <span className="hidden sm:inline">
+                {markAsReadMutation.isPending ? "..." : "Read"}
+              </span>
+            </button>
+          )}
           <button
             onClick={(e) => {
-              e.stopPropagation(); // Prevent card click
-              handleMarkAsRead(noti?.id);
-            }}
-            disabled={markAsReadMutation.isPending}
-            className={`${
-              noti?.isRead ? "hidden" : "text-pale-canvas"
-            } mb-2 flex w-full items-center gap-2 rounded-[10px] border border-deep-forest bg-deep-forest px-3 py-2 font-bold transition-all duration-300 hover:-translate-y-0.5 hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50`}
-          >
-            <span className="w-4">
-              <Check />
-            </span>
-            <span>{markAsReadMutation.isPending ? "..." : "Mark read"}</span>
-          </button>
-          <button
-            onClick={(e) => {
-              e.stopPropagation(); // Prevent card click
+              e.stopPropagation();
               handleDelete(noti?.id);
             }}
             disabled={deleteNotificationMutation.isPending}
-            className="flex w-full items-center gap-2 rounded-[10px] border-2 border-deep-forest bg-transparent px-4 py-2 font-bold text-deep-forest transition-all duration-300 hover:-translate-y-0.5 hover:bg-deep-forest hover:text-pale-canvas disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex min-h-[40px] w-[44px] items-center justify-center rounded-[10px] border border-deep-forest/15 bg-ash-whisper/45 px-3 py-2 font-bold text-deep-forest transition-colors hover:border-foudre-pink hover:bg-foudre-pink hover:text-pale-canvas disabled:cursor-not-allowed disabled:opacity-50 sm:w-full sm:gap-2"
+            title="Delete"
           >
-            <span>
-              <Trash className="w-4" />
-            </span>{" "}
-            <span>
+            <Trash className="h-4 w-4 shrink-0" />
+            <span className="hidden sm:inline">
               {deleteNotificationMutation.isPending ? "..." : "Delete"}
             </span>
           </button>

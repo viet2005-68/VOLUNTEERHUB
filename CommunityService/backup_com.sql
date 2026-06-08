@@ -65,6 +65,7 @@ CREATE TABLE public.post (
     event_id bigint NOT NULL,
     image_urls jsonb,
     owner_id character varying(255) NOT NULL,
+    share_count integer DEFAULT 0 NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
 );
 
@@ -290,4 +291,3 @@ ALTER TABLE ONLY public.comment
 --
 
 \unrestrict hZ1rUfv0fZxpcTGiY2Z86Qo92dF4tRiOz3OKTIfPIjFLli8qwWz1KHBoindk9Pd
-

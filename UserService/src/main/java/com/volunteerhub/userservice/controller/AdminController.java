@@ -1,12 +1,16 @@
 package com.volunteerhub.userservice.controller;
 
+import com.volunteerhub.common.dto.UserBadgeResponse;
+import com.volunteerhub.userservice.dto.request.UserBadgeRequest;
 import com.volunteerhub.userservice.dto.response.UserResponse;
-import com.volunteerhub.userservice.model.User;
 import com.volunteerhub.userservice.model.UserLoginHistory;
+import com.volunteerhub.userservice.service.UserBadgeService;
 import com.volunteerhub.userservice.service.UserLoginHistoryService;
 import com.volunteerhub.userservice.service.UserService;
+import com.volunteerhub.userservice.validation.OnCreate;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,6 +22,7 @@ public class AdminController {
 
     private final UserService userService;
     private final UserLoginHistoryService userLoginHistoryService;
+    private final UserBadgeService userBadgeService;
 
     @GetMapping("/users/all")
     public ResponseEntity<List<UserResponse>> findAll(@RequestParam(required = false) Integer page,
@@ -38,6 +43,12 @@ public class AdminController {
     @PutMapping("/{userId}/unban")
     public ResponseEntity<UserResponse> unbanUser(@PathVariable String userId) {
         return ResponseEntity.ok(userService.unbanUser(userId));
+    }
+
+    @PostMapping("/{userId}/badges")
+    public ResponseEntity<UserBadgeResponse> awardBadge(@PathVariable String userId,
+                                                        @Validated(OnCreate.class) @RequestBody UserBadgeRequest request) {
+        return ResponseEntity.ok(userBadgeService.awardBadge(userId, request.getBadgeId()));
     }
 
 }

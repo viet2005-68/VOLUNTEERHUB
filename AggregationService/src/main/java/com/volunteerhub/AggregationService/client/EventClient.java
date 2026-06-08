@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @FeignClient(name = "EVENTSERVICE", path = "/api/v1/events", configuration = FeignConfig.class)
 public interface EventClient {
@@ -60,4 +61,7 @@ public interface EventClient {
                                                   @RequestParam(required = false) EventStatus status,
                                                   @RequestParam(required = false) Integer pageNum,
                                                   @RequestParam(required = false) Integer pageSize);
+
+    @GetMapping("/stats/owner-counts")
+    Map<String, Long> countEventsByOwnerIds(@RequestParam List<String> ownerIds);
 }

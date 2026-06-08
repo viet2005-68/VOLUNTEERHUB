@@ -80,7 +80,7 @@ export default function EventLayout() {
           <h2 className="mt-4 text-xl font-semibold text-gray-900">
             Event is not available
           </h2>
-          <p className="mt-2 text-gray-600">
+          <p className="mt-2 text-deep-forest/70">
             This event is not available or does not exist.
           </p>
           <div className="mt-6 flex gap-3 justify-center">
@@ -92,7 +92,7 @@ export default function EventLayout() {
             </Link>
             <Link
               to="/"
-              className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50"
+              className="px-4 py-2 rounded-lg border border-gray-300 text-deep-forest hover:bg-gray-50"
             >
               Go home
             </Link>
@@ -107,7 +107,7 @@ export default function EventLayout() {
       <div className="min-h-[40vh] flex items-center justify-center">
         <div className="text-center">
           <p className="text-red-600 font-medium">Có lỗi khi tải sự kiện</p>
-          <p className="mt-1 text-gray-600">
+          <p className="mt-1 text-deep-forest/70">
             {eventError?.response?.data?.message ||
               eventError?.message ||
               "Vui lòng thử lại sau."}
@@ -147,7 +147,7 @@ export default function EventLayout() {
     if (now > deadline) {
       return {
         text: "Registration Closed",
-        className: "bg-gray-400 cursor-not-allowed",
+        className: "bg-deep-forest/35 cursor-not-allowed",
         disabled: true,
       };
     }
@@ -156,31 +156,31 @@ export default function EventLayout() {
       case "PENDING":
         return {
           text: "Pending Approval",
-          className: "bg-yellow-500 hover:bg-yellow-600",
+          className: "bg-ash-whisper text-foudre-pink border border-foudre-pink/25",
           disabled: true,
         };
       case "APPROVED":
         return {
           text: "✓ You're Participating",
-          className: "bg-green-500 hover:bg-green-600",
+          className: "bg-deep-forest",
           disabled: true,
         };
       case "COMPLETED":
         return {
           text: "✓ Event Completed",
-          className: "bg-blue-500 hover:bg-blue-600",
+          className: "bg-deep-forest",
           disabled: true,
         };
       case "REJECTED":
         return {
           text: "✗ Registration Rejected",
-          className: "bg-red-500 hover:bg-red-600",
+          className: "bg-foudre-pink/75",
           disabled: true,
         };
       default:
         return {
           text: "Join",
-          className: "bg-white hover:via-fuchsia-600 hover:to-pink-600",
+          className: "bg-foudre-pink hover:bg-deep-forest",
           disabled: false,
         };
     }
@@ -211,7 +211,7 @@ export default function EventLayout() {
         if (!isApproved) {
           return (
             <div className="p-8 text-center bg-gray-50 rounded-lg">
-              <div className="text-gray-600 mb-4">
+              <div className="text-deep-forest/70 mb-4">
                 <svg
                   className="w-16 h-16 mx-auto mb-4 text-gray-400"
                   fill="none"
@@ -239,7 +239,7 @@ export default function EventLayout() {
         if (!isApproved) {
           return (
             <div className="p-8 text-center bg-gray-50 rounded-lg">
-              <div className="text-gray-600 mb-4">
+              <div className="text-deep-forest/70 mb-4">
                 <svg
                   className="w-16 h-16 mx-auto mb-4 text-gray-400"
                   fill="none"
@@ -300,11 +300,11 @@ export default function EventLayout() {
           />
 
           {/* Mobile Registration Status */}
-          <div className="sm:hidden bg-white p-4 rounded-lg mb-4 px-4">
+          <div className="sm:hidden rounded-[18px] border border-deep-forest/10 bg-ash-whisper/45 p-4 mb-5 px-4 text-deep-forest">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <svg
-                  className="w-5 h-5 text-purple-600"
+                  className="w-5 h-5 text-foudre-pink"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -316,13 +316,13 @@ export default function EventLayout() {
                     d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                   />
                 </svg>
-                <span className="text-sm font-medium text-gray-700">
+                <span className="text-sm font-medium text-deep-forest">
                   {calculateDuration(eventData?.startTime, eventData?.endTime)}
                 </span>
               </div>
               <div className="flex items-center gap-2">
                 <svg
-                  className="w-5 h-5 text-purple-600"
+                  className="w-5 h-5 text-foudre-pink"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -334,16 +334,16 @@ export default function EventLayout() {
                     d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
                   />
                 </svg>
-                <span className="text-sm font-medium text-gray-700">
+                <span className="text-sm font-medium text-deep-forest">
                   {eventData?.participantCount || 0}/{eventData?.capacity || 10}
                 </span>
               </div>
             </div>
 
-            <div className="mb-3 text-xs text-gray-600">
+            <div className="mb-3 text-xs text-deep-forest/70">
               <div className="flex items-center gap-2 mb-1">
                 <svg
-                  className="w-4 h-4 text-gray-500"
+                  className="w-4 h-4 text-deep-forest/55"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -362,7 +362,7 @@ export default function EventLayout() {
               {eventData?.minAge && (
                 <div className="flex items-center gap-2">
                   <svg
-                    className="w-4 h-4 text-gray-500"
+                    className="w-4 h-4 text-deep-forest/55"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -384,7 +384,7 @@ export default function EventLayout() {
               disabled={
                 buttonConfig.disabled || isRegistering || isCheckingStatus
               }
-              className={`w-full py-1 rounded-lg text-white font-semibold transition-all duration-200 ${buttonConfig.className}`}
+              className={`w-full rounded-[10px] py-3 text-sm font-bold text-pale-canvas transition-all duration-200 ${buttonConfig.className}`}
             >
               {isCheckingStatus
                 ? "Checking..."
@@ -423,17 +423,27 @@ export default function EventLayout() {
           isCheckingStatus={isCheckingStatus}
           onAction={() => {}}
         />
-        {isApproved && (
+        {isApproved && user?.role !== "ADMIN" && (
           <button
             type="button"
-            onClick={() => navigate(`/dashboard/messages?eventId=${id}`)}
+            onClick={() =>
+              navigate(
+                user?.role === "MANAGER"
+                  ? "/dashboard/event-chat/" + id
+                  : "/dashboard/messages?eventId=" + id
+              )
+            }
             className="inline-flex items-center justify-center gap-2 rounded-[10px] border-2 border-deep-forest bg-deep-forest px-4 py-3 text-sm font-bold text-pale-canvas transition hover:bg-foudre-pink"
           >
             <MessageSquare className="h-4 w-4" />
             Open event chat
           </button>
         )}
-        <OrganizationCard data={eventData?.owner} />
+        <OrganizationCard
+          data={eventData?.owner}
+          totalEvents={eventData?.ownerTotalEvents}
+          totalVolunteers={eventData?.ownerTotalVolunteers}
+        />
         {/*<ContactCard />
         <RelatedEventsCard />*/}
       </aside>

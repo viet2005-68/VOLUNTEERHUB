@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import NavBar from "../components/Sidebar/NavBar";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import BottomNav from "../components/Sidebar/BottomNav";
@@ -14,12 +14,15 @@ import { saveRedirectAfterLogin } from "../utils/authRedirect";
 
 export default function MainLayout() {
   const { showNavbar } = useNavbar();
-  const { user } = useAuth();
+  const { user, setUser } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [isCheckingBan, setIsCheckingBan] = useState(true);
   const [showBanner, setShowBanner] = useState(true);
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const isMessagesPage =
+    location.pathname === "/dashboard/messages" ||
+    location.pathname.startsWith("/dashboard/event-chat");
 
   // Check profile completeness (only fetch once user is loaded and not banned)
   const { data: profileValidation, isLoading: isLoadingProfile } =
@@ -27,6 +30,19 @@ export default function MainLayout() {
 
   console.log("==== MainLayout Check ====");
   console.log("MainLayout user:", user);
+
+  const normalizedStoredUser = useMemo(
+    () => ({
+      id: user?.id || null,
+      name: user?.name || null,
+      fullName: user?.fullName || null,
+      email: user?.email || null,
+      role: user?.role || null,
+      avatarUrl: user?.avatarUrl || user?.urlAvatar || user?.urlAvartar || null,
+      status: user?.status || null,
+    }),
+    [user]
+  );
 
   useEffect(() => {
     if (!user) {
@@ -44,6 +60,43 @@ export default function MainLayout() {
         const userInfo = await getUserInfo();
         console.log("User info from /me:", userInfo);
 
+        const mergedUser = {
+          ...user,
+          ...userInfo,
+          name:
+            userInfo?.fullName ||
+            userInfo?.name ||
+            user?.fullName ||
+            user?.name ||
+            "Guest",
+          fullName: userInfo?.fullName || userInfo?.name || user?.fullName || user?.name || "",
+          avatarUrl:
+            userInfo?.avatarUrl ||
+            userInfo?.urlAvatar ||
+            userInfo?.urlAvartar ||
+            user?.avatarUrl ||
+            user?.urlAvatar ||
+            user?.urlAvartar ||
+            "",
+        };
+
+        const normalizedMeUser = {
+          id: mergedUser?.id || null,
+          name: mergedUser?.name || null,
+          fullName: mergedUser?.fullName || null,
+          email: mergedUser?.email || null,
+          role: mergedUser?.role || null,
+          avatarUrl: mergedUser?.avatarUrl || null,
+          status: mergedUser?.status || null,
+        };
+
+        if (
+          JSON.stringify(normalizedStoredUser) !==
+          JSON.stringify(normalizedMeUser)
+        ) {
+          setUser(mergedUser);
+        }
+
         if (userInfo?.status === "BANNED" || userInfo?.status === "banned") {
           console.log("User is banned, redirecting to /banned");
           navigate("/banned", { replace: true });
@@ -59,7 +112,15 @@ export default function MainLayout() {
     };
 
     checkBanStatus();
-  }, [user, navigate, location.pathname, location.search, location.hash]);
+  }, [
+    user,
+    setUser,
+    normalizedStoredUser,
+    navigate,
+    location.pathname,
+    location.search,
+    location.hash,
+  ]);
 
   // Check if user dismissed banner
   useEffect(() => {
@@ -100,6 +161,7 @@ export default function MainLayout() {
   // Also don't show while still loading profile data
   const shouldShowBanner =
     showBanner &&
+    !isMessagesPage &&
     !isLoadingProfile &&
     profileValidation &&
     !profileValidation.isComplete &&
@@ -120,9 +182,13 @@ export default function MainLayout() {
     );
   }
   return (
-    <div className="min-h-screen bg-soft-gradient flex flex-col overflow-x-hidden text-deep-forest">
+    <div
+      className={`bg-soft-gradient flex flex-col overflow-x-hidden text-deep-forest ${
+        isMessagesPage ? "h-dvh overflow-hidden" : "min-h-screen"
+      }`}
+    >
       {/* Navbar fixed (desktop / tablet) */}
-      <header className="fixed top-0 left-0 right-0 z-50 border-b border-deep-forest/15 bg-pale-canvas/90 backdrop-blur-xl">
+      <header className="fixed top-0 left-0 right-0 z-50 border-b border-deep-forest/15 bg-ash-whisper/95 text-deep-forest backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center">
           <NavBar />
         </div>
@@ -140,12 +206,22 @@ export default function MainLayout() {
 
       {/* Nội dung chính */}
       <main
-        className={`flex-1 px-4 sm:px-6 lg:px-8 pb-30 ${
-          shouldShowBanner ? "pt-36" : "pt-22"
+        className={`flex-1 ${
+          isMessagesPage
+            ? "mt-16 h-[calc(100dvh-144px)] overflow-hidden px-0 pb-0 pt-0 md:h-[calc(100dvh-64px)]"
+            : `px-4 pb-30 sm:px-6 lg:px-8 ${
+                shouldShowBanner ? "pt-36" : "pt-22"
+              }`
         }`}
       >
         {/* thêm pb-20 để tránh bị che bởi BottomNav */}
-        <div className="max-w-7xl mx-auto relative">
+        <div
+          className={
+            isMessagesPage
+              ? "mx-auto h-full min-h-0 w-full max-w-none md:max-w-7xl"
+              : "max-w-7xl mx-auto relative"
+          }
+        >
           <Outlet />
         </div>
       </main>
@@ -154,7 +230,7 @@ export default function MainLayout() {
       {showNavbar && <BottomNav />}
 
       {/* Scroll to Top Button */}
-      {showScrollTop && (
+      {showScrollTop && !isMessagesPage && (
         <button
           onClick={scrollToTop}
           className="fixed bottom-24 right-6 z-40 w-12 h-12 rounded-full bg-foudre-pink text-pale-canvas flex items-center justify-center border border-pale-canvas/60 hover:bg-deep-forest hover:scale-105 transition-all duration-300 animate-bounce"

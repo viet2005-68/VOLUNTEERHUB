@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 public class EventRejectedMessage implements EventMessage{
     private Long eventId;
     private String eventName;
+    private String imageUrl;
     private CategoryResponse category;
     private String ownerId;
     private String approvedBy;

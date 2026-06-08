@@ -14,6 +14,7 @@ public class EventApprovedMessage implements EventMessage{
 
     private Long eventId;
     private String eventName;
+    private String imageUrl;
     private CategoryResponse category;
     private int capacity;
     private String ownerId;
@@ -23,6 +24,7 @@ public class EventApprovedMessage implements EventMessage{
     private LocalDateTime endTime;
     private LocalDateTime registrationDeadline;
     private QrJoinPolicy qrJoinPolicy;
+    private Long completionBadgeId;
     @Builder.Default
     private LocalDateTime approvedTime = LocalDateTime.now();
 }

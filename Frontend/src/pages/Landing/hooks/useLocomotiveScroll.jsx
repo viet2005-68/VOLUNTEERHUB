@@ -42,7 +42,7 @@ export function LocomotiveProvider({ children }) {
         if (!section) return
         const rect = section.getBoundingClientRect()
         const scrollable = Math.max(0, track.scrollWidth - window.innerWidth)
-        const progress = Math.min(1, Math.max(0, (window.innerHeight - rect.top) / (rect.height || 1)))
+        const progress = Math.min(1, Math.max(0, -rect.top / (rect.height - window.innerHeight || 1)))
         track.style.transform = `translate3d(${-scrollable * progress}px, 0, 0)`
         track.querySelectorAll('[data-project-card]').forEach((card) => {
           const cardRect = card.getBoundingClientRect()

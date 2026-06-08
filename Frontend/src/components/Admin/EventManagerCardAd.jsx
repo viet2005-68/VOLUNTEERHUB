@@ -76,7 +76,8 @@ function EventManagerCardAd({ data }) {
   };
 
   const getProgressPercentage = () => {
-    return Math.round((registered / capacity) * 100);
+    if (!capacity) return 0;
+    return Math.min(Math.round((registered / capacity) * 100), 100);
   };
 
   const handleApproveEvent = async () => {
@@ -165,49 +166,53 @@ function EventManagerCardAd({ data }) {
   return (
     <>
       {/* Desktop View - Table Row */}
-      <tr className="hidden lg:table-row border-b border-gray-200 hover:bg-gray-50 transition-colors">
-        <td className="px-6 py-4">
+      <tr className="hidden border-b-2 border-ash-whisper text-sm transition-colors hover:bg-ash-whisper/30 last:border-b-0 lg:table-row">
+        <td className="px-6 py-5">
           <div className="flex flex-col">
-            <span className="font-semibold text-gray-900">{title}</span>
-            <span className="text-sm text-gray-500">{category}</span>
+            <span className="text-base font-bold leading-[1.2] text-deep-forest">
+              {title}
+            </span>
+            <span className="text-sm font-medium leading-[1.2] text-deep-forest/60">
+              {category}
+            </span>
           </div>
         </td>
 
-        <td className="px-6 py-4">
-          <div className="flex flex-col text-sm">
-            <div className="flex items-center gap-1 text-gray-700">
+        <td className="px-6 py-5">
+          <div className="flex flex-col gap-1 text-sm font-medium leading-[1.2]">
+            <div className="flex items-center gap-1.5 text-deep-forest">
               <i className="ri-calendar-line"></i>
               <span>{formatDate(date)}</span>
             </div>
-            <div className="flex items-center gap-1 text-gray-500">
+            <div className="flex items-center gap-1.5 text-deep-forest/65">
               <i className="ri-time-line"></i>
               <span>{formatTime(date)}</span>
             </div>
           </div>
         </td>
 
-        <td className="px-6 py-4">
-          <div className="flex items-center gap-2 text-sm text-gray-700">
-            <i className="ri-map-pin-fill text-gray-400"></i>
+        <td className="px-6 py-5">
+          <div className="flex items-center gap-2 text-sm font-medium leading-[1.2] text-deep-forest/75">
+            <i className="ri-map-pin-fill text-foudre-pink"></i>
             <span className="max-w-[150px] truncate">{location}</span>
           </div>
         </td>
 
-        <td className="px-6 py-4">
+        <td className="px-6 py-5">
           <div className="flex flex-col gap-2">
             <div className="flex items-center justify-between text-sm">
-              <span className="font-semibold text-gray-700">
+              <span className="font-bold leading-[1.2] text-deep-forest">
                 {registered}/{capacity}
               </span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
+            <div className="h-2 w-full rounded-full bg-ash-whisper">
               <div
                 className={`h-2 rounded-full transition-all ${
                   registered === capacity
-                    ? "bg-red-500"
+                    ? "bg-foudre-pink"
                     : registered >= capacity * 0.8
-                    ? "bg-orange-500"
-                    : "bg-blue-500"
+                    ? "bg-bubblegum-blush"
+                    : "bg-deep-forest"
                 }`}
                 style={{ width: `${getProgressPercentage()}%` }}
               ></div>
@@ -215,13 +220,13 @@ function EventManagerCardAd({ data }) {
           </div>
         </td>
 
-        <td className="px-6 py-4">
+        <td className="px-6 py-5">
           <span
-            className={`px-3 py-1.5 rounded-lg text-sm font-medium capitalize min-w-[90px] inline-block text-center ${
+            className={`inline-block min-w-[90px] rounded-[10px] px-3 py-2 text-center text-sm font-bold capitalize leading-[0.85] ${
               isDeleting
-                ? "bg-red-100 text-red-700 animate-pulse"
+                ? "border border-foudre-pink/20 bg-foudre-pink/10 text-foudre-pink animate-pulse"
                 : isUpdating
-                ? "bg-yellow-100 text-yellow-700 animate-pulse"
+                ? "border border-foudre-pink/20 bg-ash-whisper text-foudre-pink animate-pulse"
                 : getStatusColor(currentStatus)
             }`}
             title={
@@ -240,7 +245,7 @@ function EventManagerCardAd({ data }) {
           </span>
         </td>
 
-        <td className="px-6 py-4">
+        <td className="px-6 py-5">
           <div className="flex items-center gap-2">
             {/* Approve button - only for PENDING */}
             {currentStatus === EVENT_STATUS.PENDING && (
@@ -249,21 +254,25 @@ function EventManagerCardAd({ data }) {
                 disabled={
                   approveEventMutation.isPending || isUpdating || isDeleting
                 }
-                className="p-2 bg-green-500/90 text-white hover:bg-green-500 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="rounded-[10px] p-2 text-deep-forest transition-colors hover:bg-ash-whisper disabled:cursor-not-allowed disabled:opacity-50"
                 title="Approve Event"
               >
-                <CircleCheckBig className="w-4 h-4" />
+                <CircleCheckBig className="h-4 w-4" />
               </button>
             )}
 
             {/* View button - always visible */}
             <button
-              onClick={() => navigate(`/dashboard/eventmanager/${id}`)}
+              onClick={() => {
+                console.log("Admin navigating to event detail, ID:", id);
+                // Force navigation to bypass potential routing conflicts
+                window.location.href = `/opportunities/overview/${id}`;
+              }}
               disabled={isUpdating || isDeleting}
-              className="p-2 border-gray-500/20 border hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="rounded-[10px] p-2 text-deep-forest transition-colors hover:bg-ash-whisper disabled:cursor-not-allowed disabled:opacity-50"
               title="View Details"
             >
-              <Eye className="w-4 h-4 text-gray-600" />
+              <Eye className="h-4 w-4 text-current" />
             </button>
 
             {/* Export button - only for APPROVED */}
@@ -272,27 +281,27 @@ function EventManagerCardAd({ data }) {
                 <button
                   onClick={() => setShowExportMenu(!showExportMenu)}
                   disabled={isExporting || isUpdating || isDeleting}
-                  className="p-2 bg-green-500 hover:bg-green-600 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="rounded-[10px] p-2 text-deep-forest transition-colors hover:bg-ash-whisper disabled:cursor-not-allowed disabled:opacity-50"
                   title="Export Participants"
                 >
-                  <Download className="w-4 h-4 text-white" />
+                  <Download className="h-4 w-4" />
                 </button>
 
                 {/* Export Dropdown Menu */}
                 {showExportMenu && !isExporting && (
-                  <div className="absolute right-0 top-full mt-1 w-32 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+                  <div className="absolute right-0 top-full z-50 mt-1 w-32 overflow-hidden rounded-[10px] border border-ash-whisper bg-pale-canvas shadow-lg">
                     <button
                       onClick={() => handleExport("csv")}
-                      className="w-full px-3 py-2 text-left hover:bg-gray-100 transition-colors flex items-center gap-2 rounded-t-lg text-xs"
+                      className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs font-bold text-deep-forest transition-colors hover:bg-ash-whisper"
                     >
-                      <Download className="w-3 h-3" />
+                      <Download className="h-3 w-3" />
                       <span>CSV</span>
                     </button>
                     <button
                       onClick={() => handleExport("json")}
-                      className="w-full px-3 py-2 text-left hover:bg-gray-100 transition-colors flex items-center gap-2 rounded-b-lg text-xs"
+                      className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs font-bold text-deep-forest transition-colors hover:bg-ash-whisper"
                     >
-                      <Download className="w-3 h-3" />
+                      <Download className="h-3 w-3" />
                       <span>JSON</span>
                     </button>
                   </div>
@@ -307,10 +316,10 @@ function EventManagerCardAd({ data }) {
                 disabled={
                   rejectEventMutation.isPending || isUpdating || isDeleting
                 }
-                className="p-2 bg-orange-500 hover:bg-orange-600 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="rounded-[10px] p-2 text-foudre-pink transition-colors hover:bg-ash-whisper disabled:cursor-not-allowed disabled:opacity-50"
                 title="Reject Event"
               >
-                <Ban className="w-4 h-4 text-white" />
+                <Ban className="h-4 w-4" />
               </button>
             )}
 
@@ -321,10 +330,10 @@ function EventManagerCardAd({ data }) {
                 disabled={
                   deleteEventMutation.isPending || isUpdating || isDeleting
                 }
-                className="p-2 bg-red-400 hover:bg-red-500 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="rounded-[10px] p-2 text-foudre-pink transition-colors hover:bg-ash-whisper disabled:cursor-not-allowed disabled:opacity-50"
                 title="Delete Event"
               >
-                <Trash2 className="w-4 h-4 text-white" />
+                <Trash2 className="h-4 w-4" />
               </button>
             )}
           </div>
@@ -334,28 +343,30 @@ function EventManagerCardAd({ data }) {
       {/* Mobile View - Expandable Card */}
       <tr className="lg:hidden">
         <td colSpan="6" className="p-0">
-          <div className="bg-white border-1 border-gray-200 rounded-2xl mb-5 shadow-md">
+          <div className="mb-5 rounded-[20px] border border-ash-whisper bg-pale-canvas/80">
             {/* Compact Header - Always Visible */}
             <div
-              className="p-4 cursor-pointer active:bg-gray-50 transition-colors"
+              className="cursor-pointer p-4 transition-colors active:bg-ash-whisper/50"
               onClick={() => setIsExpanded(!isExpanded)}
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="flex-1 min-w-0">
                   {/* Title */}
-                  <p className="font-semibold text-gray-900 text-base leading-tight mb-1">
+                  <p className="mb-1 text-base font-bold leading-tight text-deep-forest">
                     {title}
                   </p>
 
                   {/* Category & Status */}
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-xs text-gray-500">{category}</span>
+                    <span className="text-xs font-medium text-deep-forest/60">
+                      {category}
+                    </span>
                     <span
-                      className={`px-2 py-0.5 rounded-md text-xs font-medium capitalize ${
+                      className={`rounded-[10px] px-2 py-1 text-xs font-bold capitalize ${
                         isDeleting
-                          ? "bg-red-100 text-red-700 animate-pulse"
+                          ? "border border-foudre-pink/20 bg-foudre-pink/10 text-foudre-pink animate-pulse"
                           : isUpdating
-                          ? "bg-yellow-100 text-yellow-700 animate-pulse"
+                          ? "border border-foudre-pink/20 bg-ash-whisper text-foudre-pink animate-pulse"
                           : getStatusColor(currentStatus)
                       }`}
                     >
@@ -370,23 +381,23 @@ function EventManagerCardAd({ data }) {
 
                 {/* Toggle Button */}
                 <button
-                  className="flex-shrink-0 p-1 hover:bg-gray-100 rounded-full transition-colors"
+                  className="flex-shrink-0 rounded-full p-1 text-deep-forest/45 transition-colors hover:bg-ash-whisper"
                   onClick={(e) => {
                     e.stopPropagation();
                     setIsExpanded(!isExpanded);
                   }}
                 >
                   {isExpanded ? (
-                    <ChevronUp className="w-5 h-5 text-gray-400" />
+                    <ChevronUp className="h-5 w-5" />
                   ) : (
-                    <ChevronDown className="w-5 h-5 text-gray-400" />
+                    <ChevronDown className="h-5 w-5" />
                   )}
                 </button>
               </div>
 
               {/* Quick Info Preview (when collapsed) */}
               {!isExpanded && (
-                <div className="mt-2 flex items-center gap-3 text-xs text-gray-500">
+                <div className="mt-2 flex items-center gap-3 text-xs font-medium text-deep-forest/60">
                   <div className="flex items-center gap-1">
                     <Calendar className="w-3.5 h-3.5" />
                     <span>{formatDate(date)}</span>
@@ -405,45 +416,45 @@ function EventManagerCardAd({ data }) {
             {isExpanded && (
               <div className="px-4 pb-4 space-y-3 rounded-xl">
                 {/* Date & Time */}
-                <div className="flex items-center gap-2 text-sm pt-3">
-                  <Calendar className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                  <span className="text-gray-700">{formatDate(date)}</span>
-                  <Clock className="w-4 h-4 text-gray-400 flex-shrink-0 ml-2" />
-                  <span className="text-gray-600">{formatTime(date)}</span>
+                <div className="flex items-center gap-2 pt-3 text-sm font-medium text-deep-forest">
+                  <Calendar className="h-4 w-4 flex-shrink-0" />
+                  <span>{formatDate(date)}</span>
+                  <Clock className="ml-2 h-4 w-4 flex-shrink-0 text-deep-forest/60" />
+                  <span className="text-deep-forest/65">{formatTime(date)}</span>
                 </div>
 
                 {/* Location */}
-                <div className="flex items-start gap-2 text-sm">
-                  <MapPin className="w-4 h-4 text-gray-400 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700 break-words">{location}</span>
+                <div className="flex items-start gap-2 text-sm font-medium text-deep-forest/75">
+                  <MapPin className="mt-0.5 h-4 w-4 flex-shrink-0 text-foudre-pink" />
+                  <span className="break-words">{location}</span>
                 </div>
 
                 {/* Volunteers Progress */}
-                <div className="bg-gray-50 rounded-lg p-3">
-                  <div className="flex items-center justify-between text-sm mb-2">
+                <div className="rounded-[10px] bg-ash-whisper/45 p-3">
+                  <div className="mb-2 flex items-center justify-between text-sm">
                     <div className="flex items-center gap-2">
-                      <Users className="w-4 h-4 text-gray-500" />
-                      <span className="text-gray-600 font-medium">
+                      <Users className="h-4 w-4 text-deep-forest/65" />
+                      <span className="font-medium text-deep-forest/70">
                         Volunteers
                       </span>
                     </div>
-                    <span className="font-semibold text-gray-900">
+                    <span className="font-bold text-deep-forest">
                       {registered}/{capacity}
                     </span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="h-2 w-full rounded-full bg-pale-canvas">
                     <div
                       className={`h-2 rounded-full transition-all ${
                         registered === capacity
-                          ? "bg-red-500"
+                          ? "bg-foudre-pink"
                           : registered >= capacity * 0.8
-                          ? "bg-orange-500"
-                          : "bg-blue-500"
+                          ? "bg-bubblegum-blush"
+                          : "bg-deep-forest"
                       }`}
                       style={{ width: `${getProgressPercentage()}%` }}
                     ></div>
                   </div>
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="mt-1 text-xs font-medium text-deep-forest/60">
                     {getProgressPercentage()}% filled
                   </p>
                 </div>
@@ -462,10 +473,10 @@ function EventManagerCardAd({ data }) {
                         isUpdating ||
                         isDeleting
                       }
-                      className="col-span-4 py-2.5 bg-green-500 hover:bg-green-600 rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="col-span-4 flex items-center justify-center gap-2 rounded-[10px] bg-deep-forest py-2.5 text-pale-canvas transition-colors hover:bg-foudre-pink disabled:cursor-not-allowed disabled:opacity-50"
                     >
-                      <CircleCheckBig className="w-4 h-4 text-white" />
-                      <span className="text-white text-sm font-medium">
+                      <CircleCheckBig className="h-4 w-4" />
+                      <span className="text-sm font-bold">
                         {approveEventMutation.isPending
                           ? "Approving..."
                           : "Approve Event"}
@@ -477,17 +488,17 @@ function EventManagerCardAd({ data }) {
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      navigate(`/dashboard/eventmanager/${id}`);
+                      navigate(`/opportunities/overview/${id}`);
                     }}
                     disabled={isUpdating || isDeleting}
                     className={`${
                       currentStatus === EVENT_STATUS.APPROVED
                         ? "col-span-2"
                         : "col-span-2"
-                    } py-2.5 bg-blue-500 hover:bg-blue-600 rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed`}
+                    } flex items-center justify-center gap-2 rounded-[10px] bg-deep-forest py-2.5 text-pale-canvas transition-colors hover:bg-foudre-pink disabled:cursor-not-allowed disabled:opacity-50`}
                   >
-                    <Eye className="w-4 h-4 text-white" />
-                    <span className="text-white text-sm font-medium">View</span>
+                    <Eye className="h-4 w-4" />
+                    <span className="text-sm font-bold">View</span>
                   </button>
 
                   {/* Export dropdown - only for APPROVED */}
@@ -499,22 +510,22 @@ function EventManagerCardAd({ data }) {
                           setShowExportMenu(!showExportMenu);
                         }}
                         disabled={isExporting || isUpdating || isDeleting}
-                        className="w-full py-2.5 bg-green-500 hover:bg-green-600 rounded-lg transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="flex w-full items-center justify-center rounded-[10px] bg-deep-forest py-2.5 text-pale-canvas transition-colors hover:bg-foudre-pink disabled:cursor-not-allowed disabled:opacity-50"
                       >
-                        <Download className="w-4 h-4 text-white" />
+                        <Download className="h-4 w-4" />
                       </button>
 
                       {/* Export Dropdown Menu */}
                       {showExportMenu && !isExporting && (
-                        <div className="absolute right-0 bottom-full mb-1 w-28 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+                        <div className="absolute bottom-full right-0 z-50 mb-1 w-28 overflow-hidden rounded-[10px] border border-ash-whisper bg-pale-canvas shadow-lg">
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
                               handleExport("csv");
                             }}
-                            className="w-full px-3 py-2 text-left hover:bg-gray-100 transition-colors flex items-center gap-2 rounded-t-lg text-xs"
+                            className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs font-bold text-deep-forest transition-colors hover:bg-ash-whisper"
                           >
-                            <Download className="w-3 h-3" />
+                            <Download className="h-3 w-3" />
                             <span>CSV</span>
                           </button>
                           <button
@@ -522,9 +533,9 @@ function EventManagerCardAd({ data }) {
                               e.stopPropagation();
                               handleExport("json");
                             }}
-                            className="w-full px-3 py-2 text-left hover:bg-gray-100 transition-colors flex items-center gap-2 rounded-b-lg text-xs"
+                            className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs font-bold text-deep-forest transition-colors hover:bg-ash-whisper"
                           >
-                            <Download className="w-3 h-3" />
+                            <Download className="h-3 w-3" />
                             <span>JSON</span>
                           </button>
                         </div>
@@ -544,10 +555,10 @@ function EventManagerCardAd({ data }) {
                         isUpdating ||
                         isDeleting
                       }
-                      className="col-span-2 py-2.5 bg-orange-500 hover:bg-orange-600 rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="col-span-2 flex items-center justify-center gap-2 rounded-[10px] bg-foudre-pink py-2.5 text-pale-canvas transition-colors hover:bg-bubblegum-blush disabled:cursor-not-allowed disabled:opacity-50"
                     >
-                      <Ban className="w-4 h-4 text-white" />
-                      <span className="text-white text-sm font-medium">
+                      <Ban className="h-4 w-4" />
+                      <span className="text-sm font-bold">
                         {rejectEventMutation.isPending
                           ? "Rejecting..."
                           : "Reject"}
@@ -567,9 +578,9 @@ function EventManagerCardAd({ data }) {
                         isUpdating ||
                         isDeleting
                       }
-                      className="col-span-1 py-2.5 bg-red-400 hover:bg-red-500 rounded-lg transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="col-span-1 flex items-center justify-center rounded-[10px] bg-foudre-pink py-2.5 text-pale-canvas transition-colors hover:bg-bubblegum-blush disabled:cursor-not-allowed disabled:opacity-50"
                     >
-                      <Trash2 className="w-4 h-4 text-white" />
+                      <Trash2 className="h-4 w-4" />
                     </button>
                   )}
                 </div>

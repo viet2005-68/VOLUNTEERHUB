@@ -6,13 +6,14 @@ import {
   ChevronUp,
   Trash,
   Download,
+  MessageSquare,
 } from "lucide-react";
 import Pagination from "@mui/material/Pagination";
 import {
   useListUserOfAnEventApproveAndCompleted,
   useRemoveParticipant,
 } from "../../hook/useRegistration";
-import { useOutletContext } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import AnalysisService from "../../services/analysisService";
 import { confirmDelete } from "../../utils/confirmDialog";
 
@@ -20,6 +21,7 @@ const PAGE_SIZE = 10; // giống cách đặt PAGE_SIZE trong EventManager
 
 function VolunteerList() {
   const { eventId } = useOutletContext();
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedIds, setExpandedIds] = useState(new Set());
   const [page, setPage] = useState(0);
@@ -116,6 +118,16 @@ function VolunteerList() {
     console.log("View registration:", registration);
   };
 
+  const handleMessage = (registration) => {
+    const volunteerId = registration.userId || registration.user?.id;
+    if (!eventId || !volunteerId) return;
+    navigate(
+      `/dashboard/messages?eventId=${encodeURIComponent(eventId)}&volunteerId=${encodeURIComponent(
+        volunteerId
+      )}`
+    );
+  };
+
   const handleDelete = async (registration) => {
     const confirmed = await confirmDelete(
       registration.user?.fullName || "this volunteer"
@@ -188,16 +200,18 @@ function VolunteerList() {
 
   if (isLoading) {
     return (
-      <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm">
-        <div className="text-center py-8 text-gray-500">Loading...</div>
+      <div className="rounded-[25px] border-2 border-ash-whisper bg-pale-canvas p-8">
+        <div className="py-8 text-center text-sm font-bold leading-[1.2] text-deep-forest/70">
+          Loading...
+        </div>
       </div>
     );
   }
 
   if (isError) {
     return (
-      <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm">
-        <div className="text-center py-8 text-red-500">
+      <div className="rounded-[25px] border-2 border-ash-whisper bg-pale-canvas p-8">
+        <div className="py-8 text-center text-sm font-bold leading-[1.2] text-foudre-pink">
           Failed to load volunteers
         </div>
       </div>
@@ -205,27 +219,27 @@ function VolunteerList() {
   }
 
   return (
-    <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm gap-4 sm:gap-6 flex flex-col">
+    <div className="flex flex-col gap-6 rounded-[25px] border border-ash-whisper bg-pale-canvas/90 px-7 pb-7 pt-10 text-deep-forest sm:gap-8 sm:border-2 sm:px-8 sm:pb-8 sm:pt-12 md:px-10 md:pb-10 md:pt-14">
       {/* Header */}
-      <div>
-        <h3 className="text-lg sm:text-xl font-semibold text-gray-900">
+      <div className="flex flex-col gap-3 pl-1">
+        <h2 className="font-beni text-[56px] font-black uppercase leading-[0.75] text-deep-forest md:text-[80px]">
           Registered Volunteers
-        </h3>
-        <p className="text-xs sm:text-sm text-gray-500">
+        </h2>
+        <p className="text-base font-medium leading-[1.2] text-deep-forest/70">
           Overview of volunteers for this event
         </p>
       </div>
 
       {/* Search Bar & Export Controls */}
-      <div className="flex flex-col sm:flex-row gap-3">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="relative w-full sm:max-w-md sm:flex-1">
+          <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-deep-forest/45" />
           <input
             type="text"
             placeholder="Search volunteers..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full rounded-[10px] border-2 border-ash-whisper bg-pale-canvas/80 px-4 py-4 pl-[48px] text-sm font-medium leading-[1.2] text-deep-forest placeholder:text-deep-forest/55 focus:border-foudre-pink focus:outline-none"
           />
         </div>
 
@@ -234,7 +248,7 @@ function VolunteerList() {
           <button
             onClick={() => setShowExportMenu(!showExportMenu)}
             disabled={isExporting || !eventId}
-            className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-[10px] bg-deep-forest px-5 py-4 text-sm font-bold leading-[0.85] text-pale-canvas transition-colors hover:bg-foudre-pink disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
           >
             <Download className="h-4 w-4" />
             <span className="max-sm:hidden">
@@ -245,17 +259,17 @@ function VolunteerList() {
 
           {/* Dropdown Menu */}
           {showExportMenu && !isExporting && (
-            <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+            <div className="absolute right-0 z-50 mt-2 w-48 overflow-hidden rounded-[10px] border-2 border-ash-whisper bg-pale-canvas text-sm font-bold leading-[1.2] text-deep-forest shadow-lg">
               <button
                 onClick={() => handleExport("csv")}
-                className="w-full px-4 py-2 text-left hover:bg-gray-100 transition-colors flex items-center gap-2 rounded-t-lg text-sm"
+                className="flex w-full items-center gap-2 px-4 py-3 text-left transition-colors hover:bg-ash-whisper"
               >
                 <Download className="w-4 h-4" />
                 <span>Export as CSV</span>
               </button>
               <button
                 onClick={() => handleExport("json")}
-                className="w-full px-4 py-2 text-left hover:bg-gray-100 transition-colors flex items-center gap-2 rounded-b-lg text-sm"
+                className="flex w-full items-center gap-2 px-4 py-3 text-left transition-colors hover:bg-ash-whisper"
               >
                 <Download className="w-4 h-4" />
                 <span>Export as JSON</span>
@@ -266,25 +280,28 @@ function VolunteerList() {
       </div>
 
       {/* Desktop Table View */}
-      <div className="hidden md:block overflow-x-auto">
-        <table className="w-full text-sm text-left">
+      <div className="hidden overflow-x-auto rounded-[20px] border-2 border-ash-whisper bg-white md:block">
+        <table className="w-full text-left">
           <thead>
-            <tr className="border-b border-gray-200 bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-600">
-              <th className="px-4 py-3">Volunteer</th>
-              <th className="px-4 py-3">Email</th>
-              <th className="px-4 py-3">Phone</th>
-              <th className="px-4 py-3">Address</th>
-              <th className="px-4 py-3">Joined At</th>
-              <th className="px-4 py-3 text-center">Actions</th>
+            <tr className="bg-ash-whisper/70">
+              <th className="px-6 py-4 text-sm font-bold leading-[1.2] text-deep-forest">Volunteer</th>
+              <th className="px-6 py-4 text-sm font-bold leading-[1.2] text-deep-forest">Email</th>
+              <th className="px-6 py-4 text-sm font-bold leading-[1.2] text-deep-forest">Phone</th>
+              <th className="px-6 py-4 text-sm font-bold leading-[1.2] text-deep-forest">Address</th>
+              <th className="px-6 py-4 text-sm font-bold leading-[1.2] text-deep-forest">Joined At</th>
+              <th className="px-6 py-4 text-center text-sm font-bold leading-[1.2] text-deep-forest">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody>
             {filteredVolunteers.length > 0 ? (
               filteredVolunteers.map((registration) => {
                 const user = registration.user || {};
                 return (
-                  <tr key={registration.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-3">
+                  <tr
+                    key={registration.id}
+                    className="border-b-2 border-ash-whisper transition-colors last:border-b-0 hover:bg-ash-whisper/30"
+                  >
+                    <td className="px-6 py-5">
                       <div className="flex items-center gap-3">
                         {user.avatarUrl ? (
                           <img
@@ -293,45 +310,52 @@ function VolunteerList() {
                             className="h-9 w-9 rounded-full flex-shrink-0 object-cover"
                           />
                         ) : (
-                          <div className="h-9 w-9 rounded-full bg-gray-200 flex items-center justify-center text-sm font-semibold text-gray-700 flex-shrink-0">
+                          <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-ash-whisper text-sm font-bold text-deep-forest">
                             {getInitials(user.fullName)}
                           </div>
                         )}
                         <div>
-                          <p className="font-medium text-gray-900">
+                          <p className="text-base font-bold leading-[1.2] text-deep-forest">
                             {user.fullName || ""}
                           </p>
-                          <p className="text-xs text-gray-500">
+                          <p className="text-sm font-medium leading-[1.2] text-deep-forest/60">
                             {user.username || ""}
                           </p>
                         </div>
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-gray-600">
+                    <td className="px-6 py-5 text-sm font-medium leading-[1.2] text-deep-forest/70">
                       {user.email || ""}
                     </td>
-                    <td className="px-4 py-3 text-gray-600">
+                    <td className="px-6 py-5 text-sm font-medium leading-[1.2] text-deep-forest/70">
                       {user.phoneNumber || ""}
                     </td>
-                    <td className="px-4 py-3 text-gray-600">
+                    <td className="max-w-[220px] px-6 py-5 text-sm font-medium leading-[1.2] text-deep-forest/70">
                       {formatAddress(user.address)}
                     </td>
-                    <td className="px-4 py-3 text-gray-600">
+                    <td className="px-6 py-5 text-sm font-medium leading-[1.2] text-deep-forest/70">
                       {formatDate(registration.reviewedAt)}
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-6 py-5">
                       <div className="flex items-center justify-center gap-2">
                         <button
                           onClick={() => handleView(registration)}
-                          className="inline-flex items-center gap-1 rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-100 transition"
+                          className="inline-flex items-center gap-1 rounded-[10px] border border-deep-forest/15 px-3 py-2 text-xs font-bold leading-[0.85] text-deep-forest transition-colors hover:bg-ash-whisper"
                         >
                           <Eye className="h-4 w-4" />
                           View
                         </button>
                         <button
+                          onClick={() => handleMessage(registration)}
+                          className="inline-flex items-center gap-1 rounded-[10px] bg-deep-forest px-3 py-2 text-xs font-bold leading-[0.85] text-pale-canvas transition-colors hover:bg-foudre-pink"
+                        >
+                          <MessageSquare className="h-4 w-4" />
+                          Message
+                        </button>
+                        <button
                           onClick={() => handleDelete(registration)}
                           disabled={isRemoving}
-                          className="inline-flex items-center gap-1 rounded-lg border border-red-300 px-3 py-1.5 text-xs font-medium bg-red-500 hover:bg-red-600 text-white transition disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="inline-flex items-center gap-1 rounded-[10px] bg-foudre-pink px-3 py-2 text-xs font-bold leading-[0.85] text-pale-canvas transition-colors hover:bg-deep-forest disabled:cursor-not-allowed disabled:opacity-50"
                         >
                           <Trash className="h-4 w-4" />
                           Delete
@@ -343,7 +367,7 @@ function VolunteerList() {
               })
             ) : (
               <tr>
-                <td colSpan="6" className="px-4 py-8 text-center text-gray-500">
+                <td colSpan="6" className="px-6 py-16 text-center text-sm font-medium leading-[1.2] text-deep-forest/65">
                   No volunteers found
                 </td>
               </tr>
@@ -361,7 +385,7 @@ function VolunteerList() {
             return (
               <div
                 key={registration.id}
-                className="border border-gray-200 rounded-lg p-4 bg-white"
+                className="rounded-[20px] border border-deep-forest/10 bg-pale-canvas/70 p-4"
               >
                 {/* Summary Section */}
                 <div className="flex items-center justify-between gap-3">
@@ -378,62 +402,69 @@ function VolunteerList() {
                       </div>
                     )}
                     <div className="min-w-0 flex-1">
-                      <p className="font-semibold text-gray-900 truncate">
+                      <p className="truncate text-sm font-bold leading-[1.2] text-deep-forest">
                         {user.fullName || ""}
                       </p>
-                      <p className="text-xs text-gray-500 truncate">
+                      <p className="truncate text-xs font-medium leading-[1.2] text-deep-forest/65">
                         {user.email || ""}
                       </p>
-                      <p className="text-xs text-gray-400">
+                      <p className="text-xs font-medium leading-[1.2] text-deep-forest/45">
                         {user.username || ""}
                       </p>
                     </div>
                   </div>
                   <button
                     onClick={() => toggleExpand(registration.id)}
-                    className="flex-shrink-0 p-1 rounded hover:bg-gray-100 transition"
+                    className="flex-shrink-0 rounded-[10px] p-2 transition hover:bg-ash-whisper"
                   >
                     {isExpanded ? (
-                      <ChevronUp className="h-5 w-5 text-gray-400" />
+                      <ChevronUp className="h-5 w-5 text-deep-forest/55" />
                     ) : (
-                      <ChevronDown className="h-5 w-5 text-gray-400" />
+                      <ChevronDown className="h-5 w-5 text-deep-forest/55" />
                     )}
                   </button>
                 </div>
 
                 {/* Expanded Details */}
                 {isExpanded && (
-                  <div className="mt-3 pt-3 border-t border-gray-100 space-y-2">
+                  <div className="mt-3 space-y-2 border-t border-deep-forest/10 pt-3">
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-500">Phone:</span>
-                      <span className="text-gray-900 font-medium">
+                      <span className="font-medium text-deep-forest/55">Phone:</span>
+                      <span className="font-bold text-deep-forest">
                         {user.phoneNumber || ""}
                       </span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-500">Address:</span>
-                      <span className="text-gray-900 font-medium text-right flex-1 ml-2">
+                      <span className="font-medium text-deep-forest/55">Address:</span>
+                      <span className="ml-2 flex-1 text-right font-bold text-deep-forest">
                         {formatAddress(user.address)}
                       </span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-500">Joined At:</span>
-                      <span className="text-gray-900 font-medium">
+                      <span className="font-medium text-deep-forest/55">Joined At:</span>
+                      <span className="font-bold text-deep-forest">
                         {formatDate(registration.reviewedAt)}
                       </span>
                     </div>
                     <div className="flex gap-2 pt-2">
                       <button
                         onClick={() => handleView(registration)}
-                        className="flex-1 inline-flex items-center justify-center gap-1 rounded-lg border border-gray-300 px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-100 transition"
+                        className="inline-flex flex-1 items-center justify-center gap-1 rounded-[10px] border border-deep-forest/15 px-3 py-2 text-xs font-bold text-deep-forest transition hover:bg-ash-whisper"
                       >
                         <Eye className="h-4 w-4" />
                         View
                       </button>
                       <button
+                        onClick={() => handleMessage(registration)}
+                        className="inline-flex flex-1 items-center justify-center gap-1 rounded-[10px] bg-deep-forest px-3 py-2 text-xs font-bold text-pale-canvas transition hover:bg-foudre-pink"
+                      >
+                        <MessageSquare className="h-4 w-4" />
+                        Message
+                      </button>
+                      <button
                         onClick={() => handleDelete(registration)}
                         disabled={isRemoving}
-                        className="flex-1 inline-flex items-center justify-center gap-1 rounded-lg border border-red-300 px-3 py-2 text-xs font-medium bg-red-500 hover:bg-red-600 text-white transition disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="inline-flex flex-1 items-center justify-center gap-1 rounded-[10px] bg-foudre-pink px-3 py-2 text-xs font-bold text-pale-canvas transition hover:bg-deep-forest disabled:cursor-not-allowed disabled:opacity-50"
                       >
                         <Trash className="h-4 w-4" />
                         Delete
@@ -445,7 +476,7 @@ function VolunteerList() {
             );
           })
         ) : (
-          <div className="text-center py-8 text-gray-500 text-sm">
+          <div className="rounded-[20px] border border-deep-forest/10 bg-pale-canvas/70 px-6 py-12 text-center text-sm font-medium leading-[1.2] text-deep-forest/65">
             No volunteers found
           </div>
         )}
@@ -453,8 +484,8 @@ function VolunteerList() {
 
       {/* Pagination & Stats Footer */}
       {data?.data && data.data.length > 0 && (
-        <div className="flex flex-col sm:flex-row items-center justify-between pt-4 border-t border-gray-200 gap-4">
-          <p className="text-xs sm:text-sm text-gray-500">
+        <div className="flex flex-col items-center justify-between gap-4 border-t border-deep-forest/10 pt-5 sm:flex-row">
+          <p className="text-sm font-medium leading-[1.2] text-deep-forest/70">
             Showing {data.data.length} of {data.meta?.totalElements || 0}{" "}
             volunteers
           </p>
@@ -465,10 +496,10 @@ function VolunteerList() {
             sx={{
               "& .MuiPaginationItem-root": {
                 "&.Mui-selected": {
-                  backgroundColor: "#3b82f6",
-                  color: "white",
+                  backgroundColor: "#00522d",
+                  color: "#fff8f6",
                   "&:hover": {
-                    backgroundColor: "#2563eb",
+                    backgroundColor: "#00522d",
                   },
                 },
               },

@@ -3,10 +3,18 @@ kind: Ingress
 metadata:
   name: volunteerhub
   annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-http
     nginx.ingress.kubernetes.io/proxy-body-size: "30m"
+    traefik.ingress.kubernetes.io/router.middlewares: volunteerhub-rate-limit@kubernetescrd
 spec:
+  ingressClassName: traefik
+  tls:
+    - hosts:
+        - "__APP_HOST__"
+      secretName: volunteerhub-tls
   rules:
-    - http:
+    - host: "__APP_HOST__"
+      http:
         paths:
           - path: /
             pathType: Prefix

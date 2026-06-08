@@ -16,6 +16,7 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
@@ -26,6 +27,7 @@ import org.springframework.security.oauth2.server.authorization.client.InMemoryR
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
+import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.oauth2.server.authorization.settings.TokenSettings;
 import org.springframework.security.oauth2.server.authorization.token.JwtEncodingContext;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
@@ -39,6 +41,7 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.time.Duration;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Configuration
@@ -52,6 +55,9 @@ public class OAuth2SecurityConfig {
 
     @Value("${spring.security.oauth2.client.redirect-uri}")
     private String redirectUri;
+
+    @Value("${spring.security.oauth2.authorizationserver.issuer-uri}")
+    private String issuerUri;
 
     @Value("${spring.security.oauth2.key.public-key}")
     private String publicKeyBase64;
@@ -87,7 +93,7 @@ public class OAuth2SecurityConfig {
                 .authorizeHttpRequests(
                         c -> c
                                 .requestMatchers("/login", "/login.html", "/logout").permitAll()
-                                .requestMatchers("/api/v1/users/register", "/api/v1/users/login").permitAll()
+                                .requestMatchers("/api/v1/users/register", "/api/v1/users/login", "/api/v1/users/refresh").permitAll()
                                 .anyRequest().authenticated());
         http.logout(logout -> logout
                 .logoutUrl("/logout")
@@ -97,7 +103,7 @@ public class OAuth2SecurityConfig {
                     response.setStatus(HttpServletResponse.SC_OK);
                 }));
         http.csrf(csrf -> csrf
-                .ignoringRequestMatchers("/logout", "/api/v1/users/register", "/api/v1/users/login"));
+                .ignoringRequestMatchers("/logout", "/api/v1/users/register", "/api/v1/users/login", "/api/v1/users/refresh"));
         http.cors(c -> c.configurationSource(corsConfigurationSource()));
         return http.build();
     }
@@ -136,11 +142,23 @@ public class OAuth2SecurityConfig {
                 .clientSecret(passwordEncoder.encode(clientSecret))
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+                .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
                 .redirectUri(redirectUri)
                 .scope(OidcScopes.OPENID)
-                .tokenSettings(TokenSettings.builder().accessTokenTimeToLive(Duration.ofHours(24)).build())
+                .tokenSettings(TokenSettings.builder()
+                        .accessTokenTimeToLive(Duration.ofHours(24))
+                        .refreshTokenTimeToLive(Duration.ofDays(7))
+                        .reuseRefreshTokens(false)
+                        .build())
                 .build();
         return new InMemoryRegisteredClientRepository(registeredClient);
+    }
+
+    @Bean
+    public AuthorizationServerSettings authorizationServerSettings() {
+        return AuthorizationServerSettings.builder()
+                .issuer(issuerUri)
+                .build();
     }
 
     @Bean
@@ -173,7 +191,10 @@ public class OAuth2SecurityConfig {
                     context.getClaims().subject(securityUser.getId().toString());
                     context.getClaims().claim("user_id", securityUser.getId());
                     context.getClaims().claim("email", securityUser.getEmail());
-                    context.getClaims().claim("roles", securityUser.getAuthorities());
+                    context.getClaims().claim("roles", securityUser.getAuthorities().stream()
+                            .map(GrantedAuthority::getAuthority)
+                            .map(role -> Map.of("role", role))
+                            .toList());
                     context.getClaims().claim("name", securityUser.getName());
                 }
             }

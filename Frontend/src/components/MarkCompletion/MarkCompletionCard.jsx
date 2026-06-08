@@ -1,6 +1,15 @@
 import React from "react";
-import Card from "../Card.jsx/Card";
-import { CheckCircle, XCircle, Award, PencilLine } from "lucide-react";
+import {
+  Award,
+  CheckCircle,
+  Clock3,
+  ClipboardList,
+  Mail,
+  PencilLine,
+  RotateCcw,
+  UserRound,
+  XCircle,
+} from "lucide-react";
 
 function MarkCompletionCard({
   volunteer,
@@ -10,242 +19,171 @@ function MarkCompletionCard({
   onMarkCompleted,
   onUndo,
 }) {
-  const { name, email, status, hoursLogged, feedback, avatar, eventName, eventId } =
-    volunteer;
+  const {
+    name = "Unknown",
+    email = "",
+    status,
+    hoursLogged,
+    feedback,
+    avatar,
+    eventName,
+    eventId,
+    registrationId,
+  } = volunteer;
 
-  // Card cho người đã Registered - hiển thị nút Mark Attended/Absent
-  if (status === "registered") {
+  const statusMeta = {
+    registered: {
+      label: "Registered",
+      className: "border-deep-forest/15 bg-deep-forest/10 text-deep-forest",
+    },
+    attended: {
+      label: "Attended",
+      className: "border-deep-forest bg-deep-forest text-pale-canvas",
+    },
+    completed: {
+      label: "Completed",
+      className: "border-emerald-200 bg-emerald-100 text-emerald-800",
+    },
+    absent: {
+      label: "Absent",
+      className: "border-red-200 bg-red-100 text-red-700",
+    },
+  }[status] || {
+    label: status || "Unknown",
+    className: "border-deep-forest/15 bg-deep-forest/10 text-deep-forest",
+  };
+
+  const resolvedEventName = eventName || "Chưa có tên sự kiện";
+  const resolvedId = eventId ?? registrationId ?? null;
+  const parsedHours = Number(hoursLogged);
+  const hasHours = Number.isFinite(parsedHours) && parsedHours > 0;
+  const hoursText = hasHours
+    ? `${Number.isInteger(parsedHours) ? parsedHours : parsedHours.toFixed(1)} hours logged`
+    : null;
+
+  const ActionButton = ({ children, icon, onClick, variant = "primary" }) => {
+    const isPrimary = variant === "primary";
     return (
-      <Card>
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
-          <div className="flex items-center gap-3 sm:gap-4">
-            {/* Avatar */}
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden flex-shrink-0">
-              {avatar ? (
-                <img
-                  src={avatar}
-                  alt={name}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <span className="text-gray-600 text-base sm:text-lg font-semibold">
-                  {name.charAt(0)}
+      <button
+        onClick={() => onClick?.(volunteer)}
+        className={`inline-flex w-full items-center justify-center gap-2 rounded-lg px-5 py-3 text-sm font-bold leading-none transition sm:w-auto ${
+          isPrimary
+            ? "bg-deep-forest text-pale-canvas hover:bg-deep-forest/90"
+            : "border border-deep-forest/20 bg-pale-canvas text-deep-forest hover:border-deep-forest hover:bg-deep-forest/5"
+        }`}
+      >
+        {icon}
+        <span>{children}</span>
+      </button>
+    );
+  };
+
+  return (
+    <div className="rounded-2xl border border-deep-forest/15 bg-white/85 p-4 text-deep-forest shadow-[0_12px_28px_rgba(0,82,45,0.07)] sm:p-5">
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+        <div className="flex min-w-0 gap-4">
+          <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-deep-forest/15 bg-deep-forest/10 text-deep-forest sm:h-[72px] sm:w-[72px]">
+            {avatar ? (
+              <img src={avatar} alt={name} className="h-full w-full object-cover" />
+            ) : (
+              <UserRound className="h-8 w-8" />
+            )}
+          </div>
+
+          <div className="min-w-0 flex-1 space-y-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <p className="truncate text-xl font-bold leading-[1.05] text-deep-forest sm:text-2xl">
+                {name}
+              </p>
+              <span
+                className={`inline-flex items-center rounded-full border px-3 py-1.5 text-xs font-bold uppercase leading-none ${statusMeta.className}`}
+              >
+                {statusMeta.label}
+              </span>
+            </div>
+
+            {email && (
+              <p className="flex min-w-0 items-center gap-2 text-sm font-medium text-deep-forest/65 sm:text-base">
+                <Mail className="h-5 w-5 shrink-0" />
+                <span className="truncate">{email}</span>
+              </p>
+            )}
+
+            <div className="flex flex-wrap gap-2 text-sm font-medium text-deep-forest/70">
+              <span className="inline-flex min-w-0 items-center gap-2 rounded-lg bg-deep-forest/5 px-3 py-2">
+                <ClipboardList className="h-5 w-5 shrink-0 text-deep-forest" />
+                <span className="min-w-0 break-words">
+                  Sự kiện: <b>{resolvedEventName}</b>
+                  {resolvedId ? ` • ID: ${resolvedId}` : ""}
+                </span>
+              </span>
+              {hoursText && (
+                <span className="inline-flex items-center gap-2 rounded-lg bg-deep-forest/5 px-3 py-2">
+                  <Clock3 className="h-5 w-5 shrink-0 text-deep-forest" />
+                  {hoursText}
                 </span>
               )}
             </div>
 
-            {/* Info */}
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-2 flex-wrap">
-                <p className="font-semibold text-gray-900 text-sm sm:text-base">
-                  {name}
-                </p>
-                <span className="px-2 sm:px-3 py-0.5 sm:py-1 text-xs sm:text-sm rounded-lg font-semibold bg-blue-100 text-blue-700">
-                  Registered
-                </span>
-              </div>
-              <p className="text-xs sm:text-sm text-gray-600 truncate">
-                {email}
+            {feedback && (
+              <p className="line-clamp-2 rounded-lg bg-deep-forest/5 px-3 py-2 text-sm font-medium italic text-deep-forest/65">
+                "{feedback}"
               </p>
-              <p className="text-xs sm:text-sm text-gray-700">
-                Sự kiện: {eventName ?? "—"} • ID: {eventId ?? "—"}
-              </p>
-            </div>
+            )}
           </div>
+        </div>
 
-          {/* Action Buttons */}
-          <div className="flex items-center gap-2 sm:gap-3">
-            <button
-              onClick={() => onMarkAttended(volunteer)}
-              className="flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors flex-1 sm:flex-initial text-sm"
+        <div className="flex flex-col gap-2 sm:flex-row lg:justify-end">
+          {status === "registered" && (
+            <>
+              <ActionButton
+                variant="secondary"
+                onClick={onMarkAttended}
+                icon={<CheckCircle className="h-5 w-5" />}
+              >
+                Mark Attended
+              </ActionButton>
+              <ActionButton
+                variant="secondary"
+                onClick={onMarkAbsent}
+                icon={<XCircle className="h-5 w-5" />}
+              >
+                Mark Absent
+              </ActionButton>
+            </>
+          )}
+
+          {status === "attended" && (
+            <ActionButton
+              onClick={onMarkCompleted}
+              icon={<Award className="h-5 w-5" />}
             >
-              <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5" />
-              <span className="text-xs sm:text-sm">Mark Attended</span>
-            </button>
-            <button
-              onClick={() => onMarkAbsent(volunteer)}
-              className="flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors flex-1 sm:flex-initial text-sm"
+              Mark Completed
+            </ActionButton>
+          )}
+
+          {status === "completed" && (
+            <ActionButton
+              onClick={onEditCompletion}
+              icon={<PencilLine className="h-5 w-5" />}
             >
-              <XCircle className="w-4 h-4 sm:w-5 sm:h-5" />
-              <span className="text-xs sm:text-sm">Mark Absent</span>
-            </button>
-          </div>
+              Edit Completion
+            </ActionButton>
+          )}
+
+          {status === "absent" && (
+            <ActionButton
+              variant="secondary"
+              onClick={onUndo}
+              icon={<RotateCcw className="h-5 w-5" />}
+            >
+              Undo
+            </ActionButton>
+          )}
         </div>
-      </Card>
-    );
-  }
-
-  // Card cho người đã Attended - hiển thị hours logged và nút Mark Completed
-  if (status === "attended") {
-    return (
-      <Card>
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
-          <div className="flex items-center gap-3 sm:gap-4">
-            {/* Avatar */}
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden flex-shrink-0">
-              {avatar ? (
-                <img
-                  src={avatar}
-                  alt={name}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <span className="text-gray-600 text-base sm:text-lg font-semibold">
-                  {name.charAt(0)}
-                </span>
-              )}
-            </div>
-
-            {/* Info */}
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-2 mb-1 flex-wrap">
-                <p className="font-semibold text-gray-900 text-sm sm:text-base">
-                  {name}
-                </p>
-                <span className="px-2 sm:px-3 py-0.5 sm:py-1 text-xs sm:text-sm rounded-lg font-semibold bg-gray-900 text-white">
-                  Attended
-                </span>
-              </div>
-              <p className="text-xs sm:text-sm text-gray-600 mb-1 truncate">
-                {email}
-              </p>
-              <p className="text-xs sm:text-sm text-gray-700">
-                Sự kiện: {eventName ?? "—"} • ID: {eventId ?? "—"}
-              </p>
-              <p className="text-xs sm:text-sm text-gray-700">
-                {hoursLogged} hours logged
-              </p>
-            </div>
-          </div>
-
-          {/* Mark Completed Button */}
-          <button
-            onClick={() => onMarkCompleted(volunteer)}
-            className="flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg bg-black text-white hover:bg-gray-800 transition-colors w-full sm:w-auto"
-          >
-            <Award className="w-4 h-4" />
-            <span className="text-xs sm:text-sm">Mark Completed</span>
-          </button>
-        </div>
-      </Card>
-    );
-  }
-
-  // Card cho người đã Completed - hiển thị thông tin và nút Edit
-  if (status === "completed") {
-    return (
-      <Card>
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
-          <div className="flex items-start sm:items-center gap-3 sm:gap-4 flex-1">
-            {/* Avatar */}
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden flex-shrink-0">
-              {avatar ? (
-                <img
-                  src={avatar}
-                  alt={name}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <span className="text-gray-600 text-base sm:text-lg font-semibold">
-                  {name.charAt(0)}
-                </span>
-              )}
-            </div>
-
-            {/* Info */}
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-1 flex-wrap">
-                <p className="font-semibold text-gray-900 text-sm sm:text-base">
-                  {name}
-                </p>
-                <span className="px-2 sm:px-3 py-0.5 sm:py-1 text-xs sm:text-sm rounded-lg font-semibold bg-green-100 text-green-700">
-                  Completed
-                </span>
-                <Award className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-500" />
-              </div>
-              <p className="text-xs sm:text-sm text-gray-600 mb-2 truncate">
-                {email}
-              </p>
-              <p className="text-xs sm:text-sm text-gray-700">
-                Sự kiện: {eventName ?? "—"} • ID: {eventId ?? "—"}
-              </p>
-              <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-700 mb-2 flex-wrap">
-                <span className="font-medium">{hoursLogged} hours logged</span>
-              </div>
-              {feedback && (
-                <p className="text-xs sm:text-sm text-gray-600 italic line-clamp-2">
-                  "{feedback}"
-                </p>
-              )}
-            </div>
-          </div>
-
-          {/* Edit Button */}
-          <button
-            onClick={() => onEditCompletion(volunteer)}
-            className="flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg bg-black text-white hover:bg-gray-800 transition-colors w-full sm:w-auto"
-          >
-            <PencilLine className="w-4 h-4" />
-            <span className="text-xs sm:text-sm">Edit Completion</span>
-          </button>
-        </div>
-      </Card>
-    );
-  }
-
-  // Card cho người đã Absent - chỉ hiển thị nút Undo
-  if (status === "absent") {
-    return (
-      <Card>
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
-          <div className="flex items-center gap-3 sm:gap-4">
-            {/* Avatar */}
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden flex-shrink-0">
-              {avatar ? (
-                <img
-                  src={avatar}
-                  alt={name}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <span className="text-gray-600 text-base sm:text-lg font-semibold">
-                  {name.charAt(0)}
-                </span>
-              )}
-            </div>
-
-            {/* Info */}
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-2 flex-wrap">
-                <p className="font-semibold text-gray-900 text-sm sm:text-base">
-                  {name}
-                </p>
-                <span className="px-2 sm:px-3 py-0.5 sm:py-1 text-xs sm:text-sm rounded-lg font-semibold bg-red-500 text-white">
-                  Absent
-                </span>
-              </div>
-              <p className="text-xs sm:text-sm text-gray-600 truncate">
-                {email}
-              </p>
-              <p className="text-xs sm:text-sm text-gray-700">
-                Sự kiện: {eventName ?? "—"} • ID: {eventId ?? "—"}
-              </p>
-            </div>
-          </div>
-
-          {/* Undo Button */}
-          <button
-            onClick={() => onUndo(volunteer)}
-            className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors w-full sm:w-auto text-xs sm:text-sm"
-          >
-            Undo
-          </button>
-        </div>
-      </Card>
-    );
-  }
-
-  return null;
+      </div>
+    </div>
+  );
 }
 
 export default MarkCompletionCard;

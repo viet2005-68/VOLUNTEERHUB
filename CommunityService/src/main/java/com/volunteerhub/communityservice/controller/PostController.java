@@ -59,4 +59,10 @@ public class PostController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return ResponseEntity.ok(postService.delete(authentication.getName(), postId));
     }
+
+    @PostMapping("/{postId}/shares")
+    public ResponseEntity<PostResponse> share(@PathVariable Long postId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return ResponseEntity.ok(postService.share(authentication.getName(), postId));
+    }
 }

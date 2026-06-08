@@ -1,0 +1,31 @@
+import {
+  TechBadge,
+  EducationBadge,
+  LeadBadge,
+  EnvironmentBadge,
+  GoldMedal,
+  PeopleWithCommunityBadge,
+  PlantBadge,
+  BasicBadge,
+  HandEarthBadge,
+  SaveWaterBadge,
+  AnimalBadge,
+  SocietyBadge,
+  BloodBadge,
+} from "../assets/Badge/index";
+
+export const BADGE_CATALOG = [
+  { id: 1, title: "Tech Badge", description: "Tech Badge", icon: TechBadge },
+  { id: 2, title: "Education Badge", description: "Education Badge", icon: EducationBadge },
+  { id: 3, title: "Lead Badge", description: "Lead Badge", icon: LeadBadge },
+  { id: 4, title: "Environment Badge", description: "Environment Badge", icon: EnvironmentBadge },
+  { id: 5, title: "Gold Medal", description: "Gold Medal", icon: GoldMedal },
+  { id: 6, title: "People With Community Badge", description: "People With Community Badge", icon: PeopleWithCommunityBadge },
+  { id: 7, title: "Plant Badge", description: "Plant Badge", icon: PlantBadge },
+  { id: 8, title: "Basic Badge", description: "Basic Badge", icon: BasicBadge },
+  { id: 9, title: "Hand Earth Badge", description: "Hand Earth Badge", icon: HandEarthBadge },
+  { id: 10, title: "Save Water Badge", description: "Save Water Badge", icon: SaveWaterBadge },
+  { id: 11, title: "Animal Badge", description: "Animal Badge", icon: AnimalBadge },
+  { id: 12, title: "Society Badge", description: "Society Badge", icon: SocietyBadge },
+  { id: 13, title: "Blood Badge", description: "Blood Badge", icon: BloodBadge },
+];

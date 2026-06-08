@@ -1,25 +1,13 @@
-import React, { useRef } from "react";
+import React from "react";
 import { Virtuoso } from "react-virtuoso";
 import NotificationCard from "./NotificationCard";
-import { MoveUp, Loader2, Bell } from "lucide-react";
+import { Loader2, Bell } from "lucide-react";
 
 function NotificationList({ items, loadMore, hasMore, isLoading }) {
-  const virtuosoRef = useRef();
-
-  // Hàm scroll đến đầu
-  const scrollToTop = () => {
-    virtuosoRef.current?.scrollToIndex({
-      index: 0,
-      align: "start",
-      behavior: "smooth",
-    });
-  };
-
-  // Footer component for loading state
   const Footer = () => {
     if (!hasMore && items.length > 0) {
       return (
-        <div className="text-center py-4 text-gray-500 text-sm">
+        <div className="py-4 text-center text-sm font-semibold text-deep-forest/55">
           No more notifications
         </div>
       );
@@ -28,8 +16,10 @@ function NotificationList({ items, loadMore, hasMore, isLoading }) {
     if (isLoading) {
       return (
         <div className="flex items-center justify-center py-4">
-          <Loader2 className="w-5 h-5 animate-spin text-blue-600" />
-          <span className="ml-2 text-sm text-gray-600">Loading more...</span>
+          <Loader2 className="h-5 w-5 animate-spin text-deep-forest" />
+          <span className="ml-2 text-sm font-medium text-deep-forest/60">
+            Loading more...
+          </span>
         </div>
       );
     }
@@ -38,38 +28,40 @@ function NotificationList({ items, loadMore, hasMore, isLoading }) {
   };
 
   return (
-    <div className="h-[55vh] max-h-[700px] min-h-[320px] bg-white p-3 sm:p-4">
+    <div className="relative bg-pale-canvas">
       {items.length === 0 ? (
-        <div className="flex items-center justify-center h-full">
+        <div className="flex min-h-[280px] items-center justify-center rounded-[20px] border border-deep-forest/10 bg-ash-whisper/25">
           <div className="text-center">
-            <div className="text-yellow-500 text-5xl mb-4 flex justify-center">
-              <Bell className="w-12 h-12" />
+            <div className="mx-auto mb-4 flex h-[80px] w-[80px] items-center justify-center rounded-full bg-pale-canvas text-deep-forest/45 shadow-sm">
+              <Bell className="h-10 w-10" />
             </div>
-            <p className="text-gray-500">No notifications yet</p>
+            <p className="text-base font-bold text-deep-forest">
+              No notifications yet
+            </p>
+            <p className="mt-1 text-sm font-medium text-deep-forest/55">
+              New updates will show up here.
+            </p>
           </div>
         </div>
       ) : (
-        <>
+        <div className="h-[min(68vh,720px)] min-h-[420px] overflow-hidden rounded-[20px] border border-deep-forest/10 bg-ash-whisper/25">
           <Virtuoso
-            ref={virtuosoRef}
-            style={{ height: "100%" }}
             data={items}
             endReached={loadMore}
+            overscan={240}
+            increaseViewportBy={{ top: 160, bottom: 360 }}
+            computeItemKey={(index, noti) => noti?.id ?? index}
             itemContent={(index, noti) => (
-              <NotificationCard key={`${noti?.id ?? index}`} noti={noti} />
+              <div className="px-3 pt-3">
+                <NotificationCard noti={noti} />
+              </div>
             )}
             components={{
               Footer,
             }}
+            style={{ height: "100%" }}
           />
-
-          <button
-            onClick={scrollToTop}
-            className="absolute animate-bounce -bottom-5 right-0 w-10 h-10 rounded-2xl bg-blue-600 text-white flex items-center justify-center shadow-md hover:bg-blue-700 transition"
-          >
-            <MoveUp />
-          </button>
-        </>
+        </div>
       )}
     </div>
   );

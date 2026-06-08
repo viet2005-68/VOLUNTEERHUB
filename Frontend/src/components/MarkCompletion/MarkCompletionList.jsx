@@ -66,6 +66,25 @@ function MarkCompletionList() {
 
   const registrations = data?.items || [];
 
+  const getEventName = (reg) => reg.eventName || reg.event?.name || reg.event?.title || "";
+  const getEventId = (reg) => reg.eventId ?? reg.event?.id ?? null;
+  const getServiceHours = (reg) => {
+    const directHours = reg.serviceHours ?? reg.hoursLogged ?? reg.volunteerHours;
+    if (directHours !== undefined && directHours !== null && directHours !== "") {
+      const parsed = Number(directHours);
+      return Number.isFinite(parsed) ? parsed : null;
+    }
+
+    const start = reg.event?.startTime || reg.startTime;
+    const end = reg.event?.endTime || reg.endTime;
+    if (!start || !end) return null;
+
+    const minutes = (new Date(end).getTime() - new Date(start).getTime()) / 60000;
+    if (!Number.isFinite(minutes) || minutes <= 0) return null;
+
+    return Math.round((minutes / 60) * 10) / 10;
+  };
+
   // Local overrides for immediate UI after completion/note edit
   const [statusOverrides, setStatusOverrides] = useState({}); // { [regKey]: { status: "COMPLETED", note: string|null } }
   const getRegKey = (reg) =>
@@ -100,11 +119,12 @@ function MarkCompletionList() {
       name: reg.fullName || reg.username || "Unknown",
       email: reg.email || "",
       status: cardStatus,
-      hoursLogged: Math.floor(Math.random() * 4) + 1, // Random 1-4 hours
+      hoursLogged: getServiceHours(reg),
       feedback: statusOverrides[regKey]?.note ?? reg.note ?? undefined,
-      avatar: reg.avatarUrl || null,
-      eventName: reg.eventName,
-      eventId: reg.eventId,
+      avatar: reg.avatarUrl || reg.user?.avatarUrl || null,
+      eventName: getEventName(reg),
+      eventId: getEventId(reg),
+      registrationId: reg.registrationId,
     };
   });
 
@@ -180,16 +200,16 @@ function MarkCompletionList() {
 
   if (isLoading) {
     return (
-      <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm">
-        <div className="text-center py-8 text-gray-500">Loading...</div>
+      <div className="rounded-[25px] border-2 border-ash-whisper bg-pale-canvas p-8">
+        <div className="text-center py-8 text-sm font-bold leading-[1.2] text-deep-forest/70">Loading...</div>
       </div>
     );
   }
 
   if (isError) {
     return (
-      <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm">
-        <div className="text-center py-8 text-red-500">
+      <div className="rounded-[25px] border-2 border-ash-whisper bg-pale-canvas p-8">
+        <div className="text-center py-8 text-sm font-bold leading-[1.2] text-deep-forest">
           Failed to load volunteers
         </div>
       </div>
@@ -197,22 +217,22 @@ function MarkCompletionList() {
   }
 
   return (
-    <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm gap-4 sm:gap-6 flex flex-col">
+    <div className="flex flex-col gap-6 rounded-[25px] border border-ash-whisper bg-pale-canvas/90 px-7 pb-7 pt-10 text-deep-forest sm:gap-8 sm:border-2 sm:px-8 sm:pb-8 sm:pt-12 md:px-10 md:pb-10 md:pt-14">
       {/* Header */}
-      <div className="mb-2">
-        <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-1 sm:mb-2">
+      <div className="flex flex-col gap-3 pl-1">
+        <h2 className="font-beni text-[48px] font-black uppercase leading-[0.7] text-deep-forest sm:text-[56px] md:text-[68px] lg:text-[72px]">
           Volunteer Completion Management
         </h2>
-        <p className="text-sm sm:text-base text-gray-600">
+        <p className="text-base font-medium leading-[1.2] text-deep-forest/70">
           Mark attendance and completion status for event volunteers
         </p>
       </div>
 
       {/* Search and Action Buttons */}
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 sm:gap-4 mb-3">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         {/* Search Bar */}
-        <div className="relative w-full lg:flex-1 lg:min-w-[300px]">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
+        <div className="relative w-full lg:min-w-[300px] lg:flex-1">
+          <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-deep-forest/45" />
           <input
             type="text"
             placeholder="Search volunteers..."
@@ -221,17 +241,17 @@ function MarkCompletionList() {
               setSearchQuery(e.target.value);
               setPage(1);
             }}
-            className="w-full pl-9 sm:pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50 text-sm sm:text-base"
+            className="w-full rounded-[10px] border-2 border-ash-whisper bg-pale-canvas/80 px-4 py-4 pl-[48px] pr-4 text-sm font-medium leading-[1.2] text-deep-forest placeholder:text-deep-forest/55 focus:border-deep-forest focus:outline-none"
           />
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center gap-2 sm:gap-3 pb-1 max-md:self-end relative">
+        <div className="relative flex flex-wrap items-center justify-end gap-3">
           <button
             onClick={() => {}}
-            className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors whitespace-nowrap text-xs sm:text-sm"
+            className="inline-flex items-center justify-center gap-2 rounded-[10px] bg-deep-forest px-4 py-3 text-sm font-bold leading-[0.85] text-pale-canvas transition hover:bg-deep-forest/90 whitespace-nowrap"
           >
-            <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+            <CheckCircle className="h-5 w-5 flex-shrink-0" />
             <span className="sm:hidden">Mark All</span>
             <span className="hidden sm:inline">
               Mark All Attended as Completed
@@ -239,9 +259,9 @@ function MarkCompletionList() {
           </button>
           <button
             onClick={() => {}}
-            className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors whitespace-nowrap text-xs sm:text-sm"
+            className="inline-flex items-center justify-center gap-2 rounded-[10px] border border-deep-forest/20 bg-pale-canvas px-4 py-3 text-sm font-bold leading-[0.85] text-deep-forest transition hover:border-deep-forest hover:bg-ash-whisper hover:text-deep-forest whitespace-nowrap"
           >
-            <Send className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+            <Send className="h-5 w-5 flex-shrink-0" />
             <span className="hidden xs:inline">Send Certificates</span>
             <span className="xs:hidden">Send</span>
           </button>
@@ -265,8 +285,8 @@ function MarkCompletionList() {
       </div>
 
       {/* Tip Box */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6">
-        <p className="text-xs sm:text-sm text-gray-700">
+      <div className="rounded-[20px] border border-deep-forest/20 bg-ash-whisper/60 p-4">
+        <p className="text-sm font-medium leading-[1.2] text-deep-forest/75">
           <span className="font-semibold">Tip:</span> Filter by "Attended" to
           view the list of approved volunteers, then mark them as "Completed"
           and add a note to issue certificates.
@@ -288,7 +308,7 @@ function MarkCompletionList() {
             />
           ))
         ) : (
-          <div className="text-center py-8 sm:py-12 text-gray-500 text-sm sm:text-base">
+          <div className="rounded-[20px] border border-deep-forest/10 bg-pale-canvas/70 px-6 py-12 text-center text-sm font-medium leading-[1.2] text-deep-forest/65">
             No volunteers found matching "{searchQuery}"
           </div>
         )}
@@ -296,19 +316,19 @@ function MarkCompletionList() {
 
       {/* Completion Note Modal */}
       {selectedReg && (
-        <div className="fixed inset-0 bg-gray-900/60 bg-opacity-40 flex items-center justify-center p-4 z-50">
-          <div className="bg-white w-full max-w-[500px] p-6 rounded-xl shadow-lg">
-            <h3 className="text-xl font-semibold mb-3 text-center">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-deep-forest/65 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-[500px] rounded-[20px] border border-deep-forest/25 bg-pale-canvas p-6 text-deep-forest">
+            <h3 className="font-beni text-[46px] font-black uppercase leading-[0.7] text-deep-forest">
               {isEditingNote ? "Edit Completion Note" : "Mark Completion"}
             </h3>
-            <p className="text-sm text-gray-600 text-center mb-3">
-              Event: {selectedReg?.eventName ?? "—"} • ID:{" "}
-              {selectedReg?.eventId ?? "—"}
+            <p className="mb-3 text-center text-sm font-medium leading-[1.2] text-deep-forest/70">
+              Event: {selectedReg?.eventName || selectedReg?.event?.name || "Chưa có tên sự kiện"} • ID:{" "}
+              {selectedReg?.eventId ?? selectedReg?.event?.id ?? "N/A"}
             </p>
 
             <div className="space-y-4">
               <div>
-                <p className="text-sm text-gray-600 mb-2">
+                <p className="mb-2 text-sm font-bold leading-[1.2] text-deep-forest">
                   Completion Note (optional):
                 </p>
                 <textarea
@@ -316,14 +336,14 @@ function MarkCompletionList() {
                   onChange={(e) => setNote(e.target.value)}
                   placeholder="Enter completion note (optional)"
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                  className="w-full rounded-[10px] border-2 border-ash-whisper bg-pale-canvas px-4 py-3 text-sm font-medium leading-[1.2] text-deep-forest placeholder:text-deep-forest/45 focus:border-deep-forest focus:outline-none"
                   disabled={reviewMutation.isPending}
                 />
               </div>
 
               <div className="flex justify-end gap-3 mt-4">
                 <button
-                  className="px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded transition"
+                  className="rounded-[10px] border border-deep-forest bg-transparent px-4 py-3 text-sm font-bold text-deep-forest transition hover:border-deep-forest hover:bg-ash-whisper hover:text-deep-forest"
                   onClick={() => {
                     setSelectedReg(null);
                     setNote("");
@@ -336,7 +356,7 @@ function MarkCompletionList() {
                 <button
                   onClick={handleComplete}
                   disabled={reviewMutation.isPending}
-                  className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="rounded-[10px] bg-deep-forest px-4 py-3 text-sm font-bold text-pale-canvas transition hover:bg-deep-forest/90 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {reviewMutation.isPending
                     ? "Processing..."

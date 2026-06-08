@@ -1,0 +1,887 @@
+openapi: 3.0.3
+info:
+  title: Community Service API
+  version: 1.0.0
+  description: API for managing event community posts, comments, reactions
+
+servers:
+  - url: http://localhost:8080
+    description: Local development server
+
+paths:
+  /api/v1/events/{eventId}/posts:
+    get:
+      summary: Get all posts for an event
+      parameters:
+        - name: eventId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: sortedBy
+          in: query
+          schema:
+            type: string
+            default: id
+        - name: order
+          in: query
+          schema:
+            type: string
+            default: desc
+            enum: [asc, desc]
+        - name: pageNum
+          in: query
+          schema:
+            type: integer
+            format: int32
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagePostResponse'
+        '403':
+          description: Access denied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+    post:
+      summary: Create a new post for an event
+      parameters:
+        - name: eventId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - postRequest
+              properties:
+                postRequest:
+                  $ref: '#/components/schemas/PostRequest'
+                imageFiles:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                  description: Optional image attachments for the post
+      responses:
+        '200':
+          description: Post created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+        '403':
+          description: Access denied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+
+  /api/v1/events/{eventId}/posts/{postId}:
+    get:
+      summary: Get a post by ID
+      parameters:
+        - name: eventId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostResponse'
+        '403':
+          description: Access denied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+        '404':
+          description: Post not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+    put:
+      summary: Update a post
+      parameters:
+        - name: eventId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - postRequest
+              properties:
+                postRequest:
+                  $ref: '#/components/schemas/PostRequest'
+                imageFiles:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                  description: Optional replacement image attachments for the post
+      responses:
+        '200':
+          description: Post updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostResponse'
+        '403':
+          description: Access denied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+        '404':
+          description: Post not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+    delete:
+      summary: Delete a post
+      parameters:
+        - name: eventId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Post deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostResponse'
+        '403':
+          description: Access denied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+        '404':
+          description: Post not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+
+  /api/v1/events/{eventId}/posts/{postId}/comments:
+    get:
+      summary: Get all comments for a post
+      parameters:
+        - name: eventId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CommentResponse'
+        '403':
+          description: Access denied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+    post:
+      summary: Create a comment on a post
+      parameters:
+        - name: eventId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentRequest'
+      responses:
+        '201':
+          description: Comment created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+        '403':
+          description: Access denied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+        '404':
+          description: Post or parent comment not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+
+  /api/v1/events/{eventId}/posts/{postId}/comments/{commentId}:
+    put:
+      summary: Update a comment
+      parameters:
+        - name: eventId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: commentId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentRequest'
+      responses:
+        '200':
+          description: Comment updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentResponse'
+        '403':
+          description: Access denied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+        '404':
+          description: Comment not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+    delete:
+      summary: Delete a comment
+      parameters:
+        - name: eventId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: commentId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Comment deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentResponse'
+        '403':
+          description: Access denied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+        '404':
+          description: Comment not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+
+  /api/v1/events/{eventId}/posts/{postId}/reactions:
+    get:
+      summary: Get reactions for a post
+      parameters:
+        - name: eventId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: type
+          in: query
+          schema:
+            $ref: '#/components/schemas/ReactionType'
+        - name: pageNum
+          in: query
+          schema:
+            type: integer
+            format: int32
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageReactionResponse'
+        '403':
+          description: Access denied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+    post:
+      summary: Create a reaction on a post
+      parameters:
+        - name: eventId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReactionRequest'
+      responses:
+        '201':
+          description: Reaction created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReactionResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+        '403':
+          description: Access denied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+        '404':
+          description: Post not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+        '409':
+          description: Duplicate reaction constraint violation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+    put:
+      summary: Create, update, or toggle the current user's reaction for a post
+      parameters:
+        - name: eventId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReactionRequest'
+      responses:
+        '200':
+          description: Reaction updated, created, or toggled off
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReactionResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+        '403':
+          description: Access denied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+        '404':
+          description: Related resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+    delete:
+      summary: Delete the current user's reaction for a post
+      parameters:
+        - name: eventId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Reaction deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReactionResponse'
+        '403':
+          description: Access denied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+        '404':
+          description: Reaction not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+
+  /api/v1/events/{eventId}/posts/{postId}/reactions/count:
+    get:
+      summary: Get reaction counts by type for a post
+      parameters:
+        - name: eventId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReactionCountMap'
+        '403':
+          description: Access denied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+
+  /api/v1/events/{eventId}/posts/{postId}/reactions/me:
+    get:
+      summary: Get the current user's reaction for a post
+      parameters:
+        - name: eventId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ReactionResponse'
+                nullable: true
+
+  /api/v1/events/{eventId}/posts/{postId}/reactions/{reactionId}:
+    put:
+      summary: Update a reaction by reaction ID
+      parameters:
+        - name: eventId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: reactionId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReactionRequest'
+      responses:
+        '200':
+          description: Reaction updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReactionResponse'
+        '403':
+          description: Access denied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+        '404':
+          description: Reaction not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+    delete:
+      summary: Delete a reaction by reaction ID
+      parameters:
+        - name: eventId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: reactionId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Reaction deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReactionResponse'
+        '403':
+          description: Access denied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+        '404':
+          description: Reaction not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+
+components:
+  schemas:
+    PostRequest:
+      type: object
+      required:
+        - content
+      properties:
+        content:
+          type: string
+
+    CommentRequest:
+      type: object
+      required:
+        - content
+      properties:
+        parentId:
+          type: integer
+          format: int64
+          nullable: true
+        content:
+          type: string
+
+    ReactionRequest:
+      type: object
+      required:
+        - type
+      properties:
+        type:
+          $ref: '#/components/schemas/ReactionType'
+
+    PostResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        eventId:
+          type: integer
+          format: int64
+        content:
+          type: string
+        imageUrls:
+          type: array
+          items:
+            type: string
+        ownerId:
+          type: string
+        reactionCount:
+          type: integer
+          format: int32
+        reactionCounts:
+          $ref: '#/components/schemas/ReactionCountMap'
+        myReaction:
+          allOf:
+            - $ref: '#/components/schemas/ReactionResponse'
+          nullable: true
+        myReactionType:
+          allOf:
+            - $ref: '#/components/schemas/ReactionType'
+          nullable: true
+        shareCount:
+          type: integer
+          format: int32
+        commentCount:
+          type: integer
+          format: int32
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    CommentResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        ownerId:
+          type: string
+        postId:
+          type: integer
+          format: int64
+        parentId:
+          type: integer
+          format: int64
+          nullable: true
+        content:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    ReactionResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        ownerId:
+          type: string
+        postId:
+          type: integer
+          format: int64
+        type:
+          $ref: '#/components/schemas/ReactionType'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    ReactionType:
+      type: string
+      enum: [LIKE, LOVE, HAHA, WOW, SAD, ANGRY]
+
+    ReactionCountMap:
+      type: object
+      additionalProperties:
+        type: integer
+        format: int64
+      example:
+        LIKE: 12
+        LOVE: 4
+        HAHA: 2
+        WOW: 1
+        SAD: 0
+        ANGRY: 0
+
+    ErrorDetails:
+      type: object
+      properties:
+        message:
+          type: string
+
+    PagePostResponse:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/PostResponse'
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
+        number:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+
+    PageReactionResponse:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReactionResponse'
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
+        number:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32

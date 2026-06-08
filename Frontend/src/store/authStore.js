@@ -66,6 +66,8 @@ export const useAuthStore = create((set, get) => ({
         localStorage.removeItem("token");
         localStorage.removeItem("access_token");
         localStorage.removeItem("refresh_token");
+        localStorage.removeItem("refresh_token_provider");
+        localStorage.removeItem("google_refresh_token");
 
         // Clear state
         console.log("🟢 [authStore] Clearing Zustand state...");
@@ -81,4 +83,3 @@ export const useAuthStore = create((set, get) => ({
     hasRole: (role) => get().user?.role === role,
     hasAnyRole: (roles = []) => roles.includes(get().user?.role),
 }));
-

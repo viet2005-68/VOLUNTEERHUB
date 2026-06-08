@@ -236,6 +236,7 @@ public class UserEventService {
             UserEventRequest request) {
         UserEvent userEvent = findEntityByUserIdAndEventId(participantId, eventId);
         EventSnapshot eventSnapshot = eventSnapshotService.findEntityById(eventId);
+        userEvent.setEventSnapshot(eventSnapshot);
         if (!eventSnapshot.getOwnerId().equals(userId)) {
             throw new AccessDeniedException(
                     "Insufficient permission to review user's request to event with id " + eventId);
@@ -344,6 +345,27 @@ public class UserEventService {
 
         if (totalApps == 0) return 0L;
         return (long) ((double) approvedCount / totalApps * 100);
+    }
+
+    public Map<String, Long> countUniqueVolunteersByOwnerIds(List<String> ownerIds) {
+        if (ownerIds == null || ownerIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        Map<String, Long> counts = ownerIds.stream()
+                .filter(Objects::nonNull)
+                .distinct()
+                .collect(Collectors.toMap(id -> id, id -> 0L, (left, right) -> left, LinkedHashMap::new));
+
+        if (counts.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        List<UserEventStatus> participantStatuses = List.of(UserEventStatus.APPROVED, UserEventStatus.COMPLETED);
+        userEventRepository.countUniqueVolunteersByOwnerIds(counts.keySet(), participantStatuses)
+                .forEach(row -> counts.put((String) row[0], ((Number) row[1]).longValue()));
+
+        return counts;
     }
 
     public List<UserEventExport> getAllForExport() {

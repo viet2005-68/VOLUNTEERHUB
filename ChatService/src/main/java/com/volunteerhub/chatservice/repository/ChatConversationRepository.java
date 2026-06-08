@@ -13,4 +13,11 @@ public interface ChatConversationRepository extends JpaRepository<ChatConversati
     Optional<ChatConversation> findByEventIdAndManagerIdAndVolunteerId(Long eventId, String managerId, String volunteerId);
 
     List<ChatConversation> findByManagerIdOrVolunteerIdOrderByLastMessageAtDesc(String managerId, String volunteerId);
+
+    List<ChatConversation> findByEventIdAndManagerIdOrEventIdAndVolunteerIdOrderByLastMessageAtDesc(
+            Long managerEventId,
+            String managerId,
+            Long volunteerEventId,
+            String volunteerId
+    );
 }

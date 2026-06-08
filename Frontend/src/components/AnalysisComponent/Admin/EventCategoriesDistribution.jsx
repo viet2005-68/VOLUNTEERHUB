@@ -30,11 +30,11 @@ function EventCategoriesDistribution() {
   const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white p-3 rounded-lg shadow-lg border border-gray-200">
-          <p className="font-semibold text-gray-900">
+        <div className="rounded-[10px] border-2 border-ash-whisper bg-pale-canvas p-3 text-deep-forest shadow-lg">
+          <p className="font-bold leading-[1.2] text-deep-forest">
             {payload[0].payload.status}
           </p>
-          <p className="text-sm text-blue-600">
+          <p className="text-sm font-medium leading-[1.2] text-foudre-pink">
             Events: <span className="font-semibold">{payload[0].value}</span>
           </p>
         </div>
@@ -44,12 +44,12 @@ function EventCategoriesDistribution() {
   };
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-      <div className="mb-4">
-        <h3 className="text-lg font-semibold text-gray-900">
+    <div className="rounded-[20px] border-2 border-ash-whisper bg-white p-6 text-deep-forest shadow-sm">
+      <div className="mb-5">
+        <h3 className="font-beni text-[42px] font-black uppercase leading-[0.75] text-deep-forest sm:text-[48px]">
           Event Status Distribution
         </h3>
-        <p className="text-sm text-gray-500 mt-1">
+        <p className="mt-2 text-sm font-medium leading-[1.2] text-deep-forest/65">
           Current moderation and active-event mix
         </p>
       </div>
@@ -60,11 +60,11 @@ function EventCategoriesDistribution() {
             data={chartData}
             margin={{ top: 5, right: 20, left: -20, bottom: 5 }}
           >
-            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-            <XAxis dataKey="status" stroke="#6b7280" />
-            <YAxis stroke="#6b7280" />
+            <CartesianGrid strokeDasharray="3 3" stroke="#fce5df" />
+            <XAxis dataKey="status" stroke="#00522d" tick={{ fontSize: 12, fill: "#00522d" }} />
+            <YAxis stroke="#00522d" tick={{ fontSize: 12, fill: "#00522d" }} />
             <Tooltip content={<CustomTooltip />} />
-            <Bar dataKey="events" fill="#3b82f6" radius={[8, 8, 0, 0]} />
+            <Bar dataKey="events" fill="#00522d" radius={[10, 10, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>

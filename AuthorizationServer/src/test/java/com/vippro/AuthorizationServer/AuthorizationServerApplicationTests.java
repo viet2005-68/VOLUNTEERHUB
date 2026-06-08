@@ -1,7 +1,11 @@
 package com.vippro.AuthorizationServer;
 
+import com.nimbusds.jose.jwk.source.JWKSource;
+import com.nimbusds.jose.proc.SecurityContext;
+import com.vippro.AuthorizationServer.service.TokenService;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 @SpringBootTest(properties = {
 		"spring.datasource.url=jdbc:h2:mem:authorizationserver_test;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1",
@@ -20,6 +24,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 		"APP_CORS_ALLOWED_ORIGINS=http://localhost:30080"
 })
 class AuthorizationServerApplicationTests {
+
+	@MockBean
+	private TokenService tokenService;
+
+	@MockBean
+	private JWKSource<SecurityContext> jwkSource;
 
 	@Test
 	void contextLoads() {

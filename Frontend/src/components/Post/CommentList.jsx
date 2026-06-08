@@ -1,6 +1,5 @@
 import React from "react";
 import CommentItem from "./CommentItem";
-import { useAuth } from "../../hook/useAuth";
 
 export default function CommentList({
   comments,
@@ -10,10 +9,9 @@ export default function CommentList({
   onReplyComment,
   currentUserId,
   currentUserName,
+  readOnly = false,
 }) {
   // Build nested comment
-  const {user} = useAuth();
-  console.log("user", user)
   const buildCommentTree = (comments) => {
     const commentMap = {};
     const rootComments = [];
@@ -38,7 +36,7 @@ export default function CommentList({
 
   if (comments.length === 0) {
     return (
-      <div className="text-sm text-gray-500 text-center py-8">
+      <div className="text-sm text-deep-forest/60 text-center py-8">
         No comments yet.
       </div>
     );
@@ -57,6 +55,7 @@ export default function CommentList({
           replies={comment.replies}
           currentUserId={currentUserId}
           currentUserName={currentUserName}
+          readOnly={readOnly}
           depth={0}
         />
       ))}

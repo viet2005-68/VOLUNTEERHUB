@@ -155,8 +155,8 @@ function UserManager() {
         </p>
       </div>
       {/* Toolbar */}
-      <div className="rounded-[20px] border-2 border-ash-whisper bg-white p-4">
-        <div className="relative">
+      <div className="flex flex-col gap-3 rounded-[20px] border-2 border-ash-whisper bg-white p-4 lg:flex-row lg:items-center lg:justify-between">
+        <div className="relative min-w-0 flex-1">
           {/* Search */}
           <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-deep-forest/45" />
           <input
@@ -164,59 +164,60 @@ function UserManager() {
             placeholder="Search users..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full rounded-[10px] border-2 border-ash-whisper bg-pale-canvas py-4 pl-12 pr-4 text-sm font-bold text-deep-forest outline-none transition-colors placeholder:text-deep-forest/40 focus:border-deep-forest"
+            className="w-full rounded-[10px] border-2 border-ash-whisper bg-pale-canvas py-4 pl-[48px] pr-4 text-sm font-bold text-deep-forest outline-none transition-colors placeholder:text-deep-forest/40 focus:border-deep-forest"
           />
         </div>
-      </div>
-      {/* Filter & Export */}
-      <div className="flex flex-row flex-wrap items-center justify-end gap-3 rounded-[20px] border-2 border-ash-whisper bg-white p-4">
-        <DropdownSelect
-          value={filterStatus}
-          onChange={setFilterStatus}
-          options={[
-            { value: "all", label: "All Status" },
-            { value: "pending", label: "Pending" },
-            { value: "active", label: "Active" },
-            { value: "banned", label: "Banned" },
-          ]}
-        />
 
-        {/* Export Dropdown */}
-        <div className="relative">
-          <button
-            onClick={() => setShowExportMenu(!showExportMenu)}
-            disabled={isExporting}
-            className="flex items-center justify-center gap-2 whitespace-nowrap rounded-[10px] bg-deep-forest px-4 py-3 font-bold text-pale-canvas transition-all hover:brightness-110 hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            <Download className="w-5 h-5" />
-            <span className="max-sm:hidden">
-              {isExporting ? "Exporting..." : "Export Users"}
-            </span>
-            <span className="sm:hidden">
-              {isExporting ? "Export..." : "Export"}
-            </span>
-            <ChevronDown className="w-4 h-4" />
-          </button>
+        <div className="flex shrink-0 flex-row flex-wrap items-center justify-end gap-3">
+          <DropdownSelect
+            value={filterStatus}
+            onChange={setFilterStatus}
+            options={[
+              { value: "all", label: "All Status" },
+              { value: "pending", label: "Pending" },
+              { value: "active", label: "Active" },
+              { value: "banned", label: "Banned" },
+            ]}
+            className="w-[160px]"
+          />
 
-          {/* Dropdown Menu */}
-          {showExportMenu && !isExporting && (
-            <div className="absolute right-0 z-50 mt-2 w-48 overflow-hidden rounded-[10px] border-2 border-ash-whisper bg-pale-canvas">
-              <button
-                onClick={() => handleExport("csv")}
-                className="flex w-full items-center gap-2 px-4 py-3 text-left font-bold text-deep-forest transition-colors hover:bg-ash-whisper"
-              >
-                <Download className="w-4 h-4" />
-                <span>Export as CSV</span>
-              </button>
-              <button
-                onClick={() => handleExport("json")}
-                className="flex w-full items-center gap-2 px-4 py-3 text-left font-bold text-deep-forest transition-colors hover:bg-ash-whisper"
-              >
-                <Download className="w-4 h-4" />
-                <span>Export as JSON</span>
-              </button>
-            </div>
-          )}
+          {/* Export Dropdown */}
+          <div className="relative">
+            <button
+              onClick={() => setShowExportMenu(!showExportMenu)}
+              disabled={isExporting}
+              className="flex items-center justify-center gap-2 whitespace-nowrap rounded-[10px] bg-deep-forest px-4 py-4 text-sm font-bold leading-[0.85] text-pale-canvas transition-all hover:-translate-y-0.5 hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <Download className="h-5 w-5" />
+              <span className="max-sm:hidden">
+                {isExporting ? "Exporting..." : "Export Users"}
+              </span>
+              <span className="sm:hidden">
+                {isExporting ? "Export..." : "Export"}
+              </span>
+              <ChevronDown className="h-4 w-4" />
+            </button>
+
+            {/* Dropdown Menu */}
+            {showExportMenu && !isExporting && (
+              <div className="absolute right-0 z-50 mt-2 w-48 overflow-hidden rounded-[10px] border-2 border-ash-whisper bg-pale-canvas">
+                <button
+                  onClick={() => handleExport("csv")}
+                  className="flex w-full items-center gap-2 px-4 py-3 text-left font-bold text-deep-forest transition-colors hover:bg-ash-whisper"
+                >
+                  <Download className="h-4 w-4" />
+                  <span>Export as CSV</span>
+                </button>
+                <button
+                  onClick={() => handleExport("json")}
+                  className="flex w-full items-center gap-2 px-4 py-3 text-left font-bold text-deep-forest transition-colors hover:bg-ash-whisper"
+                >
+                  <Download className="h-4 w-4" />
+                  <span>Export as JSON</span>
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
       <div className="overflow-hidden rounded-[20px] border-2 border-ash-whisper bg-white">
@@ -297,7 +298,7 @@ function UserManager() {
                   backgroundColor: "#00522d",
                   color: "#fff8f6",
                   "&:hover": {
-                    backgroundColor: "#006b3b",
+                    backgroundColor: "#00522d",
                   },
                 },
               },

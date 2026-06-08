@@ -4,9 +4,9 @@ import nuoiemImage from '../../assets/landing/nuoiem.jpg'
 import baove from '../../assets/landing/baove.jpg'
 import ruabien from '../../assets/landing/ruabien.jpg'
 import trongcay from '../../assets/landing/trongcay.jpg'
-
+import tronglua from '../../assets/landing/tronglua.jpg'
 const members = [
-  ['Mentors', 'Education support', nuoiemImage, '/media/site/e705d77393-1766136288/margaux-audio.mp3'],
+  ['Mentors', 'Education support', tronglua, '/media/site/e705d77393-1766136288/margaux-audio.mp3'],
   ['Protectors', 'Community safety', baove, '/media/site/e9bbd985e2-1766136304/mathieu-audio.mp3'],
   ['Helpers', 'Event volunteers', ruabien, '/media/site/b6db5aab54-1766136315/florent_3.mp3'],
   ['Planters', 'Green action', trongcay, '/media/site/a39e6834f4-1766136357/johane-audio.mp3'],
@@ -55,8 +55,10 @@ function Team() {
       <article ref={cardRef} className="team-card" data-cursor="audio">
         <img src={member[2]} alt={member[0]} />
         <div>
-          <span>{member[1]}</span>
-          <h3>{member[0].split('').join(' ')}</h3>
+          <div>
+            <span>{member[1]}</span>
+            <h3>{member[0].split('').join(' ')}</h3>
+          </div>
           <button type="button" onClick={toggleAudio} className={playing ? 'is-playing' : ''} data-cursor="audio">
             {playing ? 'Pause story' : 'Hear story'}
           </button>

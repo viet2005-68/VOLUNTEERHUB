@@ -8,23 +8,23 @@ export const EVENT_STATUS = {
 export const STATUS_CONFIG = {
   [EVENT_STATUS.PENDING]: {
     label: "Pending",
-    color: "bg-yellow-100 text-yellow-700",
+    color: "border border-foudre-pink/20 bg-ash-whisper text-foudre-pink",
     description: "Waiting for approval",
   },
   [EVENT_STATUS.APPROVED]: {
     label: "Approved",
-    color: "bg-green-100 text-green-700",
+    color: "border border-deep-forest/15 bg-deep-forest/10 text-deep-forest",
     description: "Event is active",
   },
   [EVENT_STATUS.REJECTED]: {
     label: "Rejected",
-    color: "bg-red-100 text-red-700",
+    color: "border border-foudre-pink/20 bg-foudre-pink/10 text-foudre-pink",
     description: "Event rejected",
   },
 };
 
 export const getStatusColor = (status) => {
-  return STATUS_CONFIG[status]?.color || "bg-gray-100 text-gray-700";
+  return STATUS_CONFIG[status]?.color || "border border-deep-forest/10 bg-ash-whisper text-deep-forest";
 };
 
 export const canCancelEvent = (status) => {

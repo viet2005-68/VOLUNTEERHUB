@@ -2,15 +2,15 @@ import RegistrationRow from "./RegistrationRow";
 
 export default function RegistrationTable({ data = [], isFetching, onSelect }) {
   return (
-    <div className="bg-white rounded-xl">
+    <div className="relative overflow-x-auto rounded-[20px] border-2 border-ash-whisper bg-white">
       <table className="w-full">
-        <thead className="bg-gray-100">
-          <tr className="border-b border-b-gray-600/20 text-base">
-            <th className="p-4 text-left">Volunteer</th>
-            <th className="p-4 text-left">Event</th>
-            <th className="p-4 text-left">Register Date</th>
-            <th className="p-4 text-left">Status</th>
-            <th className="p-4 text-left">Action</th>
+        <thead>
+          <tr className="bg-ash-whisper/70">
+            <th className="px-6 py-4 text-left text-sm font-bold leading-[1.2] text-deep-forest">Volunteer</th>
+            <th className="px-6 py-4 text-left text-sm font-bold leading-[1.2] text-deep-forest">Event</th>
+            <th className="px-6 py-4 text-left text-sm font-bold leading-[1.2] text-deep-forest">Register Date</th>
+            <th className="px-6 py-4 text-left text-sm font-bold leading-[1.2] text-deep-forest">Status</th>
+            <th className="px-6 py-4 text-left text-sm font-bold leading-[1.2] text-deep-forest">Action</th>
           </tr>
         </thead>
 
@@ -29,7 +29,7 @@ export default function RegistrationTable({ data = [], isFetching, onSelect }) {
             ))
           ) : (
             <tr>
-              <td colSpan="5" className="p-8 text-center text-gray-500">
+              <td colSpan="5" className="px-6 py-16 text-center text-sm font-medium leading-[1.2] text-deep-forest/65">
                 No registrations found
               </td>
             </tr>

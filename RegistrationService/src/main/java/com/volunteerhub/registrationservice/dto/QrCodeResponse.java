@@ -19,6 +19,11 @@ public class QrCodeResponse {
     private QrCodeStatus status;
     private LocalDateTime expiresAt;
     private Integer maxUses;
+    private String label;
+    private String note;
     private Integer useCount;
+    private LocalDateTime revokedAt;
+    private String revokedBy;
+    private String revokeReason;
     private LocalDateTime createdAt;
 }

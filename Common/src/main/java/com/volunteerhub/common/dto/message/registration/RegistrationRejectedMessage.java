@@ -13,6 +13,7 @@ public class RegistrationRejectedMessage implements RegistrationMessage{
     private Long registrationId;
     private String userId;
     private Long eventId;
+    private String imageUrl;
     private UserEventStatus status;
     private String note;
     private LocalDateTime reviewedAt;

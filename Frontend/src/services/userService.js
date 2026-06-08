@@ -76,6 +76,15 @@ const getProfileCompleteness = async () => {
     }
 };
 
+const getMyBadges = async () => {
+    try {
+        return await axiosClient.get("/v1/users/users/badges");
+    } catch (error) {
+        console.error("Error fetching user badges:", error);
+        throw error;
+    }
+};
+
 const getAllUsers = async () => {
     try {
         const users = await axiosClient.get("/v1/users/admin/users/all");
@@ -106,4 +115,4 @@ const unbanUser = async (userId) => {
     }
 };
 
-export { createUserProfile, getUserInfo, updateUserInfo, getProfileCompleteness, getAllUsers, banUser, unbanUser };
+export { createUserProfile, getUserInfo, updateUserInfo, getProfileCompleteness, getMyBadges, getAllUsers, banUser, unbanUser };

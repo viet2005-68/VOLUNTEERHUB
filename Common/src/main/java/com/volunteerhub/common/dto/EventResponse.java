@@ -44,4 +44,6 @@ public class EventResponse {
     private String optional;
 
     private QrJoinPolicy qrJoinPolicy;
+
+    private Long completionBadgeId;
 }

@@ -165,6 +165,25 @@ select:focus-visible {
     outline-offset: 3px;
 }
 
+.MuiPaginationItem-root {
+    color: var(--color-deep-forest) !important;
+    font-family: var(--font-clash-grotesk) !important;
+    font-weight: 700 !important;
+}
+
+.MuiPaginationItem-root:hover {
+    background-color: rgb(0 82 45 / 0.1) !important;
+}
+
+.MuiPaginationItem-root.Mui-selected {
+    background-color: var(--color-deep-forest) !important;
+    color: var(--color-pale-canvas) !important;
+}
+
+.MuiPaginationItem-root.Mui-selected:hover {
+    background-color: var(--color-deep-forest) !important;
+}
+
 .nav-link {
     @apply text-lg font-bold text-deep-forest duration-300;
 }

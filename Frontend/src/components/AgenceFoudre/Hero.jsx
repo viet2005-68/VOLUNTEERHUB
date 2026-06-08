@@ -76,7 +76,7 @@ const MERGE_START = 0.04
 const MERGE_END = 0.16
 const SECOND_SLIDE_START = 0.28
 const THIRD_SLIDE_START = 0.6
-const HERO_SEQUENCE_END = 0.94
+const HERO_SEQUENCE_END = 1.0
 
 function Hero() {
   const rootRef = useRef(null)
@@ -242,6 +242,16 @@ function Hero() {
       right.style.transform = `translate(-50%, -50%) translate3d(${sideX * spread}px, ${map(0, -12, spread)}px, 0) rotate(${7 * spread}deg) scale(${map(0.9, 0.96, spread)})`
       center.style.transform = `translate(-50%, -50%) translate3d(0, 0, 0) scale(${map(1, 1.03, spread)})`
       bg.style.opacity = segment(progress, 0.22, 0.38)
+
+      const exitTranslateY = rect.bottom < window.innerHeight ? rect.bottom - window.innerHeight : 0
+      cardStack.style.transform = `translate(-50%, calc(-50% + ${exitTranslateY}px))`
+      heroUi.style.transform = `translateY(${exitTranslateY}px)`
+      
+      const bigLogo = stage.querySelector('.hero-big-logo')
+      if (bigLogo) bigLogo.style.transform = `translate(-50%, calc(-50% + ${exitTranslateY}px))`
+      
+      const tickers = stage.querySelector('.hero-stage-tickers')
+      if (tickers) tickers.style.transform = `translateZ(0) translateY(${exitTranslateY}px)`
     }
 
     const onScroll = () => {

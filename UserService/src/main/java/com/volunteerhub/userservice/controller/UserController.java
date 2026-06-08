@@ -1,9 +1,11 @@
 package com.volunteerhub.userservice.controller;
 
+import com.volunteerhub.common.dto.UserBadgeResponse;
 import com.volunteerhub.userservice.dto.request.UserRequest;
+import com.volunteerhub.userservice.dto.response.UserAnalyticsSummaryResponse;
+import com.volunteerhub.userservice.dto.response.UserMonthlyCreationAnalyticsResponse;
 import com.volunteerhub.userservice.dto.response.UserResponse;
 import com.volunteerhub.common.enums.UserRole;
-import com.volunteerhub.userservice.model.UserBadge;
 import com.volunteerhub.userservice.model.UserLoginHistory;
 import com.volunteerhub.userservice.service.UserBadgeService;
 import com.volunteerhub.userservice.service.UserLoginHistoryService;
@@ -59,13 +61,14 @@ public class UserController {
     }
 
     @GetMapping("/badges")
-    public ResponseEntity<List<UserBadge>> getUserBadges() {
+    public ResponseEntity<List<UserBadgeResponse>> getUserBadges() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return ResponseEntity.ok(userBadgeService.findByUserId(authentication.getName()));
     }
 
     @GetMapping("/{userId}/badges")
-    public ResponseEntity<List<UserBadge>> getUserBadgesByUserId(@PathVariable String userId) {
+    @PreAuthorize("authentication.name == #userId or hasRole('ADMIN')")
+    public ResponseEntity<List<UserBadgeResponse>> getUserBadgesByUserId(@PathVariable String userId) {
         return ResponseEntity.ok(userBadgeService.findByUserId(userId));
     }
 
@@ -112,6 +115,20 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Long> countManagers() {
         return ResponseEntity.ok(userService.countManagers());
+    }
+
+    @GetMapping("/analytics/created-per-month")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<UserMonthlyCreationAnalyticsResponse>> countCreatedUsersPerMonth(
+            @RequestParam(defaultValue = "12") Integer months
+    ) {
+        return ResponseEntity.ok(userService.countCreatedUsersPerMonth(months));
+    }
+
+    @GetMapping("/analytics/summary")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<UserAnalyticsSummaryResponse> getUserAnalyticsSummary() {
+        return ResponseEntity.ok(userService.getUserAnalyticsSummary());
     }
 
 //    @GetMapping("/export-all")

@@ -60,10 +60,10 @@ function VolunteerParticipationTrends() {
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white p-4 rounded-lg shadow-lg border border-gray-200">
-          <p className="font-semibold text-gray-900 mb-2">{label}</p>
+        <div className="rounded-[10px] border border-ash-whisper bg-pale-canvas p-4 shadow-lg">
+          <p className="font-bold text-deep-forest mb-2">{label}</p>
           {payload.map((entry) => (
-            <p key={entry.dataKey} className="text-sm" style={{ color: entry.color }}>
+            <p key={entry.dataKey} className="text-sm font-medium" style={{ color: entry.color }}>
               {entry.name}: <span className="font-semibold">{entry.value}</span>
             </p>
           ))}
@@ -80,23 +80,23 @@ function VolunteerParticipationTrends() {
 
   const renderChart = () => {
     if (isLoading) {
-      return <div className="flex h-full items-center justify-center text-gray-500">Loading trend...</div>;
+      return <div className="flex h-full items-center justify-center text-deep-forest/60">Loading trend...</div>;
     }
 
     if (monthlyData.length === 0) {
-      return <div className="flex h-full items-center justify-center text-gray-500">No trend data yet</div>;
+      return <div className="flex h-full items-center justify-center text-deep-forest/60">No trend data yet</div>;
     }
 
     if (chartType === "bar") {
       return (
         <BarChart {...commonProps}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-          <XAxis dataKey="month" stroke="#6b7280" />
-          <YAxis stroke="#6b7280" />
+          <CartesianGrid strokeDasharray="3 3" stroke="#fce5df" />
+          <XAxis dataKey="month" stroke="#00522d" />
+          <YAxis stroke="#00522d" />
           <Tooltip content={<CustomTooltip />} />
           <Legend />
-          <Bar dataKey="applications" fill="#3b82f6" name="Applications" radius={[8, 8, 0, 0]} />
-          <Bar dataKey="completed" fill="#10b981" name="Completed" radius={[8, 8, 0, 0]} />
+          <Bar dataKey="applications" fill="#00522d" name="Applications" radius={[8, 8, 0, 0]} />
+          <Bar dataKey="completed" fill="#79b69c" name="Completed" radius={[8, 8, 0, 0]} />
         </BarChart>
       );
     }
@@ -104,13 +104,13 @@ function VolunteerParticipationTrends() {
     if (chartType === "line") {
       return (
         <LineChart {...commonProps}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-          <XAxis dataKey="month" stroke="#6b7280" />
-          <YAxis stroke="#6b7280" />
+          <CartesianGrid strokeDasharray="3 3" stroke="#fce5df" />
+          <XAxis dataKey="month" stroke="#00522d" />
+          <YAxis stroke="#00522d" />
           <Tooltip content={<CustomTooltip />} />
           <Legend />
-          <Line type="monotone" dataKey="applications" stroke="#3b82f6" strokeWidth={3} name="Applications" />
-          <Line type="monotone" dataKey="serviceHours" stroke="#8b5cf6" strokeWidth={3} name="Service Hours" />
+          <Line type="monotone" dataKey="applications" stroke="#00522d" strokeWidth={3} name="Applications" />
+          <Line type="monotone" dataKey="serviceHours" stroke="#79b69c" strokeWidth={3} name="Service Hours" />
         </LineChart>
       );
     }
@@ -119,23 +119,23 @@ function VolunteerParticipationTrends() {
       <AreaChart {...commonProps}>
         <defs>
           <linearGradient id="colorApplications" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8} />
-            <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.1} />
+            <stop offset="5%" stopColor="#00522d" stopOpacity={0.8} />
+            <stop offset="95%" stopColor="#00522d" stopOpacity={0.1} />
           </linearGradient>
           <linearGradient id="colorCompleted" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#10b981" stopOpacity={0.8} />
-            <stop offset="95%" stopColor="#10b981" stopOpacity={0.1} />
+            <stop offset="5%" stopColor="#79b69c" stopOpacity={0.8} />
+            <stop offset="95%" stopColor="#79b69c" stopOpacity={0.1} />
           </linearGradient>
         </defs>
-        <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-        <XAxis dataKey="month" stroke="#6b7280" />
-        <YAxis stroke="#6b7280" />
+        <CartesianGrid strokeDasharray="3 3" stroke="#fce5df" />
+        <XAxis dataKey="month" stroke="#00522d" />
+        <YAxis stroke="#00522d" />
         <Tooltip content={<CustomTooltip />} />
         <Legend />
         <Area
           type="monotone"
           dataKey="applications"
-          stroke="#3b82f6"
+          stroke="#00522d"
           strokeWidth={2}
           fill="url(#colorApplications)"
           name="Applications"
@@ -143,7 +143,7 @@ function VolunteerParticipationTrends() {
         <Area
           type="monotone"
           dataKey="completed"
-          stroke="#10b981"
+          stroke="#79b69c"
           strokeWidth={2}
           fill="url(#colorCompleted)"
           name="Completed"
@@ -153,18 +153,18 @@ function VolunteerParticipationTrends() {
   };
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+    <div className="rounded-[20px] border-2 border-ash-whisper bg-pale-canvas p-6 shadow-sm">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
-          <h3 className="text-lg font-semibold text-gray-900">
+          <h3 className="font-clash-grotesk text-2xl font-bold leading-[1.05] text-deep-forest">
             Volunteer Participation Trends
           </h3>
-          <p className="text-sm text-gray-500 mt-1">
-            Applications, completions, and service hours over the last 6 months
+          <p className="mt-2 text-sm font-medium text-deep-forest/65">
+            Applications, completions, and service hours from live analytics
           </p>
         </div>
 
-        <div className="flex gap-2 bg-gray-100 p-1 rounded-lg">
+        <div className="flex gap-2 rounded-[10px] bg-ash-whisper p-1">
           {[
             ["area", Activity],
             ["bar", BarChart2],
@@ -175,8 +175,8 @@ function VolunteerParticipationTrends() {
               onClick={() => setChartType(type)}
               className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                 chartType === type
-                  ? "bg-white text-blue-600 shadow-sm"
-                  : "text-gray-600 hover:text-gray-900"
+                  ? "bg-pale-canvas text-deep-forest shadow-sm"
+                  : "text-deep-forest/65 hover:text-deep-forest"
               }`}
             >
               <Icon className="w-4 h-4" />
@@ -192,22 +192,22 @@ function VolunteerParticipationTrends() {
         </ResponsiveContainer>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 pt-6 border-t border-gray-200">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 pt-6 border-t border-ash-whisper">
         <div className="text-center">
-          <p className="text-sm text-gray-600 mb-1">Peak Month</p>
-          <p className="text-lg font-bold text-gray-900">{totals.peak.month}</p>
+          <p className="text-sm font-medium text-deep-forest/65 mb-1">Peak Month</p>
+          <p className="text-lg font-bold text-deep-forest">{totals.peak.month}</p>
         </div>
         <div className="text-center">
-          <p className="text-sm text-gray-600 mb-1">Applications</p>
-          <p className="text-lg font-bold text-blue-600">{totals.applications}</p>
+          <p className="text-sm font-medium text-deep-forest/65 mb-1">Applications</p>
+          <p className="text-lg font-bold text-deep-forest">{totals.applications}</p>
         </div>
         <div className="text-center">
-          <p className="text-sm text-gray-600 mb-1">Completed</p>
-          <p className="text-lg font-bold text-green-600">{totals.completed}</p>
+          <p className="text-sm font-medium text-deep-forest/65 mb-1">Completed</p>
+          <p className="text-lg font-bold text-deep-forest">{totals.completed}</p>
         </div>
         <div className="text-center">
-          <p className="text-sm text-gray-600 mb-1">Service Hours</p>
-          <p className="text-lg font-bold text-purple-600">
+          <p className="text-sm font-medium text-deep-forest/65 mb-1">Service Hours</p>
+          <p className="text-lg font-bold text-deep-forest">
             {new Intl.NumberFormat("en-US", { maximumFractionDigits: 1 }).format(totals.serviceHours)}h
           </p>
         </div>

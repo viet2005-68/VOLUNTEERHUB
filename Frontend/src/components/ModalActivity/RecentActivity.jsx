@@ -6,7 +6,7 @@ import Skeleton from "@mui/material/Skeleton";
 import Card from "../Card.jsx/Card";
 import { BellOff } from "lucide-react";
 
-function RecentActivity() {
+function RecentActivity({ className = "" }) {
   const queryParams = {
     pageSize: 3,
     sortedBy: "date",
@@ -16,8 +16,6 @@ function RecentActivity() {
   const { data, isLoading, isError, isFetching } =
     useRecentPendingRegistrations(queryParams);
 
-  console.log("[RecentActivity] data:", data);
-
   const items = Array.isArray(data)
     ? data
     : Array.isArray(data?.content)
@@ -25,8 +23,6 @@ function RecentActivity() {
     : Array.isArray(data?.data)
     ? data.data
     : [];
-
-  console.log("[RecentActivity] items:", items);
 
   const cards = items
     .slice()
@@ -61,10 +57,8 @@ function RecentActivity() {
       };
     });
 
-  console.log("[RecentActivity] cards:", cards);
-
   const SkeletonRecentActivityCard = () => (
-    <div className="text-gray-600 max-md:text-sm">
+    <div className="text-deep-forest/70 max-md:text-sm">
       <Card>
         <div className="flex items-start gap-3 p-3">
           <div className="flex flex-col justify-between gap-1.5 flex-1">
@@ -95,7 +89,7 @@ function RecentActivity() {
   );
 
   return (
-    <div className="h-full">
+    <div className={`h-full ${className}`.trim()}>
       <ModalActivity
         title="Awaiting Approval"
         subtile="Events recently added and pending review"
@@ -111,20 +105,20 @@ function RecentActivity() {
         )}
         {isError && (
           <div className="text-center py-8 flex flex-col gap-4 items-center">
-            <div className="w-16 h-16 mx-auto bg-gray-100 rounded-full flex items-center justify-center">
-              <BellOff className="w-8 h-8 text-gray-400" />
+            <div className="mx-auto flex h-[80px] w-[80px] items-center justify-center rounded-full bg-deep-forest/5">
+              <BellOff className="h-[36px] w-[36px] text-deep-forest/45" />
             </div>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-deep-forest/60">
               Failed to load recent activities.
             </p>
           </div>
         )}
         {!isLoading && !isFetching && !isError && cards.length === 0 && (
           <div className="text-center py-8 flex flex-col gap-4 items-center">
-            <div className="w-16 h-16 mx-auto bg-gray-100 rounded-full flex items-center justify-center">
-              <BellOff className="w-8 h-8 text-gray-400" />
+            <div className="mx-auto flex h-[80px] w-[80px] items-center justify-center rounded-full bg-deep-forest/5">
+              <BellOff className="h-[36px] w-[36px] text-deep-forest/45" />
             </div>
-            <p className="text-sm text-gray-500">No pending activities.</p>
+            <p className="text-sm text-deep-forest/60">No pending activities.</p>
           </div>
         )}
         {!isLoading &&

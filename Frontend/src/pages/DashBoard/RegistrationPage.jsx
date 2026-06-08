@@ -17,6 +17,7 @@ export default function RegistrationPage() {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [page, setPage] = useState(1);
   const [selectedReg, setSelectedReg] = useState(null);
+  const [failedAvatarIds, setFailedAvatarIds] = useState(() => new Set());
   const isFirstLoad = useRef(true);
 
   // Debounce search input
@@ -54,6 +55,15 @@ export default function RegistrationPage() {
     setPage(value);
   };
 
+  const handleAvatarError = (registrationKey) => {
+    setFailedAvatarIds((current) => {
+      if (current.has(registrationKey)) return current;
+      const next = new Set(current);
+      next.add(registrationKey);
+      return next;
+    });
+  };
+
   const formatDateTime = (dateString) => {
     if (!dateString) return "";
     try {
@@ -71,22 +81,22 @@ export default function RegistrationPage() {
 
   if (showFullLoading) {
     return (
-      <div className="rounded-2xl border border-deep-forest/15 bg-pale-canvas p-6">
+      <div className="rounded-[25px] border-2 border-ash-whisper bg-pale-canvas p-8">
         <div className="flex h-64 items-center justify-center">
-          <div className="text-deep-forest/65">Loading registrations...</div>
+          <div className="text-sm font-bold leading-[1.2] text-deep-forest/70">Loading registrations...</div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="rounded-2xl border border-deep-forest/15 bg-pale-canvas p-6 text-deep-forest">
-      <div className={`${selectedReg ? "blur" : ""} flex flex-col gap-5`}>
-        <div className="flex flex-col gap-2">
-          <h3 className="text-2xl font-bold text-deep-forest">
-            Register manager
-          </h3>
-          <p className="text-deep-forest/65">
+    <div className="flex flex-col gap-6 rounded-[25px] border border-ash-whisper bg-pale-canvas/90 px-7 pb-7 pt-10 text-deep-forest sm:gap-8 sm:border-2 sm:px-8 sm:pb-8 sm:pt-12 md:px-10 md:pb-10 md:pt-14">
+      <div className={`${selectedReg ? "blur" : ""} flex flex-col gap-6 sm:gap-8`}>
+        <div className="flex flex-col gap-3 pl-1">
+          <h2 className="font-beni text-[56px] font-black uppercase leading-[0.75] text-deep-forest md:text-[80px]">
+            Register Manager
+          </h2>
+          <p className="text-base font-medium leading-[1.2] text-deep-forest/70">
             Manage all your volunteer registration
           </p>
         </div>
@@ -100,7 +110,7 @@ export default function RegistrationPage() {
         </div>
 
         {/* Desktop Table View */}
-        <div className="hidden md:block overflow-x-auto">
+        <div className="hidden md:block">
           <RegistrationTable
             data={data?.items || []}
             isFetching={isFetching}
@@ -112,29 +122,38 @@ export default function RegistrationPage() {
         <div className="md:hidden space-y-3">
           {data?.items && data.items.length > 0 ? (
             data.items.map((reg) => {
+              const registrationKey =
+                reg.registrationId ??
+                `${reg.eventId ?? "event"}-${reg.userId ?? reg.fullName ?? "volunteer"}`;
+              const avatarInitial =
+                reg.fullName?.trim()?.charAt(0)?.toUpperCase() || "V";
+              const avatarSrc =
+                reg.avatarUrl ||
+                `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(
+                  reg.fullName || "volunteer"
+                )}`;
+              const hasAvatarError = failedAvatarIds.has(registrationKey);
+
               return (
                 <div
-                  key={reg.registrationId}
-                  className="rounded-2xl border border-deep-forest/15 bg-pale-canvas p-4 transition-colors hover:bg-ash-whisper"
+                  key={registrationKey}
+                  className="overflow-hidden rounded-[20px] border border-deep-forest/10 bg-pale-canvas shadow-lg shadow-deep-forest/10"
                 >
                   {/* Header: Avatar, Name and Status */}
-                  <div className="flex items-start gap-3 mb-3">
+                  <div className="flex items-start gap-3 p-4">
                     {/* Avatar */}
-                    <div className="flex-shrink-0">
-                      {reg.avatarUrl ? (
+                    <div className="h-12 w-12 shrink-0 overflow-hidden rounded-full border-2 border-bubblegum-blush bg-ash-whisper">
+                      {!hasAvatarError ? (
                         <img
-                          src={reg.avatarUrl}
+                          src={avatarSrc}
                           alt={reg.fullName || "Volunteer"}
-                          className="h-12 w-12 rounded-full object-cover border-2 border-bubblegum-blush"
+                          className="block h-full w-full object-cover"
+                          onError={() => handleAvatarError(registrationKey)}
                         />
                       ) : (
-                        <img
-                          src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${
-                            reg.fullName || "volunteer"
-                          }`}
-                          alt="avatar"
-                          className="h-12 w-12 rounded-full object-cover border-2 border-bubblegum-blush"
-                        />
+                        <div className="flex h-full w-full items-center justify-center text-sm font-bold text-deep-forest">
+                          {avatarInitial}
+                        </div>
                       )}
                     </div>
 
@@ -149,7 +168,7 @@ export default function RegistrationPage() {
                     </div>
 
                     {/* Status Badge */}
-                    <div className="flex-shrink-0">
+                    <div className="max-w-[120px] shrink-0">
                       <RegistrationStatusBadge
                         status={reg.registrationStatus || reg.status}
                       />
@@ -157,32 +176,12 @@ export default function RegistrationPage() {
                   </div>
 
                   {/* Info Grid */}
-                  <div className="space-y-2 mb-3">
+                  <div className="space-y-2 border-t border-deep-forest/10 px-4 py-3">
                     {/* Registration Date */}
                     <div className="flex items-center gap-2 text-sm text-deep-forest/65">
-                      <svg
-                        className="w-4 h-4 flex-shrink-0"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                        />
-                      </svg>
-                      <span className="truncate">
-                        {formatDateTime(reg.registeredAt)}
-                      </span>
-                    </div>
-
-                    {/* Phone Number */}
-                    {reg.phoneNumber && (
-                      <div className="flex items-center gap-2 text-sm text-deep-forest/65">
+                      <div className="flex h-5 w-5 shrink-0 items-center justify-center">
                         <svg
-                          className="w-4 h-4 flex-shrink-0"
+                          className="h-4 w-4"
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -191,9 +190,33 @@ export default function RegistrationPage() {
                             strokeLinecap="round"
                             strokeLinejoin="round"
                             strokeWidth={2}
-                            d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                           />
                         </svg>
+                      </div>
+                      <span className="truncate">
+                        {formatDateTime(reg.registeredAt)}
+                      </span>
+                    </div>
+
+                    {/* Phone Number */}
+                    {reg.phoneNumber && (
+                      <div className="flex items-center gap-2 text-sm text-deep-forest/65">
+                        <div className="flex h-5 w-5 shrink-0 items-center justify-center">
+                          <svg
+                            className="h-4 w-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                            />
+                          </svg>
+                        </div>
                         <span className="truncate">{reg.phoneNumber}</span>
                       </div>
                     )}
@@ -202,7 +225,7 @@ export default function RegistrationPage() {
                   {/* View Details Button */}
                   <button
                     onClick={() => setSelectedReg(reg)}
-                    className="w-full px-4 py-2 rounded-lg bg-foudre-pink hover:bg-deep-forest text-pale-canvas text-sm font-bold transition-colors"
+                    className="mx-4 mb-4 w-[calc(100%-2rem)] rounded-[10px] bg-deep-forest px-4 py-3 text-sm font-bold text-pale-canvas transition-colors hover:bg-foudre-pink"
                   >
                     View details
                   </button>
@@ -210,7 +233,7 @@ export default function RegistrationPage() {
               );
             })
           ) : (
-            <div className="text-center py-8 text-deep-forest/65 text-sm">
+            <div className="rounded-[20px] border border-deep-forest/10 bg-pale-canvas/70 px-6 py-12 text-center text-sm font-medium leading-[1.2] text-deep-forest/65">
               No registrations found
             </div>
           )}
@@ -218,8 +241,8 @@ export default function RegistrationPage() {
 
         {/* Pagination */}
         {data?.items && data.items.length > 0 && (
-          <div className="flex flex-col sm:flex-row items-center justify-between pt-4 border-t border-deep-forest/15 gap-4">
-            <p className="text-sm text-deep-forest/65">
+          <div className="flex flex-col items-center justify-between gap-4 border-t border-deep-forest/10 pt-5 sm:flex-row">
+            <p className="text-sm font-medium leading-[1.2] text-deep-forest/70">
               Showing {data.items.length} of {data.totalItems} registrations
             </p>
             {data.totalPages > 0 && (
@@ -232,7 +255,7 @@ export default function RegistrationPage() {
                     color: "#00522d",
                     fontFamily: "Clash Grotesk, sans-serif",
                     "&.Mui-selected": {
-                      backgroundColor: "#db3c8a",
+                      backgroundColor: "#00522d",
                       color: "#fff8f6",
                       "&:hover": {
                         backgroundColor: "#00522d",

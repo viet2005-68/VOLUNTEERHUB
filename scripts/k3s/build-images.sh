@@ -18,6 +18,7 @@ spring_services=(
   "registration-service:RegistrationService"
   "notification-service:NotificationService"
   "chat-service:ChatService"
+  "donation-service:DonationService"
   "aggregation-service:AggregationService"
   "analytic-service:AnalyticService"
 )

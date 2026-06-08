@@ -1,9 +1,21 @@
-import React from "react";
 import Card from "../Card.jsx/Card";
-import { FaFire } from "react-icons/fa";
 import { FaArrowTrendUp } from "react-icons/fa6";
 import { Eye, Users, MessageSquare, ThumbsUp, FileText } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+
+const VIETNAMESE_TITLE_STYLE = {
+  fontFamily:
+    '"Clash Grotesk", "Be Vietnam Pro", ui-sans-serif, system-ui, "Segoe UI", Arial, sans-serif',
+  fontWeight: 700,
+  letterSpacing: "-0.012em",
+};
+
+const VIETNAMESE_META_STYLE = {
+  fontFamily:
+    '"Clash Grotesk", "Be Vietnam Pro", ui-sans-serif, system-ui, "Segoe UI", Arial, sans-serif',
+  fontWeight: 700,
+  letterSpacing: "-0.008em",
+};
 
 function TrendingCard({ items }) {
   const navigate = useNavigate();
@@ -13,7 +25,7 @@ function TrendingCard({ items }) {
     id,
     name,
     category,
-    registrationCount = 0,
+    imageUrl,
     participantCount = 0,
     registrationGrowth = 0,
     participantGrowth = 0,
@@ -34,72 +46,91 @@ function TrendingCard({ items }) {
   const trendPercentage = Math.round(maxGrowth);
 
   const handleViewClick = () => {
-    navigate(`/dashboard/event/${id}/overview`);
+    navigate(`/opportunities/overview/${id}`);
   };
 
+  const fallbackInitial = name?.charAt(0)?.toUpperCase() || "E";
+
   return (
-    <div className="bg-red-100/50 rounded-xl">
-      <Card>
-        <div className="flex flex-row gap-4 items-center justify-between ">
-          <div className="p-3 bg-red-300/20 rounded-full flex items-center justify-center flex-shrink-0">
-            <div className="w-7 h-7">
-              <FaFire className="text-red-500 w-full h-full object-contain animate-pulse" />
-            </div>
+    <div className="rounded-2xl">
+      <Card className="group border-2 border-ash-whisper bg-pale-canvas shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-bubblegum-blush hover:shadow-md">
+        <div className="grid items-center gap-4 md:grid-cols-[112px_minmax(0,1fr)_56px]">
+          <div className="aspect-square w-full overflow-hidden rounded-2xl border border-ash-whisper bg-ash-whisper">
+            {imageUrl ? (
+              <img
+                src={imageUrl}
+                alt={name}
+                className="block h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                loading="lazy"
+              />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center bg-ash-whisper text-xl font-bold text-deep-forest">
+                {fallbackInitial}
+              </div>
+            )}
           </div>
-          <div className="flex flex-col gap-1 flex-1">
-            <div className="flex flex-row justify-between items-start">
-              <p className="text-sm font-semibold md:text-base line-clamp-2">
-                {name}
-              </p>
+          <div className="flex min-w-0 flex-col gap-2">
+            <div className="flex flex-row justify-between gap-3 items-start">
+              <div className="min-w-0">
+                <p
+                  className="text-base font-bold leading-[1.15] text-deep-forest line-clamp-2"
+                  style={VIETNAMESE_TITLE_STYLE}
+                >
+                  {name}
+                </p>
+                <div
+                  className="mt-1 text-sm font-bold leading-[1.15] text-deep-forest/60"
+                  style={VIETNAMESE_META_STYLE}
+                >
+                  {category?.name || "Uncategorized"}
+                </div>
+              </div>
               {trendPercentage > 0 && (
-                <div className="bg-red-700 text-white px-2 py-1 rounded-sm flex items-center gap-1 text-xs md:text-sm whitespace-nowrap ml-2">
+                <div className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-deep-forest px-3 py-1.5 text-xs font-bold text-pale-canvas shadow-sm">
                   <FaArrowTrendUp />
                   <span>+{trendPercentage}%</span>
                 </div>
               )}
             </div>
-            <div className="text-xs md:text-sm text-gray-600">
-              {category?.name || "Uncategorized"}
-            </div>
-            <div className="grid grid-cols-2 gap-2 md:grid-cols-4 text-xs md:text-sm mt-1">
-              <div className="text-gray-600">
-                <div className="flex items-center gap-1 mb-0.5">
-                  <Users className="w-3 h-3" />
-                  <p className="text-gray-500">Participants</p>
+            <div className="grid grid-cols-1 gap-3 text-sm sm:grid-cols-2 xl:grid-cols-4 mt-1">
+              <div className="min-w-0 rounded-xl bg-ash-whisper/70 px-3 py-2 text-deep-forest">
+                <div className="flex items-center gap-1.5 mb-1 text-deep-forest/65">
+                  <Users className="h-3.5 w-3.5" />
+                  <p className="truncate">Participants</p>
                 </div>
-                <p className="text-black font-medium">
+                <p className="text-deep-forest font-bold">
                   {participantCount}/{capacity || "∞"}
                   {participantGrowth > 0 && (
-                    <span className="text-green-600 text-xs ml-1">
+                    <span className="text-emerald-600 text-xs ml-1">
                       +{participantGrowth}
                     </span>
                   )}
                 </p>
               </div>
-              <div className="text-gray-600">
-                <div className="flex items-center gap-1 mb-0.5">
-                  <FileText className="w-3 h-3" />
-                  <p className="text-gray-500">Posts</p>
+              <div className="min-w-0 rounded-xl bg-ash-whisper/70 px-3 py-2 text-deep-forest">
+                <div className="flex items-center gap-1.5 mb-1 text-deep-forest/65">
+                  <FileText className="h-3.5 w-3.5" />
+                  <p className="truncate">Posts</p>
                 </div>
-                <p className="text-black font-medium">
+                <p className="text-deep-forest font-bold">
                   {postGrowth > 0 ? `+${postGrowth}` : postGrowth}
                 </p>
               </div>
-              <div className="text-gray-600">
-                <div className="flex items-center gap-1 mb-0.5">
-                  <ThumbsUp className="w-3 h-3" />
-                  <p className="text-gray-500">Reactions</p>
+              <div className="min-w-0 rounded-xl bg-ash-whisper/70 px-3 py-2 text-deep-forest">
+                <div className="flex items-center gap-1.5 mb-1 text-deep-forest/65">
+                  <ThumbsUp className="h-3.5 w-3.5" />
+                  <p className="truncate">Reactions</p>
                 </div>
-                <p className="text-black font-medium">
+                <p className="text-deep-forest font-bold">
                   {reactionGrowth > 0 ? `+${reactionGrowth}` : reactionGrowth}
                 </p>
               </div>
-              <div className="text-gray-600">
-                <div className="flex items-center gap-1 mb-0.5">
-                  <MessageSquare className="w-3 h-3" />
-                  <p className="text-gray-500">Comments</p>
+              <div className="min-w-0 rounded-xl bg-ash-whisper/70 px-3 py-2 text-deep-forest">
+                <div className="flex items-center gap-1.5 mb-1 text-deep-forest/65">
+                  <MessageSquare className="h-3.5 w-3.5" />
+                  <p className="truncate">Comments</p>
                 </div>
-                <p className="text-black font-medium">
+                <p className="text-deep-forest font-bold">
                   {commentGrowth > 0 ? `+${commentGrowth}` : commentGrowth}
                 </p>
               </div>
@@ -107,9 +138,10 @@ function TrendingCard({ items }) {
           </div>
           <button
             onClick={handleViewClick}
-            className="rounded-xl border-black/20 p-2 bg-white md:ml-10 hover:bg-gray-100 transition cursor-pointer"
+            className="flex h-[56px] w-[56px] items-center justify-center rounded-xl border border-ash-whisper bg-ash-whisper/70 hover:bg-bubblegum-blush transition cursor-pointer max-md:justify-self-end"
+            aria-label={`View ${name}`}
           >
-            <Eye className="w-5 h-5 text-gray-600 hover:text-gray-800" />
+            <Eye className="w-5 h-5 text-deep-forest" />
           </button>
         </div>
       </Card>

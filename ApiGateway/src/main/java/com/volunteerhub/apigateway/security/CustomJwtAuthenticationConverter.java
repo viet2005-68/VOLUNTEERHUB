@@ -6,31 +6,51 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
-import java.util.Collections;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class CustomJwtAuthenticationConverter implements Converter<Jwt, JwtAuthenticationToken> {
     @Override
     public JwtAuthenticationToken convert(Jwt source) {
-        Object rolesClaimObj = source.getClaim("roles");
-
-        // Safe cast to List<Map<String, Object>>
-        List<Map<String, Object>> rolesClaim;
-        if (rolesClaimObj instanceof List<?>) {
-            rolesClaim = ((List<?>) rolesClaimObj).stream()
-                    .filter(item -> item instanceof Map)
-                    .map(item -> (Map<String, Object>) item)
-                    .collect(Collectors.toList());
-        } else {
-            rolesClaim = Collections.emptyList();
-        }
-
-        List<GrantedAuthority> authorities = rolesClaim.stream()
-                .map(roleMap -> new SimpleGrantedAuthority("ROLE_" + roleMap.get("role")))
+        List<GrantedAuthority> authorities = extractRoles(source.getClaim("roles"))
+                .filter(role -> !role.isBlank())
+                .map(CustomJwtAuthenticationConverter::normalizeRole)
+                .distinct()
                 .collect(Collectors.toList());
 
         return new JwtAuthenticationToken(source, authorities);
+    }
+
+    private static Stream<String> extractRoles(Object rolesClaim) {
+        if (rolesClaim instanceof Collection<?> roles) {
+            return roles.stream().map(CustomJwtAuthenticationConverter::extractRole);
+        }
+
+        return Stream.of(extractRole(rolesClaim));
+    }
+
+    private static String extractRole(Object roleClaim) {
+        if (roleClaim instanceof String role) {
+            return role;
+        }
+
+        if (roleClaim instanceof Map<?, ?> roleMap) {
+            Object role = roleMap.get("role");
+            if (role == null) {
+                role = roleMap.get("authority");
+            }
+            return Objects.toString(role, "");
+        }
+
+        return "";
+    }
+
+    private static GrantedAuthority normalizeRole(String role) {
+        String trimmed = role.trim();
+        return new SimpleGrantedAuthority(trimmed.startsWith("ROLE_") ? trimmed : "ROLE_" + trimmed);
     }
 }

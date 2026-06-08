@@ -33,7 +33,7 @@ public class Post {
     @Column(name = "event_id", nullable = false)
     private Long eventId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "text")
     private String content;
 
     @JdbcTypeCode(SqlTypes.JSON)
@@ -42,6 +42,10 @@ public class Post {
 
     @Column(name = "owner_id", nullable = false)
     private String ownerId;
+
+    @Builder.Default
+    @Column(name = "share_count", nullable = false)
+    private int shareCount = 0;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false)

@@ -6,6 +6,7 @@ import com.volunteerhub.common.dto.CommentResponse;
 import com.volunteerhub.common.dto.PageResponse;
 import com.volunteerhub.common.dto.PostResponse;
 import com.volunteerhub.common.dto.ReactionResponse;
+import com.volunteerhub.common.enums.ReactionType;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,6 +35,7 @@ public interface CommunityClient {
     @GetMapping("/{eventId}/posts/{postId}/reactions")
     PageResponse<ReactionResponse> findAllReactions(@PathVariable Long eventId,
                                                     @PathVariable Long postId,
+                                                    @RequestParam(required = false) ReactionType type,
                                                     @RequestParam(required = false) Integer pageNum,
                                                     @RequestParam(required = false) Integer pageSize);
 

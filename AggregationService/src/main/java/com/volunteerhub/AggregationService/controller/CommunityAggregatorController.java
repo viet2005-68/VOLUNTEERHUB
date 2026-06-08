@@ -5,6 +5,7 @@ import com.volunteerhub.AggregationService.dto.AggregatedPostResponse;
 import com.volunteerhub.AggregationService.dto.AggregatedReactionResponse;
 import com.volunteerhub.AggregationService.service.CommunityAggregatorService;
 import com.volunteerhub.common.dto.PageResponse;
+import com.volunteerhub.common.enums.ReactionType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -42,8 +43,9 @@ public class CommunityAggregatorController {
     @GetMapping("/posts/{postId}/reactions")
     public ResponseEntity<PageResponse<AggregatedReactionResponse>> getAllAggregatedReactions(@PathVariable Long eventId,
                                                                                               @PathVariable Long postId,
+                                                                                              @RequestParam(required = false) ReactionType type,
                                                                                               @RequestParam(required = false) Integer pageNum,
                                                                                               @RequestParam(required = false) Integer pageSize) {
-        return ResponseEntity.ok(communityAggregatorService.getAllAggregatedReaction(eventId, postId, pageNum, pageSize));
+        return ResponseEntity.ok(communityAggregatorService.getAllAggregatedReaction(eventId, postId, type, pageNum, pageSize));
     }
 }

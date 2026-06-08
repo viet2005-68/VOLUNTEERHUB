@@ -8,7 +8,17 @@ import org.springframework.boot.test.context.SpringBootTest;
 		"spring.datasource.driver-class-name=org.h2.Driver",
 		"spring.jpa.hibernate.ddl-auto=none",
 		"spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.H2Dialect",
-		"eureka.client.enabled=false"
+		"spring.rabbitmq.listener.simple.auto-startup=false",
+		"spring.cloud.discovery.enabled=false",
+		"eureka.client.enabled=false",
+		"HOST=localhost",
+		"PORT=0",
+		"REDIS_PORT=6379",
+		"REDIS_PASSWORD=",
+		"RABBITMQ_PORT=5672",
+		"RABBITMQ_DEFAULT_USER=guest",
+		"RABBITMQ_DEFAULT_PASS=guest",
+		"EUREKA_SERVER_URL=http://localhost:8761/eureka/"
 })
 class UserServiceApplicationTests {
 

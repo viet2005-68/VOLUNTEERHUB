@@ -56,12 +56,27 @@ public class EventQrCode {
     @Column(name = "max_uses")
     private Integer maxUses;
 
+    @Column(length = 120)
+    private String label;
+
+    @Column(length = 500)
+    private String note;
+
     @Builder.Default
     @Column(name = "use_count", nullable = false)
     private Integer useCount = 0;
 
     @Column(name = "created_by", nullable = false)
     private String createdBy;
+
+    @Column(name = "revoked_at")
+    private LocalDateTime revokedAt;
+
+    @Column(name = "revoked_by")
+    private String revokedBy;
+
+    @Column(name = "revoke_reason", length = 500)
+    private String revokeReason;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)

@@ -3,74 +3,230 @@ name: Deploy VolunteerHub
 on:
   push:
     branches:
-      - main
+      - cicd
+    paths-ignore:
+      - "Frontend/**"
+      - "README_CICD.md"
+      - "**/*.md"
   workflow_dispatch:
 
 permissions:
+  actions: read
   contents: read
   packages: write
 
 env:
   REGISTRY: ghcr.io
   OWNER: viet2005-68
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+concurrency:
+  group: volunteerhub-deploy-${{ github.ref_name }}
+  cancel-in-progress: true
 
 jobs:
+  ci-gate:
+    name: Wait for CI
+    runs-on: ubuntu-latest
+    steps:
+      - name: Skip gate for manual deploy
+        if: github.event_name == 'workflow_dispatch'
+        run: echo "Manual deploy requested; skipping CI gate."
+
+      - name: Require CI success for this commit
+        if: github.event_name != 'workflow_dispatch'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          export TARGET_SHA="${GITHUB_SHA}"
+          echo "Waiting for CI workflow to finish for commit ${TARGET_SHA}..."
+
+          for attempt in {1..80}; do
+            run_json="$(
+              gh run list \
+                --repo "${GITHUB_REPOSITORY}" \
+                --workflow "CI" \
+                --commit "${TARGET_SHA}" \
+                --limit 10 \
+                --json databaseId,status,conclusion,headSha,createdAt \
+              | jq -c 'map(select(.headSha == env.TARGET_SHA)) | sort_by(.createdAt) | reverse | .[0] // empty'
+            )"
+
+            if [ -z "$run_json" ]; then
+              echo "CI run not found yet. Attempt ${attempt}/80."
+              sleep 15
+              continue
+            fi
+
+            status="$(jq -r '.status' <<< "$run_json")"
+            conclusion="$(jq -r '.conclusion // ""' <<< "$run_json")"
+            run_id="$(jq -r '.databaseId' <<< "$run_json")"
+            echo "CI run ${run_id}: status=${status}, conclusion=${conclusion:-pending}"
+
+            if [ "$status" = "completed" ]; then
+              if [ "$conclusion" = "success" ]; then
+                echo "CI passed; continuing deploy."
+                exit 0
+              fi
+
+              echo "::error::CI did not pass for ${TARGET_SHA}. Conclusion: ${conclusion}"
+              exit 1
+            fi
+
+            sleep 15
+          done
+
+          echo "::error::Timed out waiting for CI to complete for ${TARGET_SHA}."
+          exit 1
+
+  detect-changes:
+    name: Detect changed services
+    needs: ci-gate
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+      has_changes: ${{ steps.set-matrix.outputs.has_changes }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GHCR_TOKEN }}
+          fetch-depth: 0
+
+      - name: Filter Paths
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            service-discovery:
+              - 'ServiceDiscovery/**'
+              - 'Common/**'
+            api-gateway:
+              - 'ApiGateway/**'
+              - 'Common/**'
+            authorization-server:
+              - 'AuthorizationServer/**'
+              - 'Common/**'
+            user-service:
+              - 'UserService/**'
+              - 'Common/**'
+            event-service:
+              - 'EventService/**'
+              - 'Common/**'
+            community-service:
+              - 'CommunityService/**'
+              - 'Common/**'
+            registration-service:
+              - 'RegistrationService/**'
+              - 'Common/**'
+            notification-service:
+              - 'NotificationService/**'
+              - 'Common/**'
+            chat-service:
+              - 'ChatService/**'
+              - 'Common/**'
+            donation-service:
+              - 'DonationService/**'
+              - 'Common/**'
+            aggregation-service:
+              - 'AggregationService/**'
+              - 'Common/**'
+            analytic-service:
+              - 'AnalyticService/**'
+              - 'Common/**'
+            frontend:
+              - 'Frontend/**'
+
+      - name: Generate build matrix
+        id: set-matrix
+        shell: bash
+        run: |
+          IS_DISPATCH="${{ github.event_name == 'workflow_dispatch' }}"
+          matrix_json="[]"
+          
+          append_to_matrix() {
+            local image=$1
+            local service_dir=$2
+            local kind=$3
+            matrix_json=$(echo "$matrix_json" | jq ". += [{\"image\": \"$image\", \"service_dir\": \"$service_dir\", \"kind\": \"$kind\"}]")
+          }
+          
+          if [ "$IS_DISPATCH" = "true" ] || [ "${{ steps.filter.outputs.service-discovery }}" = "true" ]; then
+            append_to_matrix "volunteerhub-service-discovery" "ServiceDiscovery" "spring"
+          fi
+          if [ "$IS_DISPATCH" = "true" ] || [ "${{ steps.filter.outputs.api-gateway }}" = "true" ]; then
+            append_to_matrix "volunteerhub-api-gateway" "ApiGateway" "spring"
+          fi
+          if [ "$IS_DISPATCH" = "true" ] || [ "${{ steps.filter.outputs.authorization-server }}" = "true" ]; then
+            append_to_matrix "volunteerhub-authorization-server" "AuthorizationServer" "spring"
+          fi
+          if [ "$IS_DISPATCH" = "true" ] || [ "${{ steps.filter.outputs.user-service }}" = "true" ]; then
+            append_to_matrix "volunteerhub-user-service" "UserService" "spring"
+          fi
+          if [ "$IS_DISPATCH" = "true" ] || [ "${{ steps.filter.outputs.event-service }}" = "true" ]; then
+            append_to_matrix "volunteerhub-event-service" "EventService" "spring"
+          fi
+          if [ "$IS_DISPATCH" = "true" ] || [ "${{ steps.filter.outputs.community-service }}" = "true" ]; then
+            append_to_matrix "volunteerhub-community-service" "CommunityService" "spring"
+          fi
+          if [ "$IS_DISPATCH" = "true" ] || [ "${{ steps.filter.outputs.registration-service }}" = "true" ]; then
+            append_to_matrix "volunteerhub-registration-service" "RegistrationService" "spring"
+          fi
+          if [ "$IS_DISPATCH" = "true" ] || [ "${{ steps.filter.outputs.notification-service }}" = "true" ]; then
+            append_to_matrix "volunteerhub-notification-service" "NotificationService" "spring"
+          fi
+          if [ "$IS_DISPATCH" = "true" ] || [ "${{ steps.filter.outputs.chat-service }}" = "true" ]; then
+            append_to_matrix "volunteerhub-chat-service" "ChatService" "spring"
+          fi
+          if [ "$IS_DISPATCH" = "true" ] || [ "${{ steps.filter.outputs.donation-service }}" = "true" ]; then
+            append_to_matrix "volunteerhub-donation-service" "DonationService" "spring"
+          fi
+          if [ "$IS_DISPATCH" = "true" ] || [ "${{ steps.filter.outputs.aggregation-service }}" = "true" ]; then
+            append_to_matrix "volunteerhub-aggregation-service" "AggregationService" "spring"
+          fi
+          if [ "$IS_DISPATCH" = "true" ] || [ "${{ steps.filter.outputs.analytic-service }}" = "true" ]; then
+            append_to_matrix "volunteerhub-analytic-service" "AnalyticService" "spring"
+          fi
+          if [ "$IS_DISPATCH" = "true" ] || [ "${{ steps.filter.outputs.frontend }}" = "true" ]; then
+            append_to_matrix "volunteerhub-frontend" "Frontend" "frontend"
+          fi
+          
+          length=$(echo "$matrix_json" | jq '. | length')
+          if [ "$length" -eq 0 ]; then
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+            echo "matrix=[]" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+            echo "matrix=$(echo "$matrix_json" | jq -c '.')" >> "$GITHUB_OUTPUT"
+          fi
+
   build:
     name: Build and push images
+    needs: detect-changes
+    if: needs.detect-changes.outputs.has_changes == 'true'
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - image: volunteerhub-service-discovery
-            service_dir: ServiceDiscovery
-            kind: spring
-          - image: volunteerhub-api-gateway
-            service_dir: ApiGateway
-            kind: spring
-          - image: volunteerhub-authorization-server
-            service_dir: AuthorizationServer
-            kind: spring
-          - image: volunteerhub-user-service
-            service_dir: UserService
-            kind: spring
-          - image: volunteerhub-event-service
-            service_dir: EventService
-            kind: spring
-          - image: volunteerhub-community-service
-            service_dir: CommunityService
-            kind: spring
-          - image: volunteerhub-registration-service
-            service_dir: RegistrationService
-            kind: spring
-          - image: volunteerhub-notification-service
-            service_dir: NotificationService
-            kind: spring
-          - image: volunteerhub-chat-service
-            service_dir: ChatService
-            kind: spring
-          - image: volunteerhub-aggregation-service
-            service_dir: AggregationService
-            kind: spring
-          - image: volunteerhub-analytic-service
-            service_dir: AnalyticService
-            kind: spring
-          - image: volunteerhub-frontend
-            service_dir: Frontend
-            kind: frontend
+        include: ${{ fromJson(needs.detect-changes.outputs.matrix) }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GHCR_TOKEN }}
+          ref: ${{ github.ref }}
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+      - name: Resolve deploy metadata
+        shell: bash
+        run: |
+          echo "DEPLOY_SHA=${{ github.sha }}" >> "$GITHUB_ENV"
 
       - name: Log in to GHCR
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ env.OWNER }}
-          password: ${{ secrets.GHCR_TOKEN }}
+        shell: bash
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login "${{ env.REGISTRY }}" -u "${{ github.actor }}" --password-stdin
 
       - name: Resolve public URL
         id: public-url
@@ -84,61 +240,83 @@ jobs:
 
       - name: Build and push Spring image
         if: matrix.kind == 'spring'
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: docker/spring-service.Dockerfile
-          platforms: linux/amd64
-          push: true
-          build-args: |
-            SERVICE_DIR=${{ matrix.service_dir }}
-          tags: |
-            ${{ env.REGISTRY }}/${{ env.OWNER }}/${{ matrix.image }}:${{ github.sha }}
-            ${{ env.REGISTRY }}/${{ env.OWNER }}/${{ matrix.image }}:latest
+        shell: bash
+        run: |
+          IMAGE="${{ env.REGISTRY }}/${{ env.OWNER }}/${{ matrix.image }}"
+          docker build \
+            --platform linux/amd64 \
+            -f docker/spring-service.Dockerfile \
+            --build-arg "SERVICE_DIR=${{ matrix.service_dir }}" \
+            -t "${IMAGE}:${DEPLOY_SHA}" \
+            -t "${IMAGE}:latest" \
+            .
+          docker push "${IMAGE}:${DEPLOY_SHA}"
+          docker push "${IMAGE}:latest"
 
       - name: Build and push frontend image
         if: matrix.kind == 'frontend'
-        uses: docker/build-push-action@v6
-        with:
-          context: Frontend
-          file: Frontend/Dockerfile
-          platforms: linux/amd64
-          push: true
-          build-args: |
-            VITE_API_URL=/api
-            VITE_API_LOGIN=${{ steps.public-url.outputs.value }}
-            VITE_AUTH_BASE_URL=
-            VITE_PUBLIC_BASE_URL=${{ steps.public-url.outputs.value }}
-            VITE_OAUTH_RESPONSE_TYPE=code
-            VITE_OAUTH_CLIENT_ID=7fcdbb6c-fc1d-4921-a52d-0466557b6132
-            VITE_OAUTH_CLIENT_SECRET=f584278e-be8a-4f55-9c64-8e7be8f9e846
-            VITE_OAUTH_SCOPE=openid
-            VITE_OAUTH_REDIRECT_URI=${{ steps.public-url.outputs.value }}/login/oauth2/code/volunteerhub
-            VITE_GOOGLE_REDIRECT_URI=${{ steps.public-url.outputs.value }}/login/oauth2/code/google
-          tags: |
-            ${{ env.REGISTRY }}/${{ env.OWNER }}/${{ matrix.image }}:${{ github.sha }}
-            ${{ env.REGISTRY }}/${{ env.OWNER }}/${{ matrix.image }}:latest
+        shell: bash
+        run: |
+          IMAGE="${{ env.REGISTRY }}/${{ env.OWNER }}/${{ matrix.image }}"
+          docker build \
+            --platform linux/amd64 \
+            -f Frontend/Dockerfile \
+            --build-arg VITE_API_URL=/api \
+            --build-arg "VITE_API_LOGIN=${{ steps.public-url.outputs.value }}" \
+            --build-arg VITE_AUTH_BASE_URL= \
+            --build-arg "VITE_PUBLIC_BASE_URL=${{ steps.public-url.outputs.value }}" \
+            --build-arg VITE_OAUTH_RESPONSE_TYPE=code \
+            --build-arg "VITE_OAUTH_CLIENT_ID=${{ secrets.CLIENT_ID }}" \
+            --build-arg "VITE_OAUTH_CLIENT_SECRET=${{ secrets.CLIENT_SECRET }}" \
+            --build-arg VITE_OAUTH_SCOPE=openid \
+            --build-arg "VITE_OAUTH_REDIRECT_URI=${{ steps.public-url.outputs.value }}/login/oauth2/code/volunteerhub" \
+            --build-arg "VITE_GG_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" \
+            --build-arg "VITE_GG_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" \
+            --build-arg "VITE_GOOGLE_REDIRECT_URI=${{ steps.public-url.outputs.value }}/login/oauth2/code/google" \
+            -t "${IMAGE}:${DEPLOY_SHA}" \
+            -t "${IMAGE}:latest" \
+            Frontend
+          docker push "${IMAGE}:${DEPLOY_SHA}"
+          docker push "${IMAGE}:latest"
 
   deploy:
     name: Deploy to k3s
     runs-on: ubuntu-latest
-    needs: build
+    needs: [detect-changes, build]
+    if: needs.detect-changes.outputs.has_changes == 'true'
+    environment: staging
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GHCR_TOKEN }}
+          ref: ${{ github.ref }}
 
-      - name: Install kubectl
-        uses: azure/setup-kubectl@v4
+      - name: Resolve deploy metadata
+        shell: bash
+        run: |
+          echo "DEPLOY_SHA=${{ github.sha }}" >> "$GITHUB_ENV"
 
-      - name: Install Helm
-        uses: azure/setup-helm@v4
+      - name: Install kubectl and Helm
+        shell: bash
+        run: |
+          set -euo pipefail
+          KUBECTL_VERSION="$(curl -fsSL https://dl.k8s.io/release/stable.txt)"
+          curl -fsSLo kubectl "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
+          chmod +x kubectl
+          sudo mv kubectl /usr/local/bin/kubectl
+
+          curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+          kubectl version --client
+          helm version
 
       - name: Prepare kubeconfig and SSH tunnel
         shell: bash
         run: |
           mkdir -p ~/.kube ~/.ssh
           printf '%s' "${{ secrets.KUBE_CONFIG }}" > ~/.kube/config
-          printf '%s' "${{ secrets.VM_SSH_KEY }}" > ~/.ssh/vm_key
+          printf '%s\n' "${{ secrets.VM_SSH_KEY }}" | tr -d '\r' > ~/.ssh/vm_key
           chmod 600 ~/.ssh/vm_key
           ssh-keyscan -H "${{ secrets.VM_HOST }}" >> ~/.ssh/known_hosts
           ssh -i ~/.ssh/vm_key -fN \
@@ -148,35 +326,203 @@ jobs:
             "${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}"
           kubectl get nodes
 
+      - name: Install PyYAML
+        run: pip install pyyaml --quiet
+
       - name: Patch deployment config
         shell: bash
+        env:
+          SERVICES_JSON: ${{ needs.detect-changes.outputs.matrix }}
         run: |
           PUBLIC_BASE_URL="${{ vars.PUBLIC_BASE_URL }}"
           if [ -z "$PUBLIC_BASE_URL" ]; then
             PUBLIC_BASE_URL="http://${{ secrets.VM_HOST }}"
           fi
+          APP_HOST="${PUBLIC_BASE_URL#http://}"
+          APP_HOST="${APP_HOST#https://}"
+          APP_HOST="${APP_HOST%%/*}"
+          FIREBASE_PROJECT_ID="${{ vars.FIREBASE_PROJECT_ID }}"
+          FIREBASE_STORAGE_BUCKET="${{ vars.FIREBASE_STORAGE_BUCKET }}"
+          VAPID_SUBJECT="${{ vars.VAPID_SUBJECT }}"
+          if [ -z "$VAPID_SUBJECT" ]; then
+            VAPID_SUBJECT="mailto:admin@volunteerhub.local"
+          fi
+          LETSENCRYPT_EMAIL="${{ vars.LETSENCRYPT_EMAIL }}"
+          if [ -z "$LETSENCRYPT_EMAIL" ]; then
+            LETSENCRYPT_EMAIL="${VAPID_SUBJECT#mailto:}"
+          fi
           sed -i "s|__PUBLIC_BASE_URL__|${PUBLIC_BASE_URL}|g" k8s/overlays/prod-lite/config-patch.yaml
-          sed -i "s|newTag: latest|newTag: ${{ github.sha }}|g" k8s/overlays/prod-lite/kustomization.yaml
+          sed -i "s|__FIREBASE_PROJECT_ID__|${FIREBASE_PROJECT_ID}|g" k8s/overlays/prod-lite/config-patch.yaml
+          sed -i "s|__FIREBASE_STORAGE_BUCKET__|${FIREBASE_STORAGE_BUCKET}|g" k8s/overlays/prod-lite/config-patch.yaml
+          sed -i "s|__VAPID_SUBJECT__|${VAPID_SUBJECT}|g" k8s/overlays/prod-lite/config-patch.yaml
+          sed -i "s|__APP_HOST__|${APP_HOST}|g" k8s/overlays/prod-lite/ingress.yaml
+          sed -i "s|__LETSENCRYPT_EMAIL__|${LETSENCRYPT_EMAIL}|g" k8s/overlays/prod-lite/cluster-issuer.yaml
+          
+          python3 -c "
+          import os, json, subprocess, yaml
+          
+          deploy_sha = os.environ['DEPLOY_SHA']
+          services_json = os.environ.get('SERVICES_JSON', '[]')
+          built_services = {item['image'] for item in json.loads(services_json)}
+          
+          kust_path = 'k8s/overlays/prod-lite/kustomization.yaml'
+          with open(kust_path, 'r') as f:
+              kust = yaml.safe_load(f)
+              
+          for img in kust.get('images', []):
+              name = img['name']
+              image_name = name.split('/')[-1]
+              gh_image = f'volunteerhub-{image_name}'
+              
+              if gh_image in built_services:
+                  img['newTag'] = deploy_sha
+                  print(f'Set {image_name} to new tag: {deploy_sha}')
+              else:
+                  try:
+                      cmd = f'kubectl get deployment/{image_name} -n volunteerhub -o jsonpath=\"{{.spec.template.spec.containers[0].image}}\"'
+                      curr_image = subprocess.check_output(cmd, shell=True, text=True).strip()
+                      if curr_image and \":\" in curr_image:
+                          curr_tag = curr_image.split(\":\")[-1]
+                          img['newTag'] = curr_tag
+                          print(f'Keep {image_name} on running tag: {curr_tag}')
+                      else:
+                          img['newTag'] = 'latest'
+                          print(f'No running tag found for {image_name}, default to latest')
+                  except Exception as e:
+                      img['newTag'] = deploy_sha
+                      print(f'Deployment {image_name} not found in K3s, default to {deploy_sha} (first-time deploy)')
+                      
+          with open(kust_path, 'w') as f:
+              yaml.safe_dump(kust, f)
+          "
+
+      - name: Install cert-manager
+        shell: bash
+        run: |
+          kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.20.2/cert-manager.yaml
+          kubectl rollout status deployment/cert-manager -n cert-manager --timeout=300s
+          kubectl rollout status deployment/cert-manager-cainjector -n cert-manager --timeout=300s
+          kubectl rollout status deployment/cert-manager-webhook -n cert-manager --timeout=300s
 
       - name: Install observability
         shell: bash
         run: |
+          set -euo pipefail
           kubectl apply -k k8s/observability
           helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
           helm repo update
-          helm upgrade --install volunteerhub-prometheus prometheus-community/kube-prometheus-stack \
-            --namespace observability \
-            --create-namespace \
-            -f k8s/observability/values-prometheus.yaml \
-            --wait \
-            --timeout 10m
+
+          install_prometheus() {
+            helm upgrade --install volunteerhub-prometheus prometheus-community/kube-prometheus-stack \
+              --namespace observability \
+              --create-namespace \
+              -f k8s/observability/values-prometheus.yaml \
+              --wait \
+              --timeout 10m
+          }
+
+          if ! install_prometheus; then
+            echo "Prometheus Helm release may be locked by an interrupted operation. Cleaning pending release metadata and retrying once."
+            kubectl get secret -n observability -l owner=helm,name=volunteerhub-prometheus -o name \
+              | xargs -r kubectl delete -n observability
+            install_prometheus
+          fi
 
       - name: Apply manifests
         run: kubectl apply -k k8s/overlays/prod-lite
 
+      - name: Wait for TLS certificate
+        shell: bash
+        run: |
+          set +e
+          for _ in {1..30}; do
+            kubectl get certificate volunteerhub-tls -n volunteerhub >/dev/null 2>&1 && break
+            sleep 10
+          done
+          kubectl wait certificate/volunteerhub-tls -n volunteerhub --for=condition=Ready --timeout=10m
+          status=$?
+          if [ "$status" -ne 0 ]; then
+            kubectl describe certificate volunteerhub-tls -n volunteerhub || true
+            kubectl describe challenge -n volunteerhub || true
+            kubectl get events -n volunteerhub --sort-by=.lastTimestamp | tail -n 80 || true
+          fi
+          exit "$status"
+
+      - name: Apply runtime secrets
+        shell: bash
+        env:
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
+          RABBITMQ_DEFAULT_PASS: ${{ secrets.RABBITMQ_DEFAULT_PASS }}
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          VAPID_PUBLIC_KEY: ${{ secrets.VAPID_PUBLIC_KEY }}
+          VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
+          VNPAY_TMN_CODE: ${{ secrets.VNPAY_TMN_CODE }}
+          VNPAY_HASH_SECRET: ${{ secrets.VNPAY_HASH_SECRET }}
+          AUTH_PUBLIC_KEY_BASE64: ${{ secrets.AUTH_PUBLIC_KEY_BASE64 }}
+          AUTH_PRIVATE_KEY_BASE64: ${{ secrets.AUTH_PRIVATE_KEY_BASE64 }}
+          FIREBASE_SERVICE_ACCOUNT_BASE64: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_BASE64 }}
+          FCM_ENABLED: ${{ secrets.FCM_ENABLED }}
+        run: |
+          set -euo pipefail
+          kubectl create namespace volunteerhub --dry-run=client -o yaml | kubectl apply -f -
+
+          required=(
+            POSTGRES_PASSWORD
+            REDIS_PASSWORD
+            RABBITMQ_DEFAULT_PASS
+            CLIENT_ID
+            CLIENT_SECRET
+            VAPID_PUBLIC_KEY
+            VAPID_PRIVATE_KEY
+            VNPAY_TMN_CODE
+            VNPAY_HASH_SECRET
+            AUTH_PUBLIC_KEY_BASE64
+            AUTH_PRIVATE_KEY_BASE64
+          )
+
+          for name in "${required[@]}"; do
+            if [ -z "${!name:-}" ]; then
+              echo "::error::Required secret ${name} is empty or missing."
+              exit 1
+            fi
+          done
+
+          kubectl create secret generic volunteerhub-secrets \
+            -n volunteerhub \
+            --from-literal=POSTGRES_PASSWORD="${POSTGRES_PASSWORD}" \
+            --from-literal=REDIS_PASSWORD="${REDIS_PASSWORD}" \
+            --from-literal=RABBITMQ_DEFAULT_PASS="${RABBITMQ_DEFAULT_PASS}" \
+            --from-literal=CLIENT_ID="${CLIENT_ID}" \
+            --from-literal=CLIENT_SECRET="${CLIENT_SECRET}" \
+            --from-literal=GOOGLE_CLIENT_ID="${GOOGLE_CLIENT_ID}" \
+            --from-literal=GOOGLE_CLIENT_SECRET="${GOOGLE_CLIENT_SECRET}" \
+            --from-literal=VAPID_PUBLIC_KEY="${VAPID_PUBLIC_KEY}" \
+            --from-literal=VAPID_PRIVATE_KEY="${VAPID_PRIVATE_KEY}" \
+            --from-literal=VNPAY_TMN_CODE="${VNPAY_TMN_CODE}" \
+            --from-literal=VNPAY_HASH_SECRET="${VNPAY_HASH_SECRET}" \
+            --from-literal=AUTH_PUBLIC_KEY_BASE64="${AUTH_PUBLIC_KEY_BASE64}" \
+            --from-literal=AUTH_PRIVATE_KEY_BASE64="${AUTH_PRIVATE_KEY_BASE64}" \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+          kubectl create secret generic volunteerhub-firebase \
+            -n volunteerhub \
+            --from-literal=FIREBASE_SERVICE_ACCOUNT_BASE64="${FIREBASE_SERVICE_ACCOUNT_BASE64}" \
+            --from-literal=FCM_ENABLED="${FCM_ENABLED:-false}" \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+          kubectl get secret volunteerhub-secrets -n volunteerhub -o jsonpath='{.data}' | jq 'keys'
+
+      - name: Restart deployments after secret update
+        run: kubectl rollout restart deployment -n volunteerhub
+
       - name: Wait for rollout
         shell: bash
         run: |
+          set +e
           deployments=(
             service-discovery
             authorization-server
@@ -187,11 +533,47 @@ jobs:
             registration-service
             notification-service
             chat-service
+            donation-service
             aggregation-service
             analytic-service
             frontend
           )
 
+          failed=0
           for deployment in "${deployments[@]}"; do
+            if ! kubectl get deployment "${deployment}" -n volunteerhub >/dev/null 2>&1; then
+              echo "Deployment ${deployment} does not exist in cluster. Skipping rollout check."
+              continue
+            fi
+
             kubectl rollout status "deployment/${deployment}" -n volunteerhub --timeout=600s
+            status=$?
+            if [ "$status" -ne 0 ]; then
+              failed=1
+              echo "::group::Diagnostics for ${deployment}"
+              kubectl get pods -n volunteerhub -o wide
+              kubectl describe "deployment/${deployment}" -n volunteerhub || true
+              kubectl get events -n volunteerhub --sort-by=.lastTimestamp | tail -n 80 || true
+              selector="$(kubectl get "deployment/${deployment}" -n volunteerhub -o jsonpath='{.spec.selector.matchLabels.app\.kubernetes\.io/name}' 2>/dev/null)"
+              if [ -n "$selector" ]; then
+                kubectl logs -n volunteerhub -l "app.kubernetes.io/name=${selector}" --all-containers --tail=200 || true
+              fi
+              echo "::endgroup::"
+              
+              echo "::error::Rollout failed for ${deployment}. Initiating auto-rollback..."
+              kubectl rollout undo "deployment/${deployment}" -n volunteerhub
+              kubectl rollout status "deployment/${deployment}" -n volunteerhub --timeout=300s
+              break
+            fi
           done
+
+          exit "$failed"
+
+      - name: Smoke test
+        shell: bash
+        run: |
+          PUBLIC_BASE_URL="${{ vars.PUBLIC_BASE_URL }}"
+          if [ -z "$PUBLIC_BASE_URL" ]; then
+            PUBLIC_BASE_URL="http://${{ secrets.VM_HOST }}"
+          fi
+          curl -fsSI --retry 8 --retry-delay 10 --retry-all-errors "$PUBLIC_BASE_URL"

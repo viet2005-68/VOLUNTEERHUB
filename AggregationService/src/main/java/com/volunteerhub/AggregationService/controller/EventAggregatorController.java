@@ -7,6 +7,7 @@ import com.volunteerhub.common.dto.PageResponse;
 import com.volunteerhub.common.dto.UserResponse;
 import com.volunteerhub.common.enums.EventStatus;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.CacheControl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -15,11 +16,22 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/aggregated/events")
 public class EventAggregatorController {
+
+    private static final CacheControl AGGREGATED_EVENT_CACHE = CacheControl.maxAge(45, TimeUnit.SECONDS)
+            .cachePrivate()
+            .mustRevalidate();
+    private static final CacheControl AGGREGATED_EVENT_DETAIL_CACHE = CacheControl.maxAge(90, TimeUnit.SECONDS)
+            .cachePrivate()
+            .mustRevalidate();
+    private static final CacheControl USER_SCOPED_AGGREGATED_CACHE = CacheControl.maxAge(30, TimeUnit.SECONDS)
+            .cachePrivate()
+            .mustRevalidate();
 
     private final EventAggregatorService eventAggregatorService;
 
@@ -35,17 +47,21 @@ public class EventAggregatorController {
                                                                                         @RequestParam(required = false) String street,
                                                                                         @RequestParam(defaultValue = "id") String sortedBy,
                                                                                         @RequestParam(defaultValue = "desc") String order) {
-        return ResponseEntity.ok(eventAggregatorService.getAggregatedEvents(
-                pageNum, pageSize, status,
-                category, startAfter, endBefore,
-                province, district, street,
-                sortedBy, order
-        ));
+        return ResponseEntity.ok()
+                .cacheControl(AGGREGATED_EVENT_CACHE)
+                .body(eventAggregatorService.getAggregatedEvents(
+                        pageNum, pageSize, status,
+                        category, startAfter, endBefore,
+                        province, district, street,
+                        sortedBy, order
+                ));
     }
 
     @GetMapping("/{eventId}")
     public ResponseEntity<AggregatedEventResponse> getAggregatedEventById(@PathVariable Long eventId) {
-        return ResponseEntity.ok(eventAggregatorService.getAggregatedEventById(eventId));
+        return ResponseEntity.ok()
+                .cacheControl(AGGREGATED_EVENT_DETAIL_CACHE)
+                .body(eventAggregatorService.getAggregatedEventById(eventId));
     }
 
     @GetMapping("/owned")
@@ -60,12 +76,14 @@ public class EventAggregatorController {
                                                                                              @RequestParam(required = false) String street,
                                                                                              @RequestParam(defaultValue = "id") String sortedBy,
                                                                                              @RequestParam(defaultValue = "desc") String order) {
-        return ResponseEntity.ok(eventAggregatorService.getAggregatedOwnedEvents(
-                pageNum, pageSize, status,
-                category, startAfter, endBefore,
-                province, district, street,
-                sortedBy, order
-        ));
+        return ResponseEntity.ok()
+                .cacheControl(USER_SCOPED_AGGREGATED_CACHE)
+                .body(eventAggregatorService.getAggregatedOwnedEvents(
+                        pageNum, pageSize, status,
+                        category, startAfter, endBefore,
+                        province, district, street,
+                        sortedBy, order
+                ));
     }
 
     @GetMapping("/owned/search")
@@ -73,7 +91,9 @@ public class EventAggregatorController {
                                                                                              @RequestParam(required = false) EventStatus status,
                                                                                              @RequestParam(required = false) Integer pageNum,
                                                                                              @RequestParam(required = false) Integer pageSize) {
-        return ResponseEntity.ok(eventAggregatorService.searchAggregatedOwnedEvents(keyword, status, pageNum, pageSize));
+        return ResponseEntity.ok()
+                .cacheControl(USER_SCOPED_AGGREGATED_CACHE)
+                .body(eventAggregatorService.searchAggregatedOwnedEvents(keyword, status, pageNum, pageSize));
     }
 
     // TODO: pagination metadata, total comments, posts, reaction, maybe need standalone service for trending computing
@@ -85,7 +105,9 @@ public class EventAggregatorController {
 
         PageResponse<TrendingEventResponse> response = eventAggregatorService.getTrendingEvents(pageNum, pageSize, days);
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok()
+                .cacheControl(AGGREGATED_EVENT_CACHE)
+                .body(response);
     }
 
     @GetMapping("/search")
@@ -95,7 +117,9 @@ public class EventAggregatorController {
             @RequestParam(required = false) Integer pageNum,
             @RequestParam(required = false) Integer pageSize) {
 
-        return ResponseEntity.ok(eventAggregatorService.searchAggregatedEvents(keyword, status, pageNum, pageSize));
+        return ResponseEntity.ok()
+                .cacheControl(AGGREGATED_EVENT_CACHE)
+                .body(eventAggregatorService.searchAggregatedEvents(keyword, status, pageNum, pageSize));
     }
 
     @GetMapping("/{eventId}/users")

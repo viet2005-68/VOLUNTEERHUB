@@ -14,7 +14,6 @@ import GrowthMetric from "../../components/Admin/GrowthMetric";
 
 export default function Overview() {
   const { user } = useAuth();
-  console.log(user.role + " hhh");
   return (
     <div className="flex flex-col gap-10">
       <DashBoardOverview />
@@ -28,8 +27,8 @@ export default function Overview() {
         )}
         {user.role === ROLES.MANAGER && (
           <>
-            <NewEventsAnnounced className="basis-1/2" />
-            <RequestCardOverview className="basis-1/2" />
+            <NewEventsAnnounced className="h-full" />
+            <RequestCardOverview className="h-full" />
           </>
         )}
         {user.role === ROLES.ADMIN && (

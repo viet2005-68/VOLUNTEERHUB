@@ -24,14 +24,16 @@ public class ReportService {
         List<UserExportDto> data;
 
         if (ids != null && !ids.isEmpty()) {
-            data = userClient.post()
-                    .uri("/internal/users/export-selected")
-                    .body(ids)
+            data = userClient.get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path("/users/by-ids")
+                            .queryParam("userIds", ids.toArray())
+                            .build())
                     .retrieve()
                     .body(new ParameterizedTypeReference<List<UserExportDto>>() {});
         } else {
             data = userClient.get()
-                    .uri("//export-all")
+                    .uri("/admin/users/all")
                     .retrieve()
                     .body(new ParameterizedTypeReference<List<UserExportDto>>() {});
         }

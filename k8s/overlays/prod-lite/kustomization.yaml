@@ -3,7 +3,9 @@ kind: Kustomization
 namespace: volunteerhub
 resources:
   - ../../base
+  - cluster-issuer.yaml
   - ingress.yaml
+  - rate-limit.yaml
 patches:
   - path: config-patch.yaml
   - target:
@@ -38,6 +40,20 @@ patches:
           limits:
             cpu: 200m
             memory: 256Mi
+  - target:
+      kind: Deployment
+      name: event-service
+    patch: &firebase-secret |-
+      - op: add
+        path: /spec/template/spec/containers/0/envFrom/-
+        value:
+          secretRef:
+            name: volunteerhub-firebase
+            optional: true
+  - target:
+      kind: Deployment
+      name: community-service
+    patch: *firebase-secret
   - target:
       kind: Deployment
       name: service-discovery
@@ -111,6 +127,10 @@ patches:
     patch: *spring-runtime
   - target:
       kind: Deployment
+      name: donation-service
+    patch: *spring-runtime
+  - target:
+      kind: Deployment
       name: aggregation-service
     patch: *spring-runtime
   - target:
@@ -144,6 +164,9 @@ images:
     newTag: latest
   - name: localhost:5000/volunteerhub/chat-service
     newName: ghcr.io/viet2005-68/volunteerhub-chat-service
+    newTag: latest
+  - name: localhost:5000/volunteerhub/donation-service
+    newName: ghcr.io/viet2005-68/volunteerhub-donation-service
     newTag: latest
   - name: localhost:5000/volunteerhub/aggregation-service
     newName: ghcr.io/viet2005-68/volunteerhub-aggregation-service

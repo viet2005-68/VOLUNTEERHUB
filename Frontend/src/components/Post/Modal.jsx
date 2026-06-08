@@ -17,7 +17,7 @@ export default function Modal({ open, onClose, children, className = "" }) {
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className={`bg-white rounded-lg shadow-lg w-[95vw] h-[95vh] max-sm:w-full max-sm:h-full transform transition-all duration-200 ${className} flex flex-1s`}
+        className={`bg-pale-canvas rounded-lg shadow-lg w-[95vw] h-[95vh] max-sm:w-full max-sm:h-full transform transition-all duration-200 ${className} flex flex-1s`}
       >
         {children}
       </div>

@@ -29,9 +29,11 @@ public class EventSnapshotService {
                 .status(eventSnapshotRequest.getStatus())
                 .ownerId(eventSnapshotRequest.getOwnerId())
                 .eventName(eventSnapshotRequest.getEventName())
+                .imageUrl(eventSnapshotRequest.getImageUrl())
                 .startTime(eventSnapshotRequest.getStartTime())
                 .endTime(eventSnapshotRequest.getEndTime())
                 .registrationDeadline(eventSnapshotRequest.getRegistrationDeadline())
+                .completionBadgeId(eventSnapshotRequest.getCompletionBadgeId())
                 .qrJoinPolicy(eventSnapshotRequest.getQrJoinPolicy() == null
                         ? QrJoinPolicy.REQUIRE_APPROVAL
                         : eventSnapshotRequest.getQrJoinPolicy())
@@ -53,6 +55,9 @@ public class EventSnapshotService {
         if (eventSnapshotRequest.getEventName() != null) {
             eventSnapshot.setEventName(eventSnapshotRequest.getEventName());
         }
+        if (eventSnapshotRequest.getImageUrl() != null) {
+            eventSnapshot.setImageUrl(eventSnapshotRequest.getImageUrl());
+        }
         if (eventSnapshotRequest.getStartTime() != null) {
             eventSnapshot.setStartTime(eventSnapshotRequest.getStartTime());
         }
@@ -61,6 +66,9 @@ public class EventSnapshotService {
         }
         if (eventSnapshotRequest.getRegistrationDeadline() != null) {
             eventSnapshot.setRegistrationDeadline(eventSnapshotRequest.getRegistrationDeadline());
+        }
+        if (eventSnapshotRequest.getCompletionBadgeId() != null) {
+            eventSnapshot.setCompletionBadgeId(eventSnapshotRequest.getCompletionBadgeId());
         }
         if (eventSnapshotRequest.getQrJoinPolicy() != null) {
             eventSnapshot.setQrJoinPolicy(eventSnapshotRequest.getQrJoinPolicy());

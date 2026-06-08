@@ -23,6 +23,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -42,6 +43,7 @@ public class ChatService {
                 ? currentUserId
                 : request.getVolunteerId();
         ChatParticipantContext context = registrationClient.getChatParticipantContext(request.getEventId(), volunteerId);
+        ensureNotSelfConversation(context);
         ensureCanRead(currentUserId, context);
 
         ChatConversation conversation = conversationRepository
@@ -57,9 +59,15 @@ public class ChatService {
     }
 
     @Transactional(readOnly = true)
-    public List<ChatConversationResponse> listConversations(String currentUserId) {
-        return conversationRepository.findByManagerIdOrVolunteerIdOrderByLastMessageAtDesc(currentUserId, currentUserId)
-                .stream()
+    public List<ChatConversationResponse> listConversations(String currentUserId, Long eventId) {
+        List<ChatConversation> conversations = eventId == null
+                ? conversationRepository.findByManagerIdOrVolunteerIdOrderByLastMessageAtDesc(currentUserId, currentUserId)
+                : conversationRepository.findByEventIdAndManagerIdOrEventIdAndVolunteerIdOrderByLastMessageAtDesc(
+                        eventId, currentUserId, eventId, currentUserId
+                );
+
+        return conversations.stream()
+                .filter(conversation -> !Objects.equals(conversation.getManagerId(), conversation.getVolunteerId()))
                 .map(conversation -> chatMapper.toConversationResponse(conversation, currentUserId, unreadCount(conversation, currentUserId)))
                 .toList();
     }
@@ -147,6 +155,12 @@ public class ChatService {
     private ChatConversation findConversation(Long conversationId) {
         return conversationRepository.findById(conversationId)
                 .orElseThrow(() -> new NoSuchElementException("Conversation with id " + conversationId + " does not exist."));
+    }
+
+    private void ensureNotSelfConversation(ChatParticipantContext context) {
+        if (Objects.equals(context.getManagerId(), context.getVolunteerId())) {
+            throw new IllegalArgumentException("Cannot open a chat conversation with yourself.");
+        }
     }
 
     private void ensureCanRead(String currentUserId, ChatParticipantContext context) {

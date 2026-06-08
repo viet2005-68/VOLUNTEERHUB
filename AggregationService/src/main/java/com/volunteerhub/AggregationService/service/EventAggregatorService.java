@@ -56,18 +56,24 @@ public class EventAggregatorService {
 
     public AggregatedEventResponse getAggregatedEventById(Long eventId) {
         EventResponse eventResponse = eventClient.getEventById(eventId);
-        UserResponse userResponse = userClient.findById(eventResponse.getOwnerId());
+        String ownerId = eventResponse.getOwnerId();
+        UserResponse userResponse = userClient.findById(ownerId);
         PageResponse<EventRegistrationCount> responsePage =
                 registrationClient.getEventsParticipantCounts(List.of(eventId), null, null, null);
 
         EventRegistrationCount totalCounts = responsePage.getContent().stream()
                 .findFirst()
                 .orElse(createEmptyCount(eventId));
+        List<String> ownerIds = Collections.singletonList(ownerId);
+        Map<String, Long> ownerEventCounts = getOwnerEventCounts(ownerIds);
+        Map<String, Long> ownerVolunteerCounts = getOwnerVolunteerCounts(ownerIds);
         return AggregatedEventResponse.builder()
                 .eventResponse(eventResponse)
                 .owner(userResponse)
                 .registrationCount(totalCounts.getRegistrationCount())
                 .participantCount(totalCounts.getParticipantCount())
+                .ownerTotalEvents(resolveOwnerTotalEvents(ownerId, userResponse, ownerEventCounts))
+                .ownerTotalVolunteers(ownerVolunteerCounts.getOrDefault(ownerId, 0L))
                 .build();
     }
 
@@ -151,6 +157,8 @@ public class EventAggregatorService {
         List<String> userIds = eventResponses.stream().map(EventResponse::getOwnerId).distinct().toList();
         Map<String, UserResponse> userMap = userClient.findAllByIds(userIds).stream()
                 .collect(Collectors.toMap(UserResponse::getId, Function.identity()));
+        Map<String, Long> ownerEventCounts = getOwnerEventCounts(userIds);
+        Map<String, Long> ownerVolunteerCounts = getOwnerVolunteerCounts(userIds);
 
         Map<Long, EventRegistrationCount> totalCountMap = registrationClient.getEventsParticipantCounts(eventIds, null, null, null)
                 .getContent().stream()
@@ -178,6 +186,8 @@ public class EventAggregatorService {
                                     .owner(owner)
                                     .registrationCount(total.getRegistrationCount())
                                     .participantCount(total.getParticipantCount())
+                                    .ownerTotalEvents(resolveOwnerTotalEvents(event.getOwnerId(), owner, ownerEventCounts))
+                                    .ownerTotalVolunteers(ownerVolunteerCounts.getOrDefault(event.getOwnerId(), 0L))
                                     .build())
                             .registrationGrowth(growth.getRegistrationCount())
                             .participantGrowth(growth.getParticipantCount())
@@ -249,6 +259,9 @@ public class EventAggregatorService {
         Map<String, UserResponse> userMap = userResponses.stream()
                 .collect(Collectors.toMap(UserResponse::getId, Function.identity()));
 
+        Map<String, Long> ownerEventCounts = getOwnerEventCounts(userIds);
+        Map<String, Long> ownerVolunteerCounts = getOwnerVolunteerCounts(userIds);
+
         List<AggregatedEventResponse> aggregated = content.stream()
                 .map(e -> {
                     EventRegistrationCount counts =
@@ -262,6 +275,8 @@ public class EventAggregatorService {
                             .owner(owner)
                             .registrationCount(counts.getRegistrationCount())
                             .participantCount(counts.getParticipantCount())
+                            .ownerTotalEvents(resolveOwnerTotalEvents(e.getOwnerId(), owner, ownerEventCounts))
+                            .ownerTotalVolunteers(ownerVolunteerCounts.getOrDefault(e.getOwnerId(), 0L))
                             .build();
                 })
                 .toList();
@@ -274,6 +289,48 @@ public class EventAggregatorService {
                 .build();
     }
 
+
+    private Map<String, Long> getOwnerEventCounts(List<String> ownerIds) {
+        List<String> distinctOwnerIds = normalizeOwnerIds(ownerIds);
+        if (distinctOwnerIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        Map<String, Long> counts = eventClient.countEventsByOwnerIds(distinctOwnerIds);
+        return counts == null ? Collections.emptyMap() : counts;
+    }
+
+    private Map<String, Long> getOwnerVolunteerCounts(List<String> ownerIds) {
+        List<String> distinctOwnerIds = normalizeOwnerIds(ownerIds);
+        if (distinctOwnerIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        Map<String, Long> counts = registrationClient.countUniqueVolunteersByOwnerIds(distinctOwnerIds);
+        return counts == null ? Collections.emptyMap() : counts;
+    }
+
+    private List<String> normalizeOwnerIds(List<String> ownerIds) {
+        if (ownerIds == null) {
+            return Collections.emptyList();
+        }
+
+        return ownerIds.stream()
+                .filter(Objects::nonNull)
+                .distinct()
+                .toList();
+    }
+
+    private Long resolveOwnerTotalEvents(String ownerId, UserResponse owner, Map<String, Long> ownerEventCounts) {
+        Long countedEvents = ownerEventCounts.get(ownerId);
+        if (countedEvents != null) {
+            return countedEvents;
+        }
+        if (owner != null && owner.getTotalEvents() != null) {
+            return owner.getTotalEvents().longValue();
+        }
+        return 0L;
+    }
 
     private EventRegistrationCount createEmptyCount(Long eventId) {
         return EventRegistrationCount.builder()
