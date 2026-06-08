@@ -12,6 +12,7 @@ public class DonationResponse {
     private Long id;
     private String donorId;
     private String managerId;
+    private Long eventId;
     private String clientDonationId;
     private Long amountVnd;
     private String provider;

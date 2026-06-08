@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
         indexes = {
                 @Index(name = "idx_donation_manager_id", columnList = "manager_id"),
                 @Index(name = "idx_donation_donor_id", columnList = "donor_id"),
+                @Index(name = "idx_donation_event_id", columnList = "event_id"),
                 @Index(name = "idx_donation_status", columnList = "status"),
                 @Index(name = "idx_donation_provider_order_id", columnList = "provider_order_id")
         },
@@ -39,6 +40,9 @@ public class Donation {
 
     @Column(name = "manager_id", nullable = false)
     private String managerId;
+
+    @Column(name = "event_id")
+    private Long eventId;
 
     @Column(name = "client_donation_id", nullable = false)
     private String clientDonationId;

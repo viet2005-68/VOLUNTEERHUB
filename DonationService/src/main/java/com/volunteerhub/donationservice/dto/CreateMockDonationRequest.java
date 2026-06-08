@@ -12,6 +12,9 @@ public class CreateMockDonationRequest {
     @NotBlank
     private String managerId;
 
+    @NotNull
+    private Long eventId;
+
     @NotBlank
     @Size(max = 120)
     private String clientDonationId;

@@ -43,3 +43,4 @@ vnpay:
   hash-secret: ${VNPAY_HASH_SECRET:}
   return-url: ${VNPAY_RETURN_URL:http://localhost:8080/api/v1/donations/vnpay/return}
   ipn-url: ${VNPAY_IPN_URL:http://localhost:8080/api/v1/donations/vnpay/ipn}
+  mobile-return-url: ${VNPAY_MOBILE_RETURN_URL:volunteerhub://donations/vnpay-return}

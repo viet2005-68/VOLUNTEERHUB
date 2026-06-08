@@ -2,6 +2,7 @@ package com.volunteerhub.donationservice.service;
 
 import com.volunteerhub.donationservice.dto.CreateMockDonationRequest;
 import com.volunteerhub.donationservice.dto.DonationResponse;
+import com.volunteerhub.donationservice.dto.EventDonationSummaryResponse;
 import com.volunteerhub.donationservice.dto.ManagerBalanceResponse;
 import com.volunteerhub.donationservice.model.Donation;
 import com.volunteerhub.donationservice.model.DonationStatus;
@@ -35,6 +36,7 @@ public class DonationService {
                     Donation donation = Donation.builder()
                             .donorId(donorId)
                             .managerId(request.getManagerId())
+                            .eventId(request.getEventId())
                             .clientDonationId(request.getClientDonationId())
                             .amountVnd(request.getAmountVnd())
                             .provider(MOCK_PROVIDER)
@@ -57,6 +59,24 @@ public class DonationService {
     }
 
     @Transactional(readOnly = true)
+    public List<DonationResponse> listMyEventDonations(String donorId, Long eventId) {
+        return donationRepository.findByDonorIdAndEventIdOrderByCreatedAtDesc(donorId, eventId).stream()
+                .map(this::toDonationResponse)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public EventDonationSummaryResponse getMyEventDonationSummary(String donorId, Long eventId) {
+        return EventDonationSummaryResponse.builder()
+                .eventId(eventId)
+                .totalSucceededAmountVnd(donationRepository.sumAmountByDonorIdAndEventIdAndStatus(
+                        donorId, eventId, DonationStatus.SUCCEEDED))
+                .succeededDonationCount(donationRepository.countByDonorIdAndEventIdAndStatus(
+                        donorId, eventId, DonationStatus.SUCCEEDED))
+                .build();
+    }
+
+    @Transactional(readOnly = true)
     public DonationResponse getDonation(String currentUserId, String role, Long donationId) {
         Donation donation = donationRepository.findById(donationId)
                 .orElseThrow(() -> new NoSuchElementException("Donation with id " + donationId + " does not exist."));
@@ -74,6 +94,43 @@ public class DonationService {
         return donationRepository.findByManagerIdOrderByCreatedAtDesc(managerId).stream()
                 .map(this::toDonationResponse)
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<DonationResponse> listEventDonations(String currentUserId, String role, Long eventId) {
+        if (isAdmin(role)) {
+            return donationRepository.findByEventIdOrderByCreatedAtDesc(eventId).stream()
+                    .map(this::toDonationResponse)
+                    .toList();
+        }
+        if (isManager(role)) {
+            return donationRepository.findByEventIdAndManagerIdOrderByCreatedAtDesc(eventId, currentUserId).stream()
+                    .map(this::toDonationResponse)
+                    .toList();
+        }
+        throw new AccessDeniedException("Only managers and admins can view event donation history.");
+    }
+
+    @Transactional(readOnly = true)
+    public EventDonationSummaryResponse getEventDonationSummary(String currentUserId, String role, Long eventId) {
+        if (!isAdmin(role) && !isManager(role)) {
+            throw new AccessDeniedException("Only managers and admins can view event donation summary.");
+        }
+        List<Donation> donations = isAdmin(role)
+                ? donationRepository.findByEventIdOrderByCreatedAtDesc(eventId)
+                : donationRepository.findByEventIdAndManagerIdOrderByCreatedAtDesc(eventId, currentUserId);
+        long total = donations.stream()
+                .filter(donation -> donation.getStatus() == DonationStatus.SUCCEEDED)
+                .mapToLong(Donation::getAmountVnd)
+                .sum();
+        long count = donations.stream()
+                .filter(donation -> donation.getStatus() == DonationStatus.SUCCEEDED)
+                .count();
+        return EventDonationSummaryResponse.builder()
+                .eventId(eventId)
+                .totalSucceededAmountVnd(total)
+                .succeededDonationCount(count)
+                .build();
     }
 
     @Transactional(readOnly = true)
@@ -161,6 +218,7 @@ public class DonationService {
                 .id(donation.getId())
                 .donorId(donation.getDonorId())
                 .managerId(donation.getManagerId())
+                .eventId(donation.getEventId())
                 .clientDonationId(donation.getClientDonationId())
                 .amountVnd(donation.getAmountVnd())
                 .provider(donation.getProvider())
@@ -175,6 +233,10 @@ public class DonationService {
 
     private boolean isAdmin(String role) {
         return "ADMIN".equals(role) || "ROLE_ADMIN".equals(role) || "SYSTEM".equals(role) || "ROLE_SYSTEM".equals(role);
+    }
+
+    private boolean isManager(String role) {
+        return "MANAGER".equals(role) || "ROLE_MANAGER".equals(role);
     }
 
     private String trimToNull(String value) {

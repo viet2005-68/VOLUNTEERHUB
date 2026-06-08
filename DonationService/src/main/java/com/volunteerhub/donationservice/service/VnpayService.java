@@ -45,6 +45,7 @@ public class VnpayService {
                 .orElseGet(() -> donationRepository.save(Donation.builder()
                         .donorId(donorId)
                         .managerId(request.getManagerId())
+                        .eventId(request.getEventId())
                         .clientDonationId(request.getClientDonationId())
                         .amountVnd(request.getAmountVnd())
                         .provider(PROVIDER)
@@ -105,6 +106,51 @@ public class VnpayService {
         Donation donation = donationRepository.findByProviderAndProviderOrderId(PROVIDER, params.get("vnp_TxnRef"))
                 .orElseThrow(() -> new NoSuchElementException("Donation order does not exist."));
         return donation.getStatus();
+    }
+
+    @Transactional
+    public VnpayReturnResult handleReturn(Map<String, String> params) {
+        if (!isValidSignature(params)) {
+            throw new IllegalArgumentException("Invalid VNPay return signature.");
+        }
+
+        String orderId = params.get("vnp_TxnRef");
+        Donation donation = donationRepository.findByProviderAndProviderOrderId(PROVIDER, orderId)
+                .orElseThrow(() -> new NoSuchElementException("Donation order does not exist."));
+
+        long amountVnd = parseVnpayAmount(params.get("vnp_Amount"));
+        if (!donation.getAmountVnd().equals(amountVnd)) {
+            throw new IllegalArgumentException("Invalid VNPay return amount.");
+        }
+
+        String responseCode = params.getOrDefault("vnp_ResponseCode", "");
+        String transactionStatus = params.getOrDefault("vnp_TransactionStatus", "");
+        boolean paymentSucceeded = "00".equals(responseCode) && "00".equals(transactionStatus);
+
+        if (donation.getStatus() == DonationStatus.PENDING) {
+            if (paymentSucceeded) {
+                donationService.markProviderDonationSucceeded(PROVIDER, orderId, params.get("vnp_TransactionNo"));
+            } else {
+                donationService.markProviderDonationFailed(PROVIDER, orderId);
+            }
+            donation = donationRepository.findByProviderAndProviderOrderId(PROVIDER, orderId)
+                    .orElseThrow(() -> new NoSuchElementException("Donation order does not exist."));
+        }
+
+        return new VnpayReturnResult(donation.getId(), orderId, donation.getStatus(), responseCode);
+    }
+
+    public String buildMobileReturnRedirect(VnpayReturnResult result) {
+        String baseUrl = StringUtils.hasText(properties.getMobileReturnUrl())
+                ? properties.getMobileReturnUrl()
+                : "volunteerhub://donations/vnpay-return";
+        String separator = baseUrl.contains("?") ? "&" : "?";
+        return baseUrl
+                + separator
+                + "donationId=" + encode(String.valueOf(result.donationId()))
+                + "&orderId=" + encode(result.orderId())
+                + "&status=" + encode(result.status().name())
+                + "&responseCode=" + encode(result.responseCode());
     }
 
     private String buildPaymentUrl(Donation donation, String clientIp, String bankCode) {
@@ -211,5 +257,13 @@ public class VnpayService {
             return null;
         }
         return value.trim();
+    }
+
+    public record VnpayReturnResult(
+            Long donationId,
+            String orderId,
+            DonationStatus status,
+            String responseCode
+    ) {
     }
 }

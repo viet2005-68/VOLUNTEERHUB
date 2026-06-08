@@ -34,12 +34,18 @@ class DonationServiceApplicationTests {
     void mockDonationCreditsManagerBalanceAndPayoutLifecycleUpdatesBuckets() {
         CreateMockDonationRequest donationRequest = new CreateMockDonationRequest();
         donationRequest.setManagerId("manager-1");
+        donationRequest.setEventId(101L);
         donationRequest.setClientDonationId("mobile-donation-1");
         donationRequest.setAmountVnd(100_000L);
         donationRequest.setMessage("Keep going");
 
+        var donation = donationService.createSuccessfulMockDonation("donor-1", donationRequest);
         donationService.createSuccessfulMockDonation("donor-1", donationRequest);
-        donationService.createSuccessfulMockDonation("donor-1", donationRequest);
+
+        assertThat(donation.getEventId()).isEqualTo(101L);
+        assertThat(donationService.listMyEventDonations("donor-1", 101L)).hasSize(1);
+        assertThat(donationService.getMyEventDonationSummary("donor-1", 101L).getTotalSucceededAmountVnd())
+                .isEqualTo(100_000L);
 
         var balance = donationService.getManagerBalance("manager-1", "MANAGER", "manager-1");
         assertThat(balance.getTotalReceivedVnd()).isEqualTo(100_000L);

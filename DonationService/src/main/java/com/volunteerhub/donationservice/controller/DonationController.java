@@ -5,6 +5,7 @@ import com.volunteerhub.donationservice.dto.CreatePayoutRequest;
 import com.volunteerhub.donationservice.dto.CreateVnpayDonationRequest;
 import com.volunteerhub.donationservice.dto.CreateVnpayDonationResponse;
 import com.volunteerhub.donationservice.dto.DonationResponse;
+import com.volunteerhub.donationservice.dto.EventDonationSummaryResponse;
 import com.volunteerhub.donationservice.dto.ManagerBalanceResponse;
 import com.volunteerhub.donationservice.dto.PayoutRequestResponse;
 import com.volunteerhub.donationservice.dto.ReviewPayoutRequest;
@@ -16,11 +17,14 @@ import com.volunteerhub.donationservice.service.VnpayService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
@@ -50,17 +54,38 @@ public class DonationController {
     }
 
     @GetMapping("/vnpay/return")
-    public Map<String, Object> handleVnpayReturn(@RequestParam Map<String, String> params) {
-        return Map.of(
-                "orderId", params.getOrDefault("vnp_TxnRef", ""),
-                "status", vnpayService.getReturnStatus(params),
-                "responseCode", params.getOrDefault("vnp_ResponseCode", "")
-        );
+    public ResponseEntity<Void> handleVnpayReturn(@RequestParam Map<String, String> params) {
+        VnpayService.VnpayReturnResult result = vnpayService.handleReturn(params);
+        return ResponseEntity.status(HttpStatus.FOUND)
+                .location(URI.create(vnpayService.buildMobileReturnRedirect(result)))
+                .build();
     }
 
     @GetMapping("/me")
     public List<DonationResponse> listMyDonations() {
         return donationService.listMyDonations(currentUserId());
+    }
+
+    @GetMapping("/me/events/{eventId}/donations")
+    public List<DonationResponse> listMyEventDonations(@PathVariable Long eventId) {
+        return donationService.listMyEventDonations(currentUserId(), eventId);
+    }
+
+    @GetMapping("/me/events/{eventId}/summary")
+    public EventDonationSummaryResponse getMyEventDonationSummary(@PathVariable Long eventId) {
+        return donationService.getMyEventDonationSummary(currentUserId(), eventId);
+    }
+
+    @GetMapping("/events/{eventId}/donations")
+    @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN')")
+    public List<DonationResponse> listEventDonations(@PathVariable Long eventId) {
+        return donationService.listEventDonations(currentUserId(), currentRole(), eventId);
+    }
+
+    @GetMapping("/events/{eventId}/summary")
+    @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN')")
+    public EventDonationSummaryResponse getEventDonationSummary(@PathVariable Long eventId) {
+        return donationService.getEventDonationSummary(currentUserId(), currentRole(), eventId);
     }
 
     @GetMapping("/{donationId}")

@@ -12,6 +12,9 @@ public class CreateVnpayDonationRequest {
     @NotBlank
     private String managerId;
 
+    @NotNull
+    private Long eventId;
+
     @NotBlank
     @Size(max = 80)
     private String clientDonationId;

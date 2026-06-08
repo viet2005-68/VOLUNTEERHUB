@@ -54,6 +54,7 @@ data:
   VNPAY_PAYMENT_URL: "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
   VNPAY_RETURN_URL: "https://volunteerhub.duckdns.org/api/v1/donations/vnpay/return"
   VNPAY_IPN_URL: "https://volunteerhub.duckdns.org/api/v1/donations/vnpay/ipn"
+  VNPAY_MOBILE_RETURN_URL: "volunteerhub://donations/vnpay-return"
 ---
 apiVersion: v1
 kind: Secret
