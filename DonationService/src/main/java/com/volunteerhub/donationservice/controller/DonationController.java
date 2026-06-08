@@ -4,6 +4,7 @@ import com.volunteerhub.donationservice.dto.CreateMockDonationRequest;
 import com.volunteerhub.donationservice.dto.CreatePayoutRequest;
 import com.volunteerhub.donationservice.dto.CreateVnpayDonationRequest;
 import com.volunteerhub.donationservice.dto.CreateVnpayDonationResponse;
+import com.volunteerhub.donationservice.dto.DonationAnalyticsResponse;
 import com.volunteerhub.donationservice.dto.DonationResponse;
 import com.volunteerhub.donationservice.dto.EventDonationSummaryResponse;
 import com.volunteerhub.donationservice.dto.ManagerBalanceResponse;
@@ -99,10 +100,28 @@ public class DonationController {
         return donationService.getManagerBalance(currentUserId(), currentRole(), currentUserId());
     }
 
+    @GetMapping("/managers/me/summary")
+    @PreAuthorize("hasRole('MANAGER')")
+    public DonationAnalyticsResponse getMyManagerDonationSummary() {
+        return donationService.getManagerDonationAnalytics(currentUserId(), currentRole(), currentUserId());
+    }
+
     @GetMapping("/managers/{managerId}/balance")
     @PreAuthorize("hasRole('ADMIN')")
     public ManagerBalanceResponse getManagerBalance(@PathVariable String managerId) {
         return donationService.getManagerBalance(currentUserId(), currentRole(), managerId);
+    }
+
+    @GetMapping("/managers/{managerId}/summary")
+    @PreAuthorize("hasRole('ADMIN')")
+    public DonationAnalyticsResponse getManagerDonationSummary(@PathVariable String managerId) {
+        return donationService.getManagerDonationAnalytics(currentUserId(), currentRole(), managerId);
+    }
+
+    @GetMapping("/admin/summary")
+    @PreAuthorize("hasRole('ADMIN')")
+    public DonationAnalyticsResponse getPlatformDonationSummary() {
+        return donationService.getPlatformDonationAnalytics(currentRole());
     }
 
     @GetMapping("/managers/me/donations")

@@ -47,6 +47,14 @@ class DonationServiceApplicationTests {
         assertThat(donationService.getMyEventDonationSummary("donor-1", 101L).getTotalSucceededAmountVnd())
                 .isEqualTo(100_000L);
 
+        var managerSummary = donationService.getManagerDonationAnalytics("manager-1", "MANAGER", "manager-1");
+        assertThat(managerSummary.getTotalSucceededAmountVnd()).isEqualTo(100_000L);
+        assertThat(managerSummary.getSucceededDonationCount()).isEqualTo(1L);
+
+        var platformSummary = donationService.getPlatformDonationAnalytics("ADMIN");
+        assertThat(platformSummary.getTotalSucceededAmountVnd()).isGreaterThanOrEqualTo(100_000L);
+        assertThat(platformSummary.getSucceededDonationCount()).isGreaterThanOrEqualTo(1L);
+
         var balance = donationService.getManagerBalance("manager-1", "MANAGER", "manager-1");
         assertThat(balance.getTotalReceivedVnd()).isEqualTo(100_000L);
         assertThat(balance.getAvailableVnd()).isEqualTo(100_000L);

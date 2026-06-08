@@ -1,6 +1,7 @@
 package com.volunteerhub.donationservice.service;
 
 import com.volunteerhub.donationservice.dto.CreateMockDonationRequest;
+import com.volunteerhub.donationservice.dto.DonationAnalyticsResponse;
 import com.volunteerhub.donationservice.dto.DonationResponse;
 import com.volunteerhub.donationservice.dto.EventDonationSummaryResponse;
 import com.volunteerhub.donationservice.dto.ManagerBalanceResponse;
@@ -141,6 +142,30 @@ public class DonationService {
         return toBalanceResponse(getOrNewBalance(managerId));
     }
 
+    @Transactional(readOnly = true)
+    public DonationAnalyticsResponse getManagerDonationAnalytics(String currentUserId, String role, String managerId) {
+        if (!isAdmin(role) && !currentUserId.equals(managerId)) {
+            throw new AccessDeniedException("Managers can only view their own donation analytics.");
+        }
+        return buildManagerAnalytics(managerId);
+    }
+
+    @Transactional(readOnly = true)
+    public DonationAnalyticsResponse getPlatformDonationAnalytics(String role) {
+        if (!isAdmin(role)) {
+            throw new AccessDeniedException("Only admins can view platform donation analytics.");
+        }
+        return DonationAnalyticsResponse.builder()
+                .managerId(null)
+                .totalSucceededAmountVnd(sumOrZero(donationRepository.sumAmountByStatus(DonationStatus.SUCCEEDED)))
+                .succeededDonationCount(donationRepository.countByStatus(DonationStatus.SUCCEEDED))
+                .pendingAmountVnd(sumOrZero(donationRepository.sumAmountByStatus(DonationStatus.PENDING)))
+                .pendingDonationCount(donationRepository.countByStatus(DonationStatus.PENDING))
+                .failedDonationCount(donationRepository.countByStatus(DonationStatus.FAILED))
+                .totalDonationCount(donationRepository.count())
+                .build();
+    }
+
     @Transactional
     public DonationResponse markDonationSucceeded(Long donationId, String providerTransactionId) {
         Donation donation = donationRepository.findById(donationId)
@@ -211,6 +236,27 @@ public class DonationService {
                 .paidOutVnd(balance.getPaidOutVnd())
                 .availableVnd(balance.availableVnd())
                 .build();
+    }
+
+    private DonationAnalyticsResponse buildManagerAnalytics(String managerId) {
+        return DonationAnalyticsResponse.builder()
+                .managerId(managerId)
+                .totalSucceededAmountVnd(sumOrZero(donationRepository.sumAmountByManagerIdAndStatus(
+                        managerId, DonationStatus.SUCCEEDED)))
+                .succeededDonationCount(donationRepository.countByManagerIdAndStatus(
+                        managerId, DonationStatus.SUCCEEDED))
+                .pendingAmountVnd(sumOrZero(donationRepository.sumAmountByManagerIdAndStatus(
+                        managerId, DonationStatus.PENDING)))
+                .pendingDonationCount(donationRepository.countByManagerIdAndStatus(
+                        managerId, DonationStatus.PENDING))
+                .failedDonationCount(donationRepository.countByManagerIdAndStatus(
+                        managerId, DonationStatus.FAILED))
+                .totalDonationCount(donationRepository.countByManagerId(managerId))
+                .build();
+    }
+
+    private Long sumOrZero(Long value) {
+        return value == null ? 0L : value;
     }
 
     private DonationResponse toDonationResponse(Donation donation) {

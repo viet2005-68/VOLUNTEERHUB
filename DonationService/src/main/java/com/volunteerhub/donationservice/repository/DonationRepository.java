@@ -29,6 +29,12 @@ public interface DonationRepository extends JpaRepository<Donation, Long> {
 
     long countByEventIdAndStatus(Long eventId, DonationStatus status);
 
+    long countByStatus(DonationStatus status);
+
+    long countByManagerIdAndStatus(String managerId, DonationStatus status);
+
+    long countByManagerId(String managerId);
+
     @Query("""
             select coalesce(sum(d.amountVnd), 0)
             from Donation d
@@ -48,4 +54,20 @@ public interface DonationRepository extends JpaRepository<Donation, Long> {
             """)
     Long sumAmountByEventIdAndStatus(@Param("eventId") Long eventId,
                                      @Param("status") DonationStatus status);
+
+    @Query("""
+            select coalesce(sum(d.amountVnd), 0)
+            from Donation d
+            where d.status = :status
+            """)
+    Long sumAmountByStatus(@Param("status") DonationStatus status);
+
+    @Query("""
+            select coalesce(sum(d.amountVnd), 0)
+            from Donation d
+            where d.managerId = :managerId
+              and d.status = :status
+            """)
+    Long sumAmountByManagerIdAndStatus(@Param("managerId") String managerId,
+                                       @Param("status") DonationStatus status);
 }
